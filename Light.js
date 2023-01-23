@@ -39,6 +39,7 @@ class LightCore
         this.light.shadow.camera.right = 20
         this.light.shadow.camera.bottom = -20
         this.light.shadow.camera.top = 20
+        this.light.shadow.bias = -0.0001
         this.gizmo = new THREE.CameraHelper(this.light.shadow.camera)
         const material = new THREE.MeshBasicMaterial({color: 0xFCE570})
         const geometry = new THREE.SphereGeometry(size, 64, 32)
