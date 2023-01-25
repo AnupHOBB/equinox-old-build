@@ -1,14 +1,16 @@
 import * as THREE from 'three'
 import { GLTFLoader } from 'gltf-loader'
-import { MouseEvent } from './MouseEvent.js'
 import { SceneManager } from './SceneManager.js'
 import { MATHS } from './Maths.js'
-import { OrbitControl } from './OrbitControl.js'
+import { CameraManager, CAMERA_TYPE } from './CameraManager.js'
 import { Light } from './Light.js'
+import { Color } from 'three'
+
+const DEBUG = false
 
 window.onload = () =>
 {
-    const lookAtPosition = new THREE.Vector3(0, -1, -5)
+    const lookAtPosition = new THREE.Vector3(0, 0, -5)
     
     let axis = new THREE.Vector3(0, -1, 0)
     axis.applyAxisAngle(new THREE.Vector3(0, 0, -1), MATHS.toRadians(20))
@@ -18,25 +20,23 @@ window.onload = () =>
     const nearPlane = 0.1
     const farPlane = 1000
     let camera = new THREE.PerspectiveCamera(fov, aspectRatio, nearPlane, farPlane)
-
-    const cameraOrbiter = new OrbitControl(camera, axis, lookAtPosition)
     
     const canvas = document.querySelector('canvas')
+    const cameraManager = new CameraManager(canvas, camera)
+    cameraManager.setType((DEBUG)?CAMERA_TYPE.firstPerson:CAMERA_TYPE.orbit)
+
     const sceneManager = new SceneManager(canvas, camera, ()=>{})
 
     const modelURL = './assets/LouveredRoof.glb'
     new GLTFLoader().load(modelURL, (model)=>onModelLoad(model), (p)=>{}, (e)=>console.log(e))
-    
-    const mouseEvent = new MouseEvent(canvas, (dx, dy)=>cameraOrbiter.pan(dx))
-    mouseEvent.setSensitivity(0.5)
-    mouseEvent.registerDoubleClickEvent(onDoubleClick)
 
-    let lightPosition = new THREE.Vector3(0, 400, 800)
+    let lightPosition = new THREE.Vector3(0, 150, 100)
 
-    let light = new Light(lightPosition, 25, lookAtPosition)
-    light.addToScene(sceneManager, false)
+    let light = new Light(lightPosition, 5, lookAtPosition)
+    light.addToScene(sceneManager, DEBUG)
 
     let material = new THREE.MeshLambertMaterial({color: 0x44aa88})
+
     let geometry = new THREE.BoxGeometry(100, 0.1, 100)
     let floor = new THREE.Mesh(geometry, material)
     floor.receiveShadow = true
@@ -44,27 +44,27 @@ window.onload = () =>
 
     sceneManager.add(floor)
 
+    let ambientLight = new THREE.AmbientLight(0xffffff, 0.8)
+    sceneManager.add(ambientLight)
+
+    let texture = new THREE.TextureLoader().load('assets/fire.jpg')
+    texture.wrapS = THREE.ClampToEdgeWrapping
+    texture.wrapT = THREE.ClampToEdgeWrapping
+
     let gltfModel
 
     function onModelLoad(model)
     {
         gltfModel = model.scene.children[0]
         gltfModel.children.forEach(mesh=>{
+            mesh.material.shadowSide = THREE.BackSide
             mesh.receiveShadow = true
             mesh.castShadow = true
+            mesh.material.map = texture
+            mesh.material.color = new Color(0.5, 0.5, 0.5)
         })
         gltfModel.position.set(2, -2, -3)
-        gltfModel.receiveShadow = true
-        gltfModel.castShadow = true
         sceneManager.add(gltfModel)
-    }
-
-    function onDoubleClick(event, flag)
-    {
-        if (flag)
-            cameraOrbiter.start(60)
-        else
-            cameraOrbiter.stop()
     }
 
     let prevSliderValue = 0
