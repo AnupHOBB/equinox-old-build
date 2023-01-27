@@ -2,7 +2,8 @@ import * as THREE from 'three'
 import { OrbitControl } from './OrbitControl.js'
 import { KeyEvent } from './KeyEvent.js'
 import { MouseEvent } from './MouseEvent.js'
-import { MATHS } from './Maths.js'
+import { MATHS } from './maths.js'
+import { MATRIX } from './matrix.js'
 
 export const CAMERA_TYPE =
 {
@@ -12,9 +13,9 @@ export const CAMERA_TYPE =
 
 export class CameraManager
 {
-    constructor(canvas, camera)
+    constructor(canvas, camera, axis, lookAtPosition)
     {
-        this.core = new CameraManagerCore(canvas, camera)
+        this.core = new CameraManagerCore(canvas, camera, axis, lookAtPosition)
     }
 
     setType(type)
@@ -31,26 +32,32 @@ export class CameraManager
         }
         else
             throw 'Invalid Camera type'
-    }   
+    } 
+    
+    worldToRaster(camera, worldPosition)
+    {
+        return this.core.worldToRaster(camera, worldPosition)
+    }
 }
 
 class CameraManagerCore
 {
-    constructor(canvas, camera)
+    constructor(canvas, camera, axis, lookAtPosition)
     {
         this.orbitSpeed = 60
-        this.lookAtPosition = new THREE.Vector3(camera.position.x, camera.position.y, camera.position.z - 5)
         this.type = CAMERA_TYPE.orbit
-        let axis = new THREE.Vector3(0, -1, 0)
-        axis.applyAxisAngle(new THREE.Vector3(0, 0, -1), MATHS.toRadians(20))
-
         this.camera = camera
         this.camera.rotation.order = 'YXZ'
-        this.cameraOrbiter = new OrbitControl(camera, axis, this.lookAtPosition)
+        this.cameraOrbiter = new OrbitControl(camera, axis, lookAtPosition)
         this.keyInput = new KeyEvent((w,s,a,d)=>this.onKeyinput(w,s,a,d))
-        this.mouseInput = new MouseEvent(canvas, (dx, dy) => this.onMouseInput(dx, dy))
+        this.mouseInput = new MouseEvent(canvas)
+        this.mouseInput.registerMoveEvent((dx, dy) => this.onMouseInput(dx, dy))
         this.mouseInput.setSensitivity(0.5)
         this.mouseInput.registerDoubleClickEvent((e, f) => this.onDoubleClick(e, f))
+        this.t = camera.near * Math.tan(MATHS.toRadians(camera.fov/2))
+        this.b = -this.t
+        this.r = this.t * camera.aspect
+        this.l = -this.r
     }
 
     onKeyinput(pressW, pressS, pressA, pressD) 
@@ -87,7 +94,7 @@ class CameraManagerCore
         }
     }
 
-    onMouseInput(deltaX, deltaY)
+    onMouseInput(deltaX, deltaY, x, y)
     {
         if (this.type == CAMERA_TYPE.firstPerson)
         {
@@ -109,5 +116,45 @@ class CameraManagerCore
             else
                 this.cameraOrbiter.stop()
         }
+    }
+
+    worldToRaster(camera, worldPosition)
+    {
+        let viewMatrix = this.getViewMatrix(camera)
+        let viewPosition = MATRIX.mat4XVec3(viewMatrix, worldPosition)
+        if (viewPosition.z < camera.near || viewPosition.z > camera.far)
+            return [, false]
+        let projectedX = (camera.near * viewPosition.x)/viewPosition.z
+        let projectedY = (camera.near * viewPosition.y)/viewPosition.z
+        if (projectedX < this.l || projectedX > this.r)
+            return [, false]
+        if (projectedY < this.b || projectedY > this.t)
+            return [, false]
+        let rasterX = (window.innerWidth * (projectedX - this.l))/(this.r - this.l)
+        let rasterY = (window.innerHeight * (this.t - projectedY))/(this.t - this.b)
+        return [{ x: rasterX, y: rasterY }, true]
+    }
+
+    getViewMatrix(camera)
+    {
+        let front = new THREE.Vector3()
+        camera.getWorldDirection(front)
+        let right = MATHS.cross(front, new THREE.Vector3(0, 1, 0))
+        let up = MATHS.cross(right, front)
+        let viewMatrixRotation =
+        [
+            [ right.x, right.y, right.z, 0 ],
+            [ up.x, up.y, up.z, 0 ],
+            [ front.x, front.y, front.z, 0],
+            [ 0, 0, 0, 1 ]
+        ]
+        let viewMatrixTranslation =
+        [
+            [ 1, 0, 0, -camera.position.x ],
+            [ 0, 1, 0, -camera.position.y ],
+            [ 0, 0, 1, -camera.position.z ],
+            [ 0, 0, 0, 1 ]
+        ]
+        return MATRIX.mat4Xmat4(viewMatrixRotation, viewMatrixTranslation)
     }
 }

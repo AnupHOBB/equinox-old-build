@@ -1,17 +1,17 @@
 import * as THREE from 'three'
 import { GLTFLoader } from 'gltf-loader'
 import { SceneManager } from './SceneManager.js'
-import { MATHS } from './Maths.js'
 import { CameraManager, CAMERA_TYPE } from './CameraManager.js'
 import { Light } from './Light.js'
 import { Color } from 'three'
+import { VideoPlayer } from './VideoPlayer.js'
+import { MATHS } from './maths.js'
 
-const DEBUG = false
+const DEBUG = true
 
 window.onload = () =>
 {
     const lookAtPosition = new THREE.Vector3(0, 0, -5)
-    
     let axis = new THREE.Vector3(0, -1, 0)
     axis.applyAxisAngle(new THREE.Vector3(0, 0, -1), MATHS.toRadians(20))
 
@@ -22,10 +22,10 @@ window.onload = () =>
     let camera = new THREE.PerspectiveCamera(fov, aspectRatio, nearPlane, farPlane)
     
     const canvas = document.querySelector('canvas')
-    const cameraManager = new CameraManager(canvas, camera)
+    const cameraManager = new CameraManager(canvas, camera, axis, lookAtPosition)
     cameraManager.setType((DEBUG)?CAMERA_TYPE.firstPerson:CAMERA_TYPE.orbit)
 
-    const sceneManager = new SceneManager(canvas, camera, ()=>{})
+    const sceneManager = new SceneManager(canvas, camera, onSceneRender)
 
     const modelURL = './assets/LouveredRoof.glb'
     new GLTFLoader().load(modelURL, (model)=>onModelLoad(model), (p)=>{}, (e)=>console.log(e))
@@ -60,8 +60,8 @@ window.onload = () =>
             mesh.material.shadowSide = THREE.BackSide
             mesh.receiveShadow = true
             mesh.castShadow = true
-            mesh.material.map = texture
-            mesh.material.color = new Color(0.5, 0.5, 0.5)
+            //mesh.material.map = texture
+            //mesh.material.color = new Color(0.5, 0.5, 0.5)
         })
         gltfModel.position.set(2, -2, -3)
         sceneManager.add(gltfModel)
@@ -76,5 +76,58 @@ window.onload = () =>
     {
         light.orbit(prevSliderValue - value)
         prevSliderValue = value
+    }
+    
+    let img = document.createElement('img')
+    img.src = 'assets/hotspot.png'
+    img.onclick = onClick
+
+    let videoPlayer = new VideoPlayer('./assets/vid.mp4', 480, 270)
+    let isShowing = false
+
+    function onClick(event)
+    {
+        if (!isShowing)
+        {
+            videoPlayer.setLocation(event.clientX, event.clientY)
+            videoPlayer.show()
+            isShowing = true
+        }
+    }
+
+    let lastRasterCoord = { x: -1, y: -1 }
+    let isHotSpotVisible = false
+
+    function onSceneRender()
+    {
+        if (gltfModel != undefined && img != undefined)
+        {
+            let [rasterCoord, isVisible] = cameraManager.worldToRaster(camera, gltfModel.position)
+            if (isVisible)
+            {
+                if (lastRasterCoord.x < 0 && lastRasterCoord.y < 0)
+                    lastRasterCoord = rasterCoord
+                img.style = 'position: absolute; top: '+rasterCoord.y+'; left: '+rasterCoord.x+'; width: 3%; height: auto;'
+                if (!isHotSpotVisible)
+                {
+                    document.body.appendChild(img)
+                    isHotSpotVisible = true
+                }
+                if (isShowing && (lastRasterCoord.x != rasterCoord.x || lastRasterCoord.y != rasterCoord.y))
+                {
+                    videoPlayer.hide()
+                    isShowing = false
+                }
+                lastRasterCoord = rasterCoord
+            }
+            else
+            {    
+                if (isHotSpotVisible)
+                {
+                    document.body.removeChild(img)
+                    isHotSpotVisible = false
+                }
+            }
+        }
     }
 }

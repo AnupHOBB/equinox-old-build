@@ -1,51 +1,73 @@
+let core = null
+
 export class MouseEvent
 {
-    constructor(canvas, onMoveCallback)
+    constructor(canvas)
     {
-        this.core = new MouseEventCore(canvas, onMoveCallback)
+        if (core == null)
+            core = new MouseEventCore(canvas)
     }
 
     setSensitivity(sensitivity)
     {
-        this.core.sensitivity = sensitivity
+        if (sensitivity != null && sensitivity != undefined)
+            core.sensitivity = sensitivity
+    }
+
+    registerClickEvent(onClick)
+    {
+        if (onClick != null && onClick != undefined)
+            core.clickCallbacks.push(onClick)
+    }
+
+    registerMoveEvent(onMoveClick)
+    {
+        if (onMoveClick != null && onMoveClick != undefined)
+            core.moveCallbacks.push(onMoveClick)
     }
 
     registerDoubleClickEvent(onDblClick)
     {
-        this.core.registerDoubleClickEvent(onDblClick)
+        if (onDblClick != null && onDblClick != undefined)
+            core.dblClickCallbacks.push(onDblClick)
     }
 
     enable()
     {
-        this.core.enable = true
+        core.enable = true
     }
 
     disable()
     {
-        this.core.enable = false
+        core.enable = false
     }
 }
 
 class MouseEventCore
 {
-    constructor(canvas, onMoveCallback)
+    constructor(canvas)
     {
         this.mousePress = false
         this.enable = true
         this.firstClick = true
         this.lastXY = { x: 0, y: 0 }
-        this.onMoveCallback = onMoveCallback
         this.sensitivity = 1
         this.canvas = canvas
         this.dblClickCounter = 0
+        this.clickCallbacks = []
+        this.moveCallbacks = []
+        this.dblClickCallbacks = []
         this.canvas.addEventListener('mousedown', e=>this.onPress(e))
         this.canvas.addEventListener('mouseup', e=>this.onRelease(e))
         this.canvas.addEventListener('mousemove', e=>this.onMove(e))
+        this.canvas.addEventListener('click', e=>this.onClick(e))
+        this.canvas.addEventListener('dblclick', e=>this.onDblClick(e))
     }
 
-    registerDoubleClickEvent(onDblClickCallback)
+    onClick(event)
     {
-        this.canvas.addEventListener('dblclick', e=>this.onDblClick(e, onDblClickCallback))
+        for (let clickCallback of this.clickCallbacks)
+            clickCallback(event.clientX, event.clientY)
     }
     
     onPress(event)
@@ -72,16 +94,18 @@ class MouseEventCore
             this.currentXY = { x: event.clientX, y: event.clientY }
             let deltaX = (this.currentXY.x - this.lastXY.x) * this.sensitivity
             let deltaY = (this.currentXY.y - this.lastXY.y) * this.sensitivity
-            this.onMoveCallback(deltaX, deltaY)
+            for (let moveCallback of this.moveCallbacks)
+                moveCallback(deltaX, deltaY, event.clientX, event.clientY)
             this.lastXY = this.currentXY
         }
     }
 
-    onDblClick(event, onDblClickCallback)
+    onDblClick(event)
     {
         this.dblClickCounter++
         if (this.dblClickCounter == 2)
             this.dblClickCounter = 0
-        onDblClickCallback(event, this.dblClickCounter == 1)
+        for (let dblClickCallback of this.dblClickCallbacks)
+            dblClickCallback(event, this.dblClickCounter == 1)
     }
 }
