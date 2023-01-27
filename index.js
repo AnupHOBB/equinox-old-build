@@ -83,15 +83,15 @@ window.onload = () =>
     img.onclick = onClick
 
     let videoPlayer = new VideoPlayer('./assets/vid.mp4', 480, 270)
-    let isShowing = false
+    let isVideoShowing = false
 
     function onClick(event)
     {
-        if (!isShowing)
+        if (!isVideoShowing)
         {
             videoPlayer.setLocation(event.clientX, event.clientY)
             videoPlayer.show()
-            isShowing = true
+            isVideoShowing = true
         }
     }
 
@@ -113,10 +113,10 @@ window.onload = () =>
                     document.body.appendChild(img)
                     isHotSpotVisible = true
                 }
-                if (isShowing && (lastRasterCoord.x != rasterCoord.x || lastRasterCoord.y != rasterCoord.y))
+                if (isVideoShowing && (lastRasterCoord.x != rasterCoord.x || lastRasterCoord.y != rasterCoord.y))
                 {
                     videoPlayer.hide()
-                    isShowing = false
+                    isVideoShowing = false
                 }
                 lastRasterCoord = rasterCoord
             }

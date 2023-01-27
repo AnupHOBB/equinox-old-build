@@ -34,5 +34,10 @@ export const MATHS =
     toDegrees : function(radians)
     {
         return (radians * 7 * 180)/22
+    },
+
+    dot : function (v1, v2)
+    {
+        return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z 
     }
 }

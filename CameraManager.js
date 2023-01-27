@@ -54,10 +54,10 @@ class CameraManagerCore
         this.mouseInput.registerMoveEvent((dx, dy) => this.onMouseInput(dx, dy))
         this.mouseInput.setSensitivity(0.5)
         this.mouseInput.registerDoubleClickEvent((e, f) => this.onDoubleClick(e, f))
-        this.t = camera.near * Math.tan(MATHS.toRadians(camera.fov/2))
-        this.b = -this.t
-        this.r = this.t * camera.aspect
-        this.l = -this.r
+        this.screenTopBound = camera.near * Math.tan(MATHS.toRadians(camera.fov/2))
+        this.screenBottomBound = -this.screenTopBound
+        this.screenRightBound = this.screenTopBound * camera.aspect
+        this.screenLeftBound = -this.screenRightBound
     }
 
     onKeyinput(pressW, pressS, pressA, pressD) 
@@ -126,12 +126,12 @@ class CameraManagerCore
             return [, false]
         let projectedX = (camera.near * viewPosition.x)/viewPosition.z
         let projectedY = (camera.near * viewPosition.y)/viewPosition.z
-        if (projectedX < this.l || projectedX > this.r)
+        if (projectedX < this.screenLeftBound || projectedX > this.screenRightBound)
             return [, false]
-        if (projectedY < this.b || projectedY > this.t)
+        if (projectedY < this.screenBottomBound || projectedY > this.screenTopBound)
             return [, false]
-        let rasterX = (window.innerWidth * (projectedX - this.l))/(this.r - this.l)
-        let rasterY = (window.innerHeight * (this.t - projectedY))/(this.t - this.b)
+        let rasterX = (window.innerWidth * (projectedX - this.screenLeftBound))/(this.screenRightBound - this.screenLeftBound)
+        let rasterY = (window.innerHeight * (this.screenTopBound - projectedY))/(this.screenTopBound - this.screenBottomBound)
         return [{ x: rasterX, y: rasterY }, true]
     }
 
@@ -141,20 +141,11 @@ class CameraManagerCore
         camera.getWorldDirection(front)
         let right = MATHS.cross(front, new THREE.Vector3(0, 1, 0))
         let up = MATHS.cross(right, front)
-        let viewMatrixRotation =
-        [
-            [ right.x, right.y, right.z, 0 ],
-            [ up.x, up.y, up.z, 0 ],
-            [ front.x, front.y, front.z, 0],
+        return [
+            [ right.x, right.y, right.z, -MATHS.dot(camera.position, right) ],
+            [ up.x, up.y, up.z, -MATHS.dot(camera.position, up) ],
+            [ front.x, front.y, front.z, -MATHS.dot(camera.position, front)],
             [ 0, 0, 0, 1 ]
         ]
-        let viewMatrixTranslation =
-        [
-            [ 1, 0, 0, -camera.position.x ],
-            [ 0, 1, 0, -camera.position.y ],
-            [ 0, 0, 1, -camera.position.z ],
-            [ 0, 0, 0, 1 ]
-        ]
-        return MATRIX.mat4Xmat4(viewMatrixRotation, viewMatrixTranslation)
     }
 }
