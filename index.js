@@ -107,7 +107,7 @@ window.onload = () =>
             {
                 if (lastRasterCoord.x < 0 && lastRasterCoord.y < 0)
                     lastRasterCoord = rasterCoord
-                img.style = 'position: absolute; top: '+rasterCoord.y+'; left: '+rasterCoord.x+'; width: 3%; height: auto;'
+                img.style = 'position: absolute; top: '+rasterCoord.y+'; left: '+rasterCoord.x+'; width: 3%; height: auto; user-select: none;'
                 if (!isHotSpotVisible)
                 {
                     document.body.appendChild(img)
