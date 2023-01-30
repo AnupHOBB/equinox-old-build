@@ -13,9 +13,9 @@ export const CAMERA_TYPE =
 
 export class CameraManager
 {
-    constructor(canvas, camera, axis, lookAtPosition)
+    constructor(canvas, camera, axis, lookAtPosition, sceneManager)
     {
-        this.core = new CameraManagerCore(canvas, camera, axis, lookAtPosition)
+        this.core = new CameraManagerCore(canvas, camera, axis, lookAtPosition, sceneManager)
     }
 
     setType(type)
@@ -42,7 +42,7 @@ export class CameraManager
 
 class CameraManagerCore
 {
-    constructor(canvas, camera, axis, lookAtPosition)
+    constructor(canvas, camera, axis, lookAtPosition, sceneManager)
     {
         this.orbitSpeed = 60
         this.type = CAMERA_TYPE.orbit
@@ -58,6 +58,7 @@ class CameraManagerCore
         this.screenBottomBound = -this.screenTopBound
         this.screenRightBound = this.screenTopBound * camera.aspect
         this.screenLeftBound = -this.screenRightBound
+        this.sceneManager = sceneManager
     }
 
     onKeyinput(pressW, pressS, pressA, pressD) 
@@ -118,33 +119,39 @@ class CameraManagerCore
         }
     }
 
-    worldToRaster(camera, worldPosition)
+    worldToRaster(worldPosition)
     {
-        let viewMatrix = this.getViewMatrix(camera)
+        let viewMatrix = this.getViewMatrix(this.camera)
         let viewPosition = MATRIX.mat4XVec3(viewMatrix, worldPosition)
-        if (viewPosition.z < camera.near || viewPosition.z > camera.far)
+        if (viewPosition.z < this.camera.near || viewPosition.z > this.camera.far)
             return [, false]
-        let projectedX = (camera.near * viewPosition.x)/viewPosition.z
-        let projectedY = (camera.near * viewPosition.y)/viewPosition.z
+        let projectedX = (this.camera.near * viewPosition.x)/viewPosition.z
+        let projectedY = (this.camera.near * viewPosition.y)/viewPosition.z
         if (projectedX < this.screenLeftBound || projectedX > this.screenRightBound)
             return [, false]
         if (projectedY < this.screenBottomBound || projectedY > this.screenTopBound)
             return [, false]
         let rasterX = (window.innerWidth * (projectedX - this.screenLeftBound))/(this.screenRightBound - this.screenLeftBound)
         let rasterY = (window.innerHeight * (this.screenTopBound - projectedY))/(this.screenTopBound - this.screenBottomBound)
+        let hitPointWorld = this.sceneManager.raycast({ x: rasterX, y: rasterY })
+        if (hitPointWorld == undefined)
+            return [{ x: rasterX, y: rasterY }, true] 
+        let hitPointView = MATRIX.mat4XVec3(viewMatrix, hitPointWorld)
+        if (viewPosition.z > hitPointView.z)
+            return [, false]
         return [{ x: rasterX, y: rasterY }, true]
     }
 
-    getViewMatrix(camera)
+    getViewMatrix()
     {
         let front = new THREE.Vector3()
-        camera.getWorldDirection(front)
+        this.camera.getWorldDirection(front)
         let right = MATHS.cross(front, new THREE.Vector3(0, 1, 0))
         let up = MATHS.cross(right, front)
         return [
-            [ right.x, right.y, right.z, -MATHS.dot(camera.position, right) ],
-            [ up.x, up.y, up.z, -MATHS.dot(camera.position, up) ],
-            [ front.x, front.y, front.z, -MATHS.dot(camera.position, front)],
+            [ right.x, right.y, right.z, -MATHS.dot(this.camera.position, right) ],
+            [ up.x, up.y, up.z, -MATHS.dot(this.camera.position, up) ],
+            [ front.x, front.y, front.z, -MATHS.dot(this.camera.position, front)],
             [ 0, 0, 0, 1 ]
         ]
     }

@@ -47,7 +47,7 @@ class VideoPlayerCore
             xPosition -= this.video.width
         if (yBound > window.innerHeight)
             yPosition -= this.video.height
-        this.video.style = this.toCssFormat(xPosition, yPosition)
+        this.video.style = 'position: absolute; top : '+yPosition+'; left: '+xPosition+';'
     }
 
     show()
@@ -64,10 +64,5 @@ class VideoPlayerCore
     {
         document.body.removeChild(this.video)
         this.isShowing = false
-    }
-
-    toCssFormat(xPosition, yPosition)
-    {
-        return 'position: absolute; top : '+yPosition+'; left: '+xPosition+';'
     }
 }

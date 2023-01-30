@@ -11,6 +11,11 @@ export class SceneManager
     {
         this.core.add(sceneObject)
     }
+
+    raycast(rasterCoord)
+    {
+        return this.core.raycast(rasterCoord)
+    }
 }
 
 class SceneCore
@@ -42,5 +47,15 @@ class SceneCore
         this.renderer.setSize(window.innerWidth, window.innerHeight)
         this.renderer.render(this.scene, this.camera)
         this.onRenderCallback()
+    }
+
+    raycast(rasterCoord)
+    {
+        let screenSpaceX = (rasterCoord.x / window.innerWidth) *  2 - 1
+        let screenSpaceY = -(rasterCoord.y / window.innerHeight) *  2 + 1
+        let rayCaster = new THREE.Raycaster()
+        rayCaster.setFromCamera({ x: screenSpaceX, y: screenSpaceY }, this.camera)
+        let hitObjects = rayCaster.intersectObjects(this.scene.children)
+        return (hitObjects.length > 0) ? hitObjects[0].point : undefined
     }
 }

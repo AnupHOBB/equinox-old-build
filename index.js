@@ -22,10 +22,11 @@ window.onload = () =>
     let camera = new THREE.PerspectiveCamera(fov, aspectRatio, nearPlane, farPlane)
     
     const canvas = document.querySelector('canvas')
-    const cameraManager = new CameraManager(canvas, camera, axis, lookAtPosition)
-    cameraManager.setType((DEBUG)?CAMERA_TYPE.firstPerson:CAMERA_TYPE.orbit)
 
     const sceneManager = new SceneManager(canvas, camera, onSceneRender)
+
+    const cameraManager = new CameraManager(canvas, camera, axis, lookAtPosition, sceneManager)
+    cameraManager.setType((DEBUG)?CAMERA_TYPE.firstPerson:CAMERA_TYPE.orbit)
 
     const modelURL = './assets/LouveredRoof.glb'
     new GLTFLoader().load(modelURL, (model)=>onModelLoad(model), (p)=>{}, (e)=>console.log(e))
@@ -33,7 +34,7 @@ window.onload = () =>
     let lightPosition = new THREE.Vector3(0, 150, 100)
 
     let light = new Light(lightPosition, 5, lookAtPosition)
-    light.addToScene(sceneManager, DEBUG)
+    light.addToScene(sceneManager, false)
 
     let material = new THREE.MeshLambertMaterial({color: 0x44aa88})
 
@@ -102,12 +103,13 @@ window.onload = () =>
     {
         if (gltfModel != undefined && img != undefined)
         {
-            let [rasterCoord, isVisible] = cameraManager.worldToRaster(camera, gltfModel.position)
+            let targetWorldCoord = MATHS.addVectors(gltfModel.position, new THREE.Vector3(-2, 2.5, 0.1))
+            let [rasterCoord, isVisible] = cameraManager.worldToRaster(targetWorldCoord)
             if (isVisible)
             {
                 if (lastRasterCoord.x < 0 && lastRasterCoord.y < 0)
                     lastRasterCoord = rasterCoord
-                img.style = 'position: absolute; top: '+rasterCoord.y+'; left: '+rasterCoord.x+'; width: 3%; height: auto; user-select: none;'
+                img.style = 'position: absolute; top: '+(rasterCoord.y)+'; left: '+(rasterCoord.x)+'; width: 2%; height: auto; user-select: none;'
                 if (!isHotSpotVisible)
                 {
                     document.body.appendChild(img)
