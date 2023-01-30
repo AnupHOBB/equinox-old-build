@@ -7,9 +7,9 @@ export class SceneManager
         this.core = new SceneCore(canvas, camera, onRenderCallback)
     }
 
-    add(sceneObject)
+    add(sceneObject, shouldRayCast)
     {
-        this.core.add(sceneObject)
+        this.core.add(sceneObject, shouldRayCast)
     }
 
     raycast(rasterCoord)
@@ -28,12 +28,15 @@ class SceneCore
         this.scene = new THREE.Scene()
         this.camera = camera
         this.onRenderCallback = onRenderCallback
+        this.raycastObjects = []
         window.requestAnimationFrame(()=>this.animFrame())
     }
 
-    add(sceneObject)
+    add(sceneObject, shouldRayCast)
     {
         this.scene.add(sceneObject)
+        if (shouldRayCast)
+            this.raycastObjects.push(sceneObject)
     }
 
     animFrame()
@@ -55,7 +58,7 @@ class SceneCore
         let screenSpaceY = -(rasterCoord.y / window.innerHeight) *  2 + 1
         let rayCaster = new THREE.Raycaster()
         rayCaster.setFromCamera({ x: screenSpaceX, y: screenSpaceY }, this.camera)
-        let hitObjects = rayCaster.intersectObjects(this.scene.children)
+        let hitObjects = rayCaster.intersectObjects(this.raycastObjects)
         return (hitObjects.length > 0) ? hitObjects[0].point : undefined
     }
 }

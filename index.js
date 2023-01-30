@@ -43,7 +43,7 @@ window.onload = () =>
     floor.receiveShadow = true
     floor.position.set(0, -2, 0)
 
-    sceneManager.add(floor)
+    sceneManager.add(floor, false)
 
     let ambientLight = new THREE.AmbientLight(0xffffff, 0.8)
     sceneManager.add(ambientLight)
@@ -65,7 +65,13 @@ window.onload = () =>
             //mesh.material.color = new Color(0.5, 0.5, 0.5)
         })
         gltfModel.position.set(2, -2, -3)
-        sceneManager.add(gltfModel)
+        sceneManager.add(gltfModel, false)
+
+        let roofBoundMaterial = new THREE.MeshBasicMaterial({ transparent: true, opacity: 0 }) 
+        let roofBoundGeometery = new THREE.BoxGeometry(4.75, 0.5, 3.5)
+        let roofBound = new THREE.Mesh(roofBoundGeometery, roofBoundMaterial)
+        roofBound.position.set(-0.1, 0.5, -4.6)
+        sceneManager.add(roofBound, true)
     }
 
     let prevSliderValue = 0
@@ -103,13 +109,13 @@ window.onload = () =>
     {
         if (gltfModel != undefined && img != undefined)
         {
-            let targetWorldCoord = MATHS.addVectors(gltfModel.position, new THREE.Vector3(-2, 2.5, 0.1))
+            let targetWorldCoord = MATHS.addVectors(gltfModel.position, new THREE.Vector3(-2.15, 2.5, 0.2))
             let [rasterCoord, isVisible] = cameraManager.worldToRaster(targetWorldCoord)
             if (isVisible)
             {
                 if (lastRasterCoord.x < 0 && lastRasterCoord.y < 0)
                     lastRasterCoord = rasterCoord
-                img.style = 'position: absolute; top: '+(rasterCoord.y)+'; left: '+(rasterCoord.x)+'; width: 2%; height: auto; user-select: none;'
+                img.style = 'position: absolute; top: '+(rasterCoord.y)+'; left: '+(rasterCoord.x)+'; width: 3%; height: auto; user-select: none;'
                 if (!isHotSpotVisible)
                 {
                     document.body.appendChild(img)
