@@ -53,7 +53,7 @@ class LightCore
         sceneManager.add(this.light, false)
         sceneManager.add(this.mesh, false)
         if (showGizmo)
-            sceneManager.add(new THREE.CameraHelper(this.light.shadow.camera))
+            sceneManager.add(new THREE.CameraHelper(this.light.shadow.camera), false)
     }
 
     orbit(speed)

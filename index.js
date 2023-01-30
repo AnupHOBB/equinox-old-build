@@ -34,7 +34,7 @@ window.onload = () =>
     let lightPosition = new THREE.Vector3(0, 150, 100)
 
     let light = new Light(lightPosition, 5, lookAtPosition)
-    light.addToScene(sceneManager, false)
+    light.addToScene(sceneManager, DEBUG)
 
     let material = new THREE.MeshLambertMaterial({color: 0x44aa88})
 
@@ -43,7 +43,7 @@ window.onload = () =>
     floor.receiveShadow = true
     floor.position.set(0, -2, 0)
 
-    sceneManager.add(floor, false)
+    sceneManager.add(floor, true)
 
     let ambientLight = new THREE.AmbientLight(0xffffff, 0.8)
     sceneManager.add(ambientLight)
@@ -68,9 +68,9 @@ window.onload = () =>
         sceneManager.add(gltfModel, false)
 
         let roofBoundMaterial = new THREE.MeshBasicMaterial({ transparent: true, opacity: 0 }) 
-        let roofBoundGeometery = new THREE.BoxGeometry(4.75, 0.5, 3.5)
+        let roofBoundGeometery = new THREE.BoxGeometry(4.75, 0.5, 3.45)
         let roofBound = new THREE.Mesh(roofBoundGeometery, roofBoundMaterial)
-        roofBound.position.set(-0.1, 0.5, -4.6)
+        roofBound.position.set(-0.1, 0.5, -4.65)
         sceneManager.add(roofBound, true)
     }
 
@@ -109,7 +109,7 @@ window.onload = () =>
     {
         if (gltfModel != undefined && img != undefined)
         {
-            let targetWorldCoord = MATHS.addVectors(gltfModel.position, new THREE.Vector3(-2.15, 2.5, 0.2))
+            let targetWorldCoord = MATHS.addVectors(gltfModel.position, new THREE.Vector3(-2.15, 2.5, 0.1))
             let [rasterCoord, isVisible] = cameraManager.worldToRaster(targetWorldCoord)
             if (isVisible)
             {
