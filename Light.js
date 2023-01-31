@@ -50,8 +50,8 @@ class LightCore
 
     addToScene(sceneManager, showGizmo)
     {
-        sceneManager.add(this.light, false)
-        sceneManager.add(this.mesh, false)
+        sceneManager.add(this.light)
+        sceneManager.add(this.mesh)
         if (showGizmo)
             sceneManager.add(new THREE.CameraHelper(this.light.shadow.camera), false)
     }

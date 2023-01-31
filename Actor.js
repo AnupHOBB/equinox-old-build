@@ -17,9 +17,14 @@ export class BoxActor
         this.floor.position.set(x, y, z)
     }
 
-    addToScene(sceneManager, rayCastable)
+    addToScene(sceneManager)
     {
-        sceneManager.add(this.floor, rayCastable)
+        sceneManager.add(this.floor)
+    }
+
+    addToRaycast(raycast)
+    {
+        raycast.addObject(this.floor)
     }
 }
 
@@ -50,9 +55,9 @@ export class GLTFActor
         this.core.addHotSpots(imageUrl, onClick, onMove)
     }
 
-    onSceneRender(cameraManager)
+    onSceneRender(cameraManager, raycast)
     {
-        this.core.onSceneRender(cameraManager)
+        this.core.onSceneRender(cameraManager, raycast)
     }
 
     getPosition()
@@ -96,19 +101,19 @@ class GLTFActorCore
 
     addHotSpots(imageUrl, onClick, onMove)
     {
-        let position = MATHS.addVectors(this.gltfModel.position, new THREE.Vector3(-2.15, 2.7, 0.08))
+        let position = MATHS.addVectors(this.gltfModel.position, new THREE.Vector3(-2.15, 2.6, 0.08))
         this.hotspots.push(new Hotspot(imageUrl, position, onClick, onMove))
     }
 
-    onSceneRender(cameraManager)
+    onSceneRender(cameraManager, raycast)
     {
         if (this.hotspots.length > 0)
         {
             for (let hotSpot of this.hotspots)
             {
-                let [rasterCoord, isVisible] = cameraManager.worldToRaster(hotSpot.getWorldPosition())
-                if (isVisible)
-                {
+                let [rasterCoord, isValid] = cameraManager.worldToRaster(hotSpot.getWorldPosition(), raycast)
+                if (isValid)
+                {        
                     hotSpot.setRasterCoordinates(rasterCoord.x, rasterCoord.y)
                     hotSpot.show()
                 }

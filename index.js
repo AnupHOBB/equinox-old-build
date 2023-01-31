@@ -5,6 +5,8 @@ import { Light } from './Light.js'
 import { VideoPlayer } from './VideoPlayer.js'
 import { MATHS } from './maths.js'
 import { GLTFActor, BoxActor } from './Actor.js'
+import { RayCast } from './RayCast.js'
+import { SliderUI } from './SliderUI.js'
 
 window.onload = () =>
 {
@@ -20,15 +22,24 @@ window.onload = () =>
     const farPlane = 1000
     const camera = new THREE.PerspectiveCamera(fov, aspectRatio, nearPlane, farPlane)
     
+    const raycast = new RayCast(camera)
+
     const canvas = document.querySelector('canvas')
 
-    const sceneManager = new SceneManager(canvas, camera, ()=>gltfActor.onSceneRender(cameraManager))
+    const sceneManager = new SceneManager(canvas, camera, ()=>gltfActor.onSceneRender(cameraManager, raycast))
 
     let videoPlayer = new VideoPlayer('./assets/vid.mp4', 480, 270)
 
     let gltfActor = new GLTFActor()
     gltfActor.addTexture('./assets/fire.jpg')
-    gltfActor.load('./assets/LouveredRoof.glb', (model, rayCastable)=>sceneManager.add(model, rayCastable), onLoadComplete)
+    gltfActor.load('./assets/LouveredRoof.glb', onLoading, onLoadComplete)
+
+    function onLoading(model, rayCastable)
+    {
+        sceneManager.add(model)
+        if (rayCastable)
+            raycast.addObject(model)
+    }
 
     function onLoadComplete()
     {
@@ -43,27 +54,19 @@ window.onload = () =>
         videoPlayer.show()
     }
 
-    const cameraManager = new CameraManager(canvas, camera, axis, lookAtPosition, sceneManager)
+    const cameraManager = new CameraManager(canvas, camera, axis, lookAtPosition)
     cameraManager.setType((DEBUG)?CAMERA_TYPE.firstPerson:CAMERA_TYPE.orbit)
 
     let light = new Light(new THREE.Vector3(0, 150, 100), 5, lookAtPosition)
-    light.addToScene(sceneManager, DEBUG)
+    light.addToScene(sceneManager, false)
 
     let floor = new BoxActor(new THREE.BoxGeometry(100, 0.1, 100), new THREE.MeshLambertMaterial({color: 0x44aa88}), true)
     floor.setPosition(0, -2, 0)
-    floor.addToScene(sceneManager, true)
+    floor.addToScene(sceneManager)
+    floor.addToRaycast(raycast)
 
     let ambientLight = new THREE.AmbientLight(0xffffff, 0.8)
     sceneManager.add(ambientLight)
 
-    let prevSliderValue = 0
-
-    const slider = document.getElementById('slider')
-    slider.addEventListener('input', ()=>onSliderChange(slider.value))
-
-    function onSliderChange(value)
-    {
-        light.orbit(prevSliderValue - value)
-        prevSliderValue = value
-    }
+    new SliderUI((v)=>light.orbit(v))
 }

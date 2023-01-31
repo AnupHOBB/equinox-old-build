@@ -13,9 +13,9 @@ export const CAMERA_TYPE =
 
 export class CameraManager
 {
-    constructor(canvas, camera, axis, lookAtPosition, sceneManager)
+    constructor(canvas, camera, axis, lookAtPosition)
     {
-        this.core = new CameraManagerCore(canvas, camera, axis, lookAtPosition, sceneManager)
+        this.core = new CameraManagerCore(canvas, camera, axis, lookAtPosition)
     }
 
     setType(type)
@@ -34,15 +34,15 @@ export class CameraManager
             throw 'Invalid Camera type'
     } 
     
-    worldToRaster(camera, worldPosition)
+    worldToRaster(worldPosition, raycaster)
     {
-        return this.core.worldToRaster(camera, worldPosition)
+        return this.core.worldToRaster(worldPosition, raycaster)
     }
 }
 
 class CameraManagerCore
 {
-    constructor(canvas, camera, axis, lookAtPosition, sceneManager)
+    constructor(canvas, camera, axis, lookAtPosition)
     {
         this.orbitSpeed = 60
         this.type = CAMERA_TYPE.orbit
@@ -54,7 +54,6 @@ class CameraManagerCore
         this.mouseInput.registerMoveEvent((dx, dy) => this.onMouseInput(dx, dy))
         this.mouseInput.setSensitivity(0.5)
         this.mouseInput.registerDoubleClickEvent((e, f) => this.onDoubleClick(e, f))
-        this.sceneManager = sceneManager
     }
 
     onKeyinput(pressW, pressS, pressA, pressD) 
@@ -115,7 +114,7 @@ class CameraManagerCore
         }
     }
 
-    worldToRaster(worldPosition)
+    worldToRaster(worldPosition, raycaster)
     {
         let viewMatrix = this.getViewMatrix(this.camera)
         let viewPosition = MATRIX.mat4XVec3(viewMatrix, worldPosition)
@@ -133,9 +132,9 @@ class CameraManagerCore
             return [, false]
         let rasterX = (window.innerWidth * (projectedX - screenLeftBound))/(screenRightBound - screenLeftBound)
         let rasterY = (window.innerHeight * (screenTopBound - projectedY))/(screenTopBound - screenBottomBound)
-        let hitPointWorld = this.sceneManager.raycast({ x: rasterX, y: rasterY })
+        let hitPointWorld = raycaster.raycast({ x: rasterX, y: rasterY })
         if (hitPointWorld == undefined)
-            return [{ x: rasterX, y: rasterY }, true] 
+            return [{ x: rasterX, y: rasterY }, true]
         let hitPointView = MATRIX.mat4XVec3(viewMatrix, hitPointWorld)
         if (viewPosition.z > hitPointView.z)
             return [, false]

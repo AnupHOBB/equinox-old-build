@@ -7,14 +7,9 @@ export class SceneManager
         this.core = new SceneCore(canvas, camera, onRenderCallback)
     }
 
-    add(sceneObject, shouldRayCast)
+    add(sceneObject)
     {
-        this.core.add(sceneObject, shouldRayCast)
-    }
-
-    raycast(rasterCoord)
-    {
-        return this.core.raycast(rasterCoord)
+        this.core.add(sceneObject)
     }
 
     startLoop()
@@ -33,25 +28,12 @@ class SceneCore
         this.scene = new THREE.Scene()
         this.camera = camera
         this.onRenderCallback = onRenderCallback
-        this.raycastObjects = []
         this.loopStarted = false
     }
 
-    add(sceneObject, shouldRayCast)
+    add(sceneObject)
     {
         this.scene.add(sceneObject)
-        if (shouldRayCast)
-            this.raycastObjects.push(sceneObject)
-    }
-
-    raycast(rasterCoord)
-    {
-        let screenSpaceX = (rasterCoord.x / window.innerWidth) *  2 - 1
-        let screenSpaceY = -(rasterCoord.y / window.innerHeight) *  2 + 1
-        let rayCaster = new THREE.Raycaster()
-        rayCaster.setFromCamera({ x: screenSpaceX, y: screenSpaceY }, this.camera)
-        let hitObjects = rayCaster.intersectObjects(this.raycastObjects)
-        return (hitObjects.length > 0) ? hitObjects[0].point : undefined
     }
 
     startLoop()
