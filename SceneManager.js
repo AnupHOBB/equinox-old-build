@@ -16,6 +16,11 @@ export class SceneManager
     {
         return this.core.raycast(rasterCoord)
     }
+
+    startLoop()
+    {
+        this.core.startLoop()
+    }
 }
 
 class SceneCore
@@ -29,7 +34,7 @@ class SceneCore
         this.camera = camera
         this.onRenderCallback = onRenderCallback
         this.raycastObjects = []
-        window.requestAnimationFrame(()=>this.animFrame())
+        this.loopStarted = false
     }
 
     add(sceneObject, shouldRayCast)
@@ -37,19 +42,6 @@ class SceneCore
         this.scene.add(sceneObject)
         if (shouldRayCast)
             this.raycastObjects.push(sceneObject)
-    }
-
-    animFrame()
-    {
-        this.renderLoop()
-        window.requestAnimationFrame(()=>this.animFrame())
-    }
-
-    renderLoop()
-    {
-        this.renderer.setSize(window.innerWidth, window.innerHeight)
-        this.renderer.render(this.scene, this.camera)
-        this.onRenderCallback()
     }
 
     raycast(rasterCoord)
@@ -60,5 +52,29 @@ class SceneCore
         rayCaster.setFromCamera({ x: screenSpaceX, y: screenSpaceY }, this.camera)
         let hitObjects = rayCaster.intersectObjects(this.raycastObjects)
         return (hitObjects.length > 0) ? hitObjects[0].point : undefined
+    }
+
+    startLoop()
+    {
+        if (!this.loopStarted)
+        { 
+            window.requestAnimationFrame(()=>this.animFrame())
+            this.loopStarted = true
+        }
+    }
+
+    animFrame()
+    {
+        this.renderLoop()
+        window.requestAnimationFrame(()=>this.animFrame())
+    }
+
+    renderLoop()
+    {
+        this.camera.aspect = window.innerWidth/window.innerHeight
+        this.camera.updateProjectionMatrix()
+        this.renderer.setSize(window.innerWidth, window.innerHeight)
+        this.renderer.render(this.scene, this.camera)
+        this.onRenderCallback()
     }
 }

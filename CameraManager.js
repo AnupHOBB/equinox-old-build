@@ -54,10 +54,6 @@ class CameraManagerCore
         this.mouseInput.registerMoveEvent((dx, dy) => this.onMouseInput(dx, dy))
         this.mouseInput.setSensitivity(0.5)
         this.mouseInput.registerDoubleClickEvent((e, f) => this.onDoubleClick(e, f))
-        this.screenTopBound = camera.near * Math.tan(MATHS.toRadians(camera.fov/2))
-        this.screenBottomBound = -this.screenTopBound
-        this.screenRightBound = this.screenTopBound * camera.aspect
-        this.screenLeftBound = -this.screenRightBound
         this.sceneManager = sceneManager
     }
 
@@ -127,12 +123,16 @@ class CameraManagerCore
             return [, false]
         let projectedX = (this.camera.near * viewPosition.x)/viewPosition.z
         let projectedY = (this.camera.near * viewPosition.y)/viewPosition.z
-        if (projectedX < this.screenLeftBound || projectedX > this.screenRightBound)
+        let screenTopBound = this.camera.near * Math.tan(MATHS.toRadians(this.camera.fov/2))
+        let screenBottomBound = -screenTopBound
+        let screenRightBound = screenTopBound * this.camera.aspect
+        let screenLeftBound = -screenRightBound
+        if (projectedX < screenLeftBound || projectedX > screenRightBound)
             return [, false]
-        if (projectedY < this.screenBottomBound || projectedY > this.screenTopBound)
+        if (projectedY < this.screenBottomBound || projectedY > screenTopBound)
             return [, false]
-        let rasterX = (window.innerWidth * (projectedX - this.screenLeftBound))/(this.screenRightBound - this.screenLeftBound)
-        let rasterY = (window.innerHeight * (this.screenTopBound - projectedY))/(this.screenTopBound - this.screenBottomBound)
+        let rasterX = (window.innerWidth * (projectedX - screenLeftBound))/(screenRightBound - screenLeftBound)
+        let rasterY = (window.innerHeight * (screenTopBound - projectedY))/(screenTopBound - screenBottomBound)
         let hitPointWorld = this.sceneManager.raycast({ x: rasterX, y: rasterY })
         if (hitPointWorld == undefined)
             return [{ x: rasterX, y: rasterY }, true] 
