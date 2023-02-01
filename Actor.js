@@ -4,120 +4,130 @@ import { MATHS } from './maths.js'
 import { Hotspot } from './HotSpot.js'
 import { Color } from 'three'
 
-export class BoxActor
+export class StaticActor
 {
     constructor(geometry, material, supportShadow)
     {
-        this.floor = new THREE.Mesh(geometry, material)
-        this.floor.receiveShadow = supportShadow
+        this.mesh = new THREE.Mesh(geometry, material)
+        this.mesh.receiveShadow = supportShadow
     }
 
-    setPosition(x, y, z)
-    {
-        this.floor.position.set(x, y, z)
-    }
+    setPosition(x, y, z) { this.mesh.position.set(x, y, z) }
 
-    addToScene(sceneManager)
-    {
-        sceneManager.add(this.floor)
-    }
+    get() { return this.mesh }
 
-    addToRaycast(raycast)
-    {
-        raycast.addObject(this.floor)
-    }
+    onSceneStart(sceneManager) {}
+
+    onSceneRender(sceneManager) {}
+
+    isReady() { return true }
 }
 
 export class GLTFActor
 {
-    constructor()
-    {
-        this.core = new GLTFActorCore()
-    }
+    constructor(url) { this.core = new GLTFActorCore(url) }
 
-    load(url, onLoading, onLoadComplete)
-    {
-        this.core.load(url, onLoading, onLoadComplete)
-    }
+    setPosition(x, y, z) { this.core.setPosition(x, y, z) }
 
-    addTexture(url)
-    {
-        this.core.addTexture(url)
-    }
+    applyTexture(url) { this.core.applyTexture(url) }
 
-    changeTexture()
-    {
-        this.core.changeTexture()
-    }
+    applyColor(color) { this.core.applyColor(color) }
 
-    addHotSpots(imageUrl, onClick, onMove)
-    {
-        this.core.addHotSpots(imageUrl, onClick, onMove)
-    }
+    changeTexture() { this.core.changeTexture() }
 
-    onSceneRender(cameraManager, raycast)
-    {
-        this.core.onSceneRender(cameraManager, raycast)
-    }
+    addHotSpots(imageUrl, offset, onClick, onMove) { this.core.addHotSpots(imageUrl, offset, onClick, onMove) }
 
-    getPosition()
-    {
-        return this.core.getPosition()
-    }
+    get() { return this.core.gltfModel }
+
+    onSceneStart(sceneManager) { this.core.onSceneStart(sceneManager) }
+
+    onSceneRender(sceneManager) { this.core.onSceneRender(sceneManager) }
+
+    isReady() { return this.core.ready }
 }
 
 class GLTFActorCore
 {
-    constructor()
+    constructor(url)
     {
+        new GLTFLoader().load(url, (model)=>this.onModelLoad(model), (p)=>{}, (e)=>console.log(e))
         this.gltfModel = null
-        this.textures = []
+        this.texture = null
+        this.color = new Color(1, 1, 1)
         this.hotspots = []
+        this.ready = false
+        this.position = new THREE.Vector3()
+        this.roofBound = new StaticActor(new THREE.BoxGeometry(4.75, 0.5, 3.45), new THREE.MeshBasicMaterial({ transparent: true, opacity: 0 }), false)
+        this.roofBound.setPosition(-0.1, 0.5, -4.7,)
     }
 
-    load(url, onLoading, onLoadComplete)
+    setPosition(x, y, z)
     {
-        new GLTFLoader().load(url, (model)=>this.onModelLoad(model, onLoading, onLoadComplete), (p)=>{}, (e)=>console.log(e))
+        this.position.x = x
+        this.position.y = y
+        this.position.z = z
+        if (this.ready)
+            this.gltfModel.position.set(x, y, z)
     }
 
-    addTexture(url)
+    applyTexture(url)
     {
-        let texture = new THREE.TextureLoader().load(url)
-        texture.wrapS = THREE.ClampToEdgeWrapping
-        texture.wrapT = THREE.ClampToEdgeWrapping
-        this.textures.push(texture)
+        this.texture = new THREE.TextureLoader().load(url)
+        this.texture.wrapS = THREE.ClampToEdgeWrapping
+        this.texture.wrapT = THREE.ClampToEdgeWrapping
+        this.changeTexture()
+    }
+
+    applyColor(color) 
+    { 
+        this.color = color
+        this.changeColor() 
     }
 
     changeTexture()
     {
-        if (this.textures.length > 0)
+        if (this.ready && this.texture != null)
         {
             this.gltfModel.children.forEach(mesh=>{
-                mesh.material.map = this.textures[0]
-                mesh.material.color = new Color(0.5, 0.5, 0.5)
+                mesh.material.map = this.texture
             })
         }
     }
 
-    addHotSpots(imageUrl, onClick, onMove)
+    changeColor()
     {
-        let position = MATHS.addVectors(this.gltfModel.position, new THREE.Vector3(-2.15, 2.6, 0.08))
+        if (this.ready)
+        {
+            this.gltfModel.children.forEach(mesh=>{
+                mesh.material.color = this.color 
+            })
+        }
+    }
+
+    addHotSpots(imageUrl, offset, onClick, onMove)
+    {
+        let position = MATHS.addVectors(this.position, offset)
         this.hotspots.push(new Hotspot(imageUrl, position, onClick, onMove))
     }
 
-    onSceneRender(cameraManager, raycast)
+    onSceneStart(sceneManager) 
     {
-        if (this.hotspots.length > 0)
+        sceneManager.add('RoofBound', this.roofBound, true)
+    }
+
+    onSceneRender(sceneManager)
+    {
+        if (this.ready && this.hotspots.length > 0)
         {
             for (let hotSpot of this.hotspots)
             {
-                let [rasterCoord, isValid] = cameraManager.worldToRaster(hotSpot.getWorldPosition(), raycast)
-                if (isValid)
-                {        
+                let [rasterCoord, showHotSpot] = sceneManager.getRasterCoordIfNearest(hotSpot.getWorldPosition())
+                if (showHotSpot)
+                {    
                     hotSpot.setRasterCoordinates(rasterCoord.x, rasterCoord.y)
                     hotSpot.show()
                 }
-                else 
+                else
                     hotSpot.hide()
             }
         }
@@ -129,7 +139,7 @@ class GLTFActorCore
             return this.gltfModel.position
     }
 
-    onModelLoad(model, onLoading, onLoadComplete)
+    onModelLoad(model)
     {
         this.gltfModel = model.scene.children[0]
         this.gltfModel.children.forEach(mesh=>{
@@ -137,13 +147,9 @@ class GLTFActorCore
             mesh.receiveShadow = true
             mesh.castShadow = true
         })
-        this.gltfModel.position.set(2, -2, -3)
-        onLoading(this.gltfModel, false)
-        let roofBoundMaterial = new THREE.MeshBasicMaterial({ transparent: true, opacity: 0 }) 
-        let roofBoundGeometery = new THREE.BoxGeometry(4.75, 0.5, 3.45)
-        let roofBound = new THREE.Mesh(roofBoundGeometery, roofBoundMaterial)
-        roofBound.position.set(-0.1, 0.5, -4.65)
-        onLoading(roofBound, true)
-        onLoadComplete()
+        this.gltfModel.position.set(this.position.x, this.position.y, this.position.z)
+        this.ready = true
+        this.changeTexture()
+        this.changeColor()
     }
 }

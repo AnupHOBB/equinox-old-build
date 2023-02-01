@@ -2,24 +2,23 @@ import * as THREE from 'three'
 
 export class RayCast
 {
-    constructor(camera)
+    constructor()
     {
         this.raycastObjects = []
-        this.camera = camera
+        this.rayCaster = new THREE.Raycaster()
     }
 
     addObject(sceneObject)
     {
-        this.raycastObjects.push(sceneObject)
+        this.raycastObjects.push(sceneObject.get())
     }
 
-    raycast(rasterCoord)
+    raycast(rasterCoord, cameraManager)
     {
         let screenSpaceX = (rasterCoord.x / window.innerWidth) *  2 - 1
         let screenSpaceY = -(rasterCoord.y / window.innerHeight) *  2 + 1
-        let rayCaster = new THREE.Raycaster()
-        rayCaster.setFromCamera({ x: screenSpaceX, y: screenSpaceY }, this.camera)
-        let hitObjects = rayCaster.intersectObjects(this.raycastObjects)
+        this.rayCaster.setFromCamera({ x: screenSpaceX, y: screenSpaceY }, cameraManager.getThreeJsCamera())
+        let hitObjects = this.rayCaster.intersectObjects(this.raycastObjects)
         return (hitObjects.length > 0) ? hitObjects[0].point : undefined
     }
 }

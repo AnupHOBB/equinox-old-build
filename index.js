@@ -1,72 +1,53 @@
 import * as THREE from 'three'
 import { SceneManager } from './SceneManager.js'
-import { CameraManager, CAMERA_TYPE } from './CameraManager.js'
-import { Light } from './Light.js'
+import { FirstPersonCameraManager } from './FirstPersonCameraManager.js'
+import { OrbitalCameraManager } from './OrbitalCameraManager.js'
+import { DirectLight } from './Light.js'
+import { AmbientLight } from './Light.js'
 import { VideoPlayer } from './VideoPlayer.js'
 import { MATHS } from './maths.js'
-import { GLTFActor, BoxActor } from './Actor.js'
-import { RayCast } from './RayCast.js'
+import { GLTFActor, StaticActor } from './Actor.js'
 import { SliderUI } from './SliderUI.js'
 
 window.onload = () =>
 {
-    const DEBUG = true
+    const DEBUG = false
 
     const lookAtPosition = new THREE.Vector3(0, 0, -5)
     let axis = new THREE.Vector3(0, -1, 0)
     axis.applyAxisAngle(new THREE.Vector3(0, 0, -1), MATHS.toRadians(20))
 
-    const fov = 90
-    const aspectRatio = window.innerWidth/window.innerHeight
-    const nearPlane = 0.1
-    const farPlane = 1000
-    const camera = new THREE.PerspectiveCamera(fov, aspectRatio, nearPlane, farPlane)
-    
-    const raycast = new RayCast(camera)
-
     const canvas = document.querySelector('canvas')
 
-    const sceneManager = new SceneManager(canvas, camera, ()=>gltfActor.onSceneRender(cameraManager, raycast))
+    const sceneManager = new SceneManager(canvas)
 
+    new SliderUI((v)=>directLight.orbit(v))
     let videoPlayer = new VideoPlayer('./assets/vid.mp4', 480, 270)
 
-    let gltfActor = new GLTFActor()
-    gltfActor.addTexture('./assets/fire.jpg')
-    gltfActor.load('./assets/LouveredRoof.glb', onLoading, onLoadComplete)
-
-    function onLoading(model, rayCastable)
-    {
-        sceneManager.add(model)
-        if (rayCastable)
-            raycast.addObject(model)
-    }
-
-    function onLoadComplete()
-    {
-        gltfActor.addHotSpots('assets/hotspot.png', onHotSpotClick, ()=>videoPlayer.hide())
-        sceneManager.startLoop()
-        gltfActor.changeTexture()
-    }
-
-    function onHotSpotClick(event)
-    {
-        videoPlayer.setLocation(event.clientX, event.clientY)
+    let gltfActor = new GLTFActor('./assets/LouveredRoof.glb')
+    gltfActor.setPosition(2, -2, -3)
+    gltfActor.addHotSpots('assets/hotspot.png', new THREE.Vector3(-2.15, 2.6, 0.08), (e)=> {
+        videoPlayer.setLocation(e.clientX, e.clientY)
         videoPlayer.show()
-    }
+    }, ()=>videoPlayer.hide())
+    if (DEBUG)
+        gltfActor.applyTexture('./assets/fire.jpg')
 
-    const cameraManager = new CameraManager(canvas, camera, axis, lookAtPosition)
-    cameraManager.setType((DEBUG)?CAMERA_TYPE.firstPerson:CAMERA_TYPE.orbit)
+    sceneManager.add('Roof', gltfActor, false)                                                                        
 
-    let light = new Light(new THREE.Vector3(0, 150, 100), 5, lookAtPosition)
-    light.addToScene(sceneManager, false)
+    const cameraManager = (DEBUG) ? new FirstPersonCameraManager(sceneManager, 90) : new OrbitalCameraManager(sceneManager, 90, axis, lookAtPosition)
+    sceneManager.addCamera('Camera', cameraManager)
 
-    let floor = new BoxActor(new THREE.BoxGeometry(100, 0.1, 100), new THREE.MeshLambertMaterial({color: 0x44aa88}), true)
+    let directLight = new DirectLight(new THREE.Vector3(0, 150, 100), 5, lookAtPosition)
+    directLight.showGizmo(DEBUG)
+    sceneManager.add('DirectLight', directLight, false)
+
+    let floor = new StaticActor(new THREE.BoxGeometry(100, 0.1, 100), new THREE.MeshLambertMaterial({color: 0x44aa88}), true)
     floor.setPosition(0, -2, 0)
-    floor.addToScene(sceneManager)
-    floor.addToRaycast(raycast)
+    sceneManager.add('Floor', floor, true)
 
-    let ambientLight = new THREE.AmbientLight(0xffffff, 0.8)
-    sceneManager.add(ambientLight)
+    let ambientLight = new AmbientLight(0xffffff, 0.8)
+    sceneManager.add('AmbientLight', ambientLight, false)
 
-    new SliderUI((v)=>light.orbit(v))
+    sceneManager.startLoop()
 }
