@@ -1,45 +1,42 @@
-let core = null
-
 export class MouseEvent
 {
     constructor(canvas)
     {
-        if (core == null)
-            core = new MouseEventCore(canvas)
+        this.core = new MouseEventCore(canvas)
     }
 
     setSensitivity(sensitivity)
     {
         if (sensitivity != null && sensitivity != undefined)
-            core.sensitivity = sensitivity
+            this.core.sensitivity = sensitivity
     }
 
     registerClickEvent(onClick)
     {
         if (onClick != null && onClick != undefined)
-            core.clickCallbacks.push(onClick)
+            this.core.clickCallbacks.push(onClick)
     }
 
     registerMoveEvent(onMoveClick)
     {
         if (onMoveClick != null && onMoveClick != undefined)
-            core.moveCallbacks.push(onMoveClick)
+            this.core.moveCallbacks.push(onMoveClick)
     }
 
     registerDoubleClickEvent(onDblClick)
     {
         if (onDblClick != null && onDblClick != undefined)
-            core.dblClickCallbacks.push(onDblClick)
+            this.core.dblClickCallbacks.push(onDblClick)
     }
 
     enable()
     {
-        core.enable = true
+        this.core.enable = true
     }
 
     disable()
     {
-        core.enable = false
+        this.core.enable = false
     }
 }
 

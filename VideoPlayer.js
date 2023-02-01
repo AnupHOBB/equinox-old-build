@@ -62,7 +62,10 @@ class VideoPlayerCore
 
     hide()
     {
-        document.body.removeChild(this.video)
-        this.isShowing = false
+        if (this.isShowing)
+        {
+            document.body.removeChild(this.video)
+            this.isShowing = false
+        }
     }
 }
