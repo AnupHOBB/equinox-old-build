@@ -4,25 +4,37 @@ import { StaticActor } from './Actor.js'
 
 export class AmbientLight
 {
-    constructor(color, intensity) { this.light = new THREE.AmbientLight(color, intensity) }
+    constructor(name, color, intensity) 
+    {
+        this.name = name 
+        this.light = new THREE.AmbientLight(color, intensity) 
+    }
 
     get() { return this.light }
+
+    onMessage(sceneManager, senderName, data) {}
 
     onSceneStart(sceneManager) {}
 
     onSceneRender(sceneManager) {}
 
     isReady() { return true }
+
+    isRayCastable() { return false }
+
+    isDrawable() { return true }
 }
 
 export class DirectLight
 {
-    constructor(position, size, lookAt) 
+    constructor(name, position, size, lookAt) 
     { 
+        this.name = name 
         this.core = new DirectLightCore(position, size, lookAt) 
         this.enableGizmo = false
         this.enabled = false
-        this.gizmo = new DirectLightGizmo(this.core.light.shadow.camera)
+        this.gizmoName = 'LightGizmo'
+        this.gizmo = new DirectLightGizmo(this.gizmoName,this.core.light.shadow.camera)
     }
 
     showGizmo(enableGizmo) { this.enableGizmo = enableGizmo }
@@ -31,37 +43,52 @@ export class DirectLight
 
     get() { return this.core.light }
 
-    onSceneStart(sceneManager) 
-    {
-        sceneManager.add('LightMesh', this.core.mesh, false)
-    }
+    onMessage(sceneManager, senderName, data) {}
+
+    onSceneStart(sceneManager) { sceneManager.add(this.core.mesh) }
 
     onSceneRender(sceneManager) 
     {
         if (this.enableGizmo && !this.enabled)
         {    
-            sceneManager.add('LightGizmo', this.gizmo, false)
+            sceneManager.add(this.gizmo)
             this.enabled = true
         }
         else if (!this.enableGizmo && this.enabled) 
         {    
-            sceneManager.remove('LightGizmo')
+            sceneManager.remove(this.gizmoName)
             this.enabled = false
         }
     }
 
     isReady() { return true }
+
+    isRayCastable() { return false }
+
+    isDrawable() { return true }
 }
 
 class DirectLightGizmo
 {
-    constructor(lightCamera) { this.gizmo = new THREE.CameraHelper(lightCamera) }
+    constructor(name, lightCamera) 
+    { 
+        this.name = name
+        this.gizmo = new THREE.CameraHelper(lightCamera) 
+    }
 
     get() { return this.gizmo }
+
+    onMessage(sceneManager, senderName, data) {}
+
+    onSceneStart(sceneManager) {}
 
     onSceneRender(sceneManager) {}
 
     isReady() { return true }
+
+    isRayCastable() { return false }
+
+    isDrawable() { return true }
 }
 
 class DirectLightCore
@@ -80,7 +107,7 @@ class DirectLightCore
         this.light.shadow.camera.bottom = -10
         this.light.shadow.camera.top = 10
         this.light.shadow.bias = -0.0005
-        this.mesh = new StaticActor(new THREE.SphereGeometry(size, 64, 32), new THREE.MeshBasicMaterial({color: 0xFCE570}), false)
+        this.mesh = new StaticActor('LightMesh', new THREE.SphereGeometry(size, 64, 32), new THREE.MeshBasicMaterial({color: 0xFCE570}), false)
         this.mesh.setPosition(position.x, position.y, position.z)
         this.lightOrbiter = new OrbitControl(this.light, new THREE.Vector3(0, 1, 0), lookAt)
         this.meshOrbiter = new OrbitControl(this.mesh.get(), new THREE.Vector3(0, 1, 0), lookAt)

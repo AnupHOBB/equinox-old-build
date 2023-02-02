@@ -12,12 +12,12 @@ import { InputManager } from './core/InputManager.js'
 
 window.onload = () =>
 {
-    const DEBUG = false
+    const DEBUG = true
 
     new SliderUI((v)=>directLight.orbit(v))
     const videoPlayer = new VideoPlayer('./assets/vid.mp4', 480, 270)
 
-    const gltfActor = new GLTFActor('./assets/LouveredRoof.glb')
+    const gltfActor = new GLTFActor('Roof', './assets/LouveredRoof.glb')
     gltfActor.setPosition(2, -2, -3)
     gltfActor.addHotSpots('assets/hotspot.png', new THREE.Vector3(-2.15, 2.6, 0.08), (e)=> {
         videoPlayer.setLocation(e.clientX, e.clientY)
@@ -27,23 +27,24 @@ window.onload = () =>
         gltfActor.applyTexture('./assets/fire.jpg')
         
     const canvas = document.querySelector('canvas')
-    const inputManager = new InputManager(canvas)
-    const sceneManager = new SceneManager(canvas, inputManager)
-    sceneManager.add('Roof', gltfActor, false)                                                                        
+
+    const sceneManager = new SceneManager(canvas)
+    sceneManager.add(gltfActor)    
 
     const lookAtPosition = new THREE.Vector3(0, 0, -5)
     const axis = new THREE.Vector3(0, -1, 0)
     axis.applyAxisAngle(new THREE.Vector3(0, 0, -1), MATHS.toRadians(20))
-    const cameraManager = (DEBUG) ? new FirstPersonCameraManager(90) : new OrbitalCameraManager(90, axis, lookAtPosition)
-    sceneManager.addCamera('Camera', cameraManager)
+    const cameraManager = (DEBUG) ? new FirstPersonCameraManager('Camera', 90) : new OrbitalCameraManager('Camera', 90, axis, lookAtPosition)
+    sceneManager.add(cameraManager)
+    sceneManager.setActiveCamera('Camera')
 
-    const directLight = new DirectLight(new THREE.Vector3(0, 150, 100), 5, lookAtPosition)
-    directLight.showGizmo(false)
-    sceneManager.add('DirectLight', directLight, false)
+    const directLight = new DirectLight('DirectLight', new THREE.Vector3(0, 150, 100), 5, lookAtPosition)
+    directLight.showGizmo(DEBUG)
+    sceneManager.add(directLight)
 
-    const floor = new StaticActor(new THREE.BoxGeometry(100, 0.1, 100), new THREE.MeshLambertMaterial({color: 0x44aa88}), true)
+    const floor = new StaticActor('Floor', new THREE.BoxGeometry(100, 0.1, 100), new THREE.MeshLambertMaterial({color: 0x44aa88}), true)
     floor.setPosition(0, -2, 0)
-    sceneManager.add('Floor', floor, true)
-    
-    sceneManager.add('AmbientLight', new AmbientLight(0xffffff, 0.8), false)
+    sceneManager.add(floor)
+    sceneManager.add(new AmbientLight('AmbientLight', 0xffffff, 0.8))
+    sceneManager.add(new InputManager('Input', canvas))
 }
