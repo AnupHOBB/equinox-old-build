@@ -54,11 +54,6 @@ export class SceneManager
     {
         this.core.changeActiveCamera(name)
     }
-
-    startLoop()
-    {
-        this.core.startLoop()
-    }
 }
 
 class SceneCore
@@ -77,6 +72,7 @@ class SceneCore
         this.rayCast = new RayCast()
         this.keyEvent = new KeyEvent()
         this.mouseEvent = new MouseEvent(canvas)
+        this.startLoop()
     }
 
     add(name, sceneObject, isRayCastable)
@@ -85,11 +81,20 @@ class SceneCore
         this.inactiveObjNameMap.set(name, null)
         if (isRayCastable)
             this.rayCast.addObject(sceneObject)
+        if (this.loopStarted)
+            sceneObject.onSceneStart(this)
     }
 
     addCamera(name, cameraManager)
     {
         this.cameraManagerMap.set(name, cameraManager)
+        if (this.activeCameraManager == null)
+        {    
+            this.activeCameraManager = cameraManager
+            this.activeCameraManager.onActive(this)
+        }
+        if (this.loopStarted)
+            cameraManager.onSceneStart(this)
     }
 
     remove(name)
@@ -150,14 +155,6 @@ class SceneCore
     {
         if (!this.loopStarted)
         { 
-            let sceneObjects = this.sceneObjectMap.values()
-            for (let sceneObject of sceneObjects)
-                sceneObject.onSceneStart(this)
-            let cameraManagers = this.cameraManagerMap.values()
-            for (let cameraManager of cameraManagers)
-                cameraManager.onSceneStart(this)
-            this.activeCameraManager = this.cameraManagerMap.values().next().value
-            this.activeCameraManager.onActive(this)
             window.requestAnimationFrame(()=>this.animFrame())
             this.loopStarted = true
         }
@@ -173,16 +170,24 @@ class SceneCore
     {
         this.activeCameraManager.setAspectRatio(window.innerWidth/window.innerHeight)
         this.activeCameraManager.updateMatrices()
-        this.addReadyObjects()
+        this.queryReadyObjects()
         this.renderer.setSize(window.innerWidth, window.innerHeight)
         this.renderer.render(this.scene, this.activeCameraManager.getThreeJsCamera())
-        let sceneObjects = this.sceneObjectMap.values()
-        for (let sceneObject of sceneObjects)
-            sceneObject.onSceneRender(this)
+        this.notifyObjects()
         this.keyEvent.notify()
     }
 
-    addReadyObjects()
+    notifyObjects()
+    {
+        let sceneObjects = this.sceneObjectMap.values()
+        for (let sceneObject of sceneObjects)
+            sceneObject.onSceneRender(this)
+        let cameraManagers = this.cameraManagerMap.values()
+        for (let cameraManager of cameraManagers)
+            cameraManager.onSceneRender(this)
+    }
+
+    queryReadyObjects()
     {
         if (this.inactiveObjNameMap.size > 0) 
         {

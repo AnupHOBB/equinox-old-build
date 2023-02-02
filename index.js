@@ -43,6 +43,4 @@ window.onload = () =>
     sceneManager.add('Floor', floor, true)
     
     sceneManager.add('AmbientLight', new AmbientLight(0xffffff, 0.8), false)
-
-    sceneManager.startLoop()
 }
