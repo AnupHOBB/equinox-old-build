@@ -1,5 +1,5 @@
 import * as THREE from 'three'
-import { MATHS } from './maths.js'
+import { MATHS } from '../helpers/maths.js'
 
 export class OrbitControl
 {

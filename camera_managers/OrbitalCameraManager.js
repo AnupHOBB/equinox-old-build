@@ -1,5 +1,5 @@
 import { PerspectiveCameraManager } from './PerspectiveCameraManager.js'
-import { OrbitControl } from './OrbitControl.js'
+import { OrbitControl } from '../core/OrbitControl.js'
 
 export class OrbitalCameraManager
 {
@@ -59,7 +59,7 @@ class OrbitalCameraManagerCore extends PerspectiveCameraManager
     {
         let inputManager = sceneManager.getInputManager()
         inputManager.registerMoveEvent((dx, dy) => this.onMouseInput(dx, dy))
-        inputManager.registerDblClickEvent((e, f) => this.onDoubleClick(e, f))
+        inputManager.registerDoubleClickEvent((e, f) => this.onDoubleClick(e, f))
     }
 
     onActive(sceneManager)

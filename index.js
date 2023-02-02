@@ -1,18 +1,18 @@
 import * as THREE from 'three'
-import { SceneManager } from './SceneManager.js'
-import { FirstPersonCameraManager } from './FirstPersonCameraManager.js'
-import { OrbitalCameraManager } from './OrbitalCameraManager.js'
-import { DirectLight } from './Light.js'
-import { AmbientLight } from './Light.js'
-import { VideoPlayer } from './VideoPlayer.js'
-import { MATHS } from './maths.js'
-import { GLTFActor, StaticActor } from './Actor.js'
-import { SliderUI } from './SliderUI.js'
-import { InputManager } from './InputManager.js'
+import { SceneManager } from './core/SceneManager.js'
+import { FirstPersonCameraManager } from './camera_managers/FirstPersonCameraManager.js'
+import { OrbitalCameraManager } from './camera_managers/OrbitalCameraManager.js'
+import { DirectLight } from './core/Light.js'
+import { AmbientLight } from './core/Light.js'
+import { VideoPlayer } from './ui/VideoPlayer.js'
+import { MATHS } from './helpers/maths.js'
+import { GLTFActor, StaticActor } from './core/Actor.js'
+import { SliderUI } from './ui/SliderUI.js'
+import { InputManager } from './core/InputManager.js'
 
 window.onload = () =>
 {
-    const DEBUG = true
+    const DEBUG = false
 
     new SliderUI((v)=>directLight.orbit(v))
     const videoPlayer = new VideoPlayer('./assets/vid.mp4', 480, 270)
