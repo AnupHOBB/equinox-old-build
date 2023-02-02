@@ -4,9 +4,9 @@ import { MATHS } from './maths.js'
 
 export class FirstPersonCameraManager
 {
-    constructor(sceneManager, fov)
+    constructor(fov)
     {
-        this.core = new FirstPersonCameraManagerCore(sceneManager, fov)
+        this.core = new FirstPersonCameraManagerCore(fov)
     }
 
     setAspectRatio(ratio)
@@ -34,6 +34,13 @@ export class FirstPersonCameraManager
         return this.core.camera
     }
 
+    onSceneStart(sceneManager) 
+    {
+        this.core.onSceneStart(sceneManager)
+    }
+
+    onSceneRender(sceneManager) {}
+
     onActive(sceneManager)
     {
         this.core.onActive(sceneManager)
@@ -42,9 +49,13 @@ export class FirstPersonCameraManager
 
 class FirstPersonCameraManagerCore extends PerspectiveCameraManager
 {
-    constructor(sceneManager, fov)
+    constructor(fov)
     {
         super(fov)
+    }
+
+    onSceneStart(sceneManager) 
+    {
         sceneManager.registerKeyEvent((w,s,a,d)=>this.onKeyinput(w,s,a,d))
         sceneManager.registerMouseMoveEvent((dx, dy) => this.onMouseInput(dx, dy))
     }
@@ -54,7 +65,7 @@ class FirstPersonCameraManagerCore extends PerspectiveCameraManager
         sceneManager.setMouseSensitivity(0.05)
     }
 
-    onKeyinput(pressW, pressS, pressA, pressD) 
+    onKeyinput(keyMap) 
     {
         let scale = 0.1
         let front = new THREE.Vector3()
@@ -63,22 +74,22 @@ class FirstPersonCameraManagerCore extends PerspectiveCameraManager
         let newPosition = new THREE.Vector3()
         front = new THREE.Vector3(front.x * scale, front.y * scale, front.z * scale)
         right = new THREE.Vector3(right.x * scale, right.y * scale, right.z * scale)
-        if (pressW)
+        if (keyMap.get('w') != undefined)
         {
             newPosition = MATHS.addVectors(this.camera.position, front)
             this.camera.position.set(newPosition.x, newPosition.y, newPosition.z)
         }
-        if (pressS)
+        if (keyMap.get('s') != undefined)
         {
             newPosition = MATHS.subtractVectors(this.camera.position, front)
              this.camera.position.set(newPosition.x, newPosition.y, newPosition.z)
         }
-        if (pressA)
+        if (keyMap.get('a') != undefined)
         {
             newPosition = MATHS.subtractVectors(this.camera.position, right)
             this.camera.position.set(newPosition.x, newPosition.y, newPosition.z)
         }
-        if (pressD)
+        if (keyMap.get('d') != undefined)
         {
             newPosition = MATHS.addVectors(this.camera.position, right)
             this.camera.position.set(newPosition.x, newPosition.y, newPosition.z)

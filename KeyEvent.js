@@ -30,12 +30,11 @@ class KeyEventCore
 {
     constructor()
     {
-        this.keyMap = { w : false, s : false, a : false, d : false}
+        this.keyMap = new Map()
         this.enable = true
         this.callbacks = []
         window.addEventListener("keydown", e=>this.onDown(e))
         window.addEventListener("keyup", e=>this.onUp(e))
-        setTimeout(()=>this.notify(), 10)
     }
 
     register(callback)
@@ -45,26 +44,16 @@ class KeyEventCore
 
     onDown(event)
     {
-        if (event.key == 'w')
-            this.keyMap.w = true
-        if (event.key == 's')
-            this.keyMap.s = true
-        if (event.key == 'a')
-            this.keyMap.a = true
-        if (event.key == 'd')
-            this.keyMap.d = true
+        let entry = this.keyMap.get(event.key)
+        if (entry == null || entry == undefined)
+            this.keyMap.set(event.key, true)
     }
 
     onUp(event)
     {
-        if (event.key == 'w')
-            this.keyMap.w = false
-        if (event.key == 's')
-            this.keyMap.s = false
-        if (event.key == 'a')
-            this.keyMap.a = false
-        if (event.key == 'd')
-            this.keyMap.d = false
+        let entry = this.keyMap.get(event.key)
+        if (entry != null && entry != undefined)
+            this.keyMap.delete(event.key)
     }
 
     notify()
@@ -72,7 +61,7 @@ class KeyEventCore
         if (this.enable)
         {
             for (let callback of this.callbacks)
-                callback(this.keyMap.w, this.keyMap.s, this.keyMap.a, this.keyMap.d)
+                callback(this.keyMap)
         }
     }
 }

@@ -153,6 +153,9 @@ class SceneCore
             let sceneObjects = this.sceneObjectMap.values()
             for (let sceneObject of sceneObjects)
                 sceneObject.onSceneStart(this)
+            let cameraManagers = this.cameraManagerMap.values()
+            for (let cameraManager of cameraManagers)
+                cameraManager.onSceneStart(this)
             this.activeCameraManager = this.cameraManagerMap.values().next().value
             this.activeCameraManager.onActive(this)
             window.requestAnimationFrame(()=>this.animFrame())
