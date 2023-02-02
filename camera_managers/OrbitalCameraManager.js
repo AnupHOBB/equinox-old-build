@@ -1,11 +1,11 @@
 import { PerspectiveCameraManager } from './PerspectiveCameraManager.js'
-import { OrbitControl } from './OrbitControl.js'
+import { OrbitControl } from '../core/OrbitControl.js'
 
 export class OrbitalCameraManager
 {
-    constructor(sceneManager, fov, axis, lookAtPosition)
+    constructor(fov, axis, lookAtPosition)
     {
-        this.core = new OrbitalCameraManagerCore(sceneManager, fov, axis, lookAtPosition)
+        this.core = new OrbitalCameraManagerCore(fov, axis, lookAtPosition)
     }
 
     setAspectRatio(ratio)
@@ -33,6 +33,13 @@ export class OrbitalCameraManager
         return this.core.camera
     }
 
+    onSceneStart(sceneManager) 
+    {
+        this.core.onSceneStart(sceneManager)
+    }
+
+    onSceneRender(sceneManager) {}
+
     onActive(sceneManager)
     {
         this.core.onActive(sceneManager)
@@ -41,18 +48,24 @@ export class OrbitalCameraManager
 
 class OrbitalCameraManagerCore extends PerspectiveCameraManager
 {
-    constructor(sceneManager, fov, axis, lookAt)
+    constructor(fov, axis, lookAt)
     {
         super(fov)
         this.orbitSpeed = 60
         this.cameraOrbiter = new OrbitControl(this.camera, axis, lookAt)
-        sceneManager.registerMouseMoveEvent((dx, dy) => this.onMouseInput(dx, dy))
-        sceneManager.registerDblClickEvent((e, f) => this.onDoubleClick(e, f))
+    }
+
+    onSceneStart(sceneManager) 
+    {
+        let inputManager = sceneManager.getInputManager()
+        inputManager.registerMoveEvent((dx, dy) => this.onMouseInput(dx, dy))
+        inputManager.registerDoubleClickEvent((e, f) => this.onDoubleClick(e, f))
     }
 
     onActive(sceneManager)
     {
-        sceneManager.setMouseSensitivity(0.5)
+        let inputManager = sceneManager.getInputManager()
+        inputManager.setCursorSensitivity(0.5)
     }
 
     onMouseInput(deltaX, deltaY, x, y)

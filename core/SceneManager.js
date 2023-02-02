@@ -1,13 +1,11 @@
 import * as THREE from 'three'
-import { KeyEvent } from './KeyEvent.js'
-import { MouseEvent } from './MouseEvent.js'
 import { RayCast } from './RayCast.js'
 
 export class SceneManager
 {
-    constructor(canvas)
+    constructor(canvas, inputManager)
     {
-        this.core = new SceneCore(canvas)
+        this.core = new SceneCore(canvas, inputManager, this)
     }
 
     add(name, sceneObject, isRayCastable)
@@ -30,40 +28,20 @@ export class SceneManager
         return this.core.getRasterCoordIfNearest(worldPosition)
     }
 
-    registerKeyEvent(onKeyEvent)
-    {
-        this.core.registerKeyEvent(onKeyEvent)
-    }
-
-    registerMouseMoveEvent(onMouseMoveEvent)
-    {
-        this.core.registerMouseMoveEvent(onMouseMoveEvent)
-    }
-
-    registerDblClickEvent(onDblClickEvent)
-    {
-        this.core.registerDblClickEvent(onDblClickEvent)
-    }
-
-    setMouseSensitivity(sensitivity)
-    {
-        this.core.setMouseSensitivity(sensitivity)
-    }
-
     changeActiveCamera(name)
     {
         this.core.changeActiveCamera(name)
     }
 
-    startLoop()
+    getInputManager()
     {
-        this.core.startLoop()
+        return this.core.inputManager
     }
 }
 
 class SceneCore
 {
-    constructor(canvas)
+    constructor(canvas, inputManager, sceneManager)
     {
         this.renderer = new THREE.WebGLRenderer({canvas, alpha:true, antialias:true})
         this.renderer.shadowMap.enabled = true
@@ -75,8 +53,9 @@ class SceneCore
         this.cameraManagerMap = new Map()
         this.activeCameraManager = null
         this.rayCast = new RayCast()
-        this.keyEvent = new KeyEvent()
-        this.mouseEvent = new MouseEvent(canvas)
+        this.inputManager = inputManager
+        this.sceneManager = sceneManager
+        this.startLoop()
     }
 
     add(name, sceneObject, isRayCastable)
@@ -85,11 +64,20 @@ class SceneCore
         this.inactiveObjNameMap.set(name, null)
         if (isRayCastable)
             this.rayCast.addObject(sceneObject)
+        if (this.loopStarted)
+            sceneObject.onSceneStart(this.sceneManager)
     }
 
     addCamera(name, cameraManager)
     {
         this.cameraManagerMap.set(name, cameraManager)
+        if (this.activeCameraManager == null)
+        {    
+            this.activeCameraManager = cameraManager
+            this.activeCameraManager.onActive(this.sceneManager)
+        }
+        if (this.loopStarted)
+            cameraManager.onSceneStart(this.sceneManager)
     }
 
     remove(name)
@@ -116,33 +104,13 @@ class SceneCore
         return [rasterCoord, isValid]
     }
 
-    registerKeyEvent(onKeyEvent)
-    {
-        this.keyEvent.register(onKeyEvent)
-    }
-
-    registerMouseMoveEvent(onMouseMoveEvent)
-    {
-        this.mouseEvent.registerMoveEvent(onMouseMoveEvent)
-    }
-
-    registerDblClickEvent(onDblClickEvent)
-    {
-        this.mouseEvent.registerDoubleClickEvent(onDblClickEvent) 
-    }
-
-    setMouseSensitivity(sensitivity)
-    {
-        this.mouseEvent.setSensitivity(sensitivity)
-    }
-
     changeActiveCamera(name)
     {
         let cameraManager = this.cameraManagerMap.get(name)
         if (cameraManager != null && cameraManager != undefined)
         {
             this.activeCameraManager = cameraManager
-            this.activeCameraManager.onActive(this)
+            this.activeCameraManager.onActive(this.sceneManager)
         } 
     }
 
@@ -150,11 +118,6 @@ class SceneCore
     {
         if (!this.loopStarted)
         { 
-            let sceneObjects = this.sceneObjectMap.values()
-            for (let sceneObject of sceneObjects)
-                sceneObject.onSceneStart(this)
-            this.activeCameraManager = this.cameraManagerMap.values().next().value
-            this.activeCameraManager.onActive(this)
             window.requestAnimationFrame(()=>this.animFrame())
             this.loopStarted = true
         }
@@ -170,16 +133,24 @@ class SceneCore
     {
         this.activeCameraManager.setAspectRatio(window.innerWidth/window.innerHeight)
         this.activeCameraManager.updateMatrices()
-        this.addReadyObjects()
+        this.queryReadyObjects()
         this.renderer.setSize(window.innerWidth, window.innerHeight)
         this.renderer.render(this.scene, this.activeCameraManager.getThreeJsCamera())
-        let sceneObjects = this.sceneObjectMap.values()
-        for (let sceneObject of sceneObjects)
-            sceneObject.onSceneRender(this)
-        this.keyEvent.notify()
+        this.notifyObjects()
+        this.inputManager.notifyKeyEvent()
     }
 
-    addReadyObjects()
+    notifyObjects()
+    {
+        let sceneObjects = this.sceneObjectMap.values()
+        for (let sceneObject of sceneObjects)
+            sceneObject.onSceneRender(this.sceneManager)
+        let cameraManagers = this.cameraManagerMap.values()
+        for (let cameraManager of cameraManagers)
+            cameraManager.onSceneRender(this.sceneManager)
+    }
+
+    queryReadyObjects()
     {
         if (this.inactiveObjNameMap.size > 0) 
         {

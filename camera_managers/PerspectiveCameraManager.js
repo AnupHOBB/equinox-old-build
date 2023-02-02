@@ -1,6 +1,6 @@
 import * as THREE from 'three'
-import { MATHS } from './maths.js'
-import { MATRIX } from './matrix.js'
+import { MATHS } from '../helpers/maths.js'
+import { MATRIX } from '../helpers/matrix.js'
 
 export class PerspectiveCameraManager
 {

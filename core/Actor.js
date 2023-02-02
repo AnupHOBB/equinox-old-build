@@ -1,6 +1,6 @@
 import * as THREE from 'three'
 import { GLTFLoader } from 'gltf-loader'
-import { MATHS } from './maths.js'
+import { MATHS } from '../helpers/maths.js'
 import { Hotspot } from './HotSpot.js'
 import { Color } from 'three'
 
