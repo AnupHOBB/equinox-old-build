@@ -8,6 +8,7 @@ import { VideoPlayer } from './VideoPlayer.js'
 import { MATHS } from './maths.js'
 import { GLTFActor, StaticActor } from './Actor.js'
 import { SliderUI } from './SliderUI.js'
+import { InputManager } from './InputManager.js'
 
 window.onload = () =>
 {
@@ -24,8 +25,10 @@ window.onload = () =>
     }, ()=>videoPlayer.hide())
     if (DEBUG)
         gltfActor.applyTexture('./assets/fire.jpg')
-
-    const sceneManager = new SceneManager(document.querySelector('canvas'))
+        
+    const canvas = document.querySelector('canvas')
+    const inputManager = new InputManager(canvas)
+    const sceneManager = new SceneManager(canvas, inputManager)
     sceneManager.add('Roof', gltfActor, false)                                                                        
 
     const lookAtPosition = new THREE.Vector3(0, 0, -5)

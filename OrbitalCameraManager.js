@@ -57,13 +57,15 @@ class OrbitalCameraManagerCore extends PerspectiveCameraManager
 
     onSceneStart(sceneManager) 
     {
-        sceneManager.registerMouseMoveEvent((dx, dy) => this.onMouseInput(dx, dy))
-        sceneManager.registerDblClickEvent((e, f) => this.onDoubleClick(e, f))
+        let inputManager = sceneManager.getInputManager()
+        inputManager.registerMoveEvent((dx, dy) => this.onMouseInput(dx, dy))
+        inputManager.registerDblClickEvent((e, f) => this.onDoubleClick(e, f))
     }
 
     onActive(sceneManager)
     {
-        sceneManager.setMouseSensitivity(0.5)
+        let inputManager = sceneManager.getInputManager()
+        inputManager.setCursorSensitivity(0.5)
     }
 
     onMouseInput(deltaX, deltaY, x, y)

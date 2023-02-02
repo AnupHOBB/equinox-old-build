@@ -56,13 +56,15 @@ class FirstPersonCameraManagerCore extends PerspectiveCameraManager
 
     onSceneStart(sceneManager) 
     {
-        sceneManager.registerKeyEvent((w,s,a,d)=>this.onKeyinput(w,s,a,d))
-        sceneManager.registerMouseMoveEvent((dx, dy) => this.onMouseInput(dx, dy))
+        let inputManager = sceneManager.getInputManager()
+        inputManager.registerKeyEvent((w,s,a,d)=>this.onKeyinput(w,s,a,d))
+        inputManager.registerMoveEvent((dx, dy) => this.onMouseInput(dx, dy))
     }
 
     onActive(sceneManager)
     {
-        sceneManager.setMouseSensitivity(0.05)
+        let inputManager = sceneManager.getInputManager()
+        inputManager.setCursorSensitivity(0.05)
     }
 
     onKeyinput(keyMap) 

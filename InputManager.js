@@ -1,42 +1,79 @@
-export class MouseEvent
+export class InputManager
 {
     constructor(canvas)
     {
-        this.core = new MouseEventCore(canvas)
+        this.keyEvent = new KeyEventCore()
+        this.mouseEvent = new MouseEventCore(canvas)
     }
 
-    setSensitivity(sensitivity)
+    registerKeyEvent(callback)
+    {
+        this.keyEvent.register(callback)
+    }
+
+    notifyKeyEvent()
+    {
+        this.keyEvent.notify()
+    }
+
+    setCursorSensitivity(sensitivity)
     {
         if (sensitivity != null && sensitivity != undefined)
-            this.core.sensitivity = sensitivity
+            this.mouseEvent.sensitivity = sensitivity
     }
 
     registerClickEvent(onClick)
     {
         if (onClick != null && onClick != undefined)
-            this.core.clickCallbacks.push(onClick)
+            this.mouseEvent.clickCallbacks.push(onClick)
     }
 
-    registerMoveEvent(onMoveClick)
+    registerMoveEvent(onMoveEvent)
     {
-        if (onMoveClick != null && onMoveClick != undefined)
-            this.core.moveCallbacks.push(onMoveClick)
+        if (onMoveEvent != null && onMoveEvent != undefined)
+            this.mouseEvent.moveCallbacks.push(onMoveEvent)
     }
 
     registerDoubleClickEvent(onDblClick)
     {
         if (onDblClick != null && onDblClick != undefined)
-            this.core.dblClickCallbacks.push(onDblClick)
+            this.mouseEvent.dblClickCallbacks.push(onDblClick)
+    }
+}
+
+class KeyEventCore
+{
+    constructor()
+    {
+        this.keyMap = new Map()
+        this.callbacks = []
+        window.addEventListener("keydown", e=>this.onDown(e))
+        window.addEventListener("keyup", e=>this.onUp(e))
     }
 
-    enable()
+    register(callback)
     {
-        this.core.enable = true
+        this.callbacks.push(callback)
     }
 
-    disable()
+    onDown(event)
     {
-        this.core.enable = false
+        let entry = this.keyMap.get(event.key)
+        if (entry == null || entry == undefined)
+            this.keyMap.set(event.key, true)
+    }
+
+    onUp(event)
+    {
+        let entry = this.keyMap.get(event.key)
+        if (entry != null && entry != undefined)
+            this.keyMap.delete(event.key)
+    }
+
+    notify()
+    {
+        for (let callback of this.callbacks)
+            callback(this.keyMap)
     }
 }
 
@@ -49,16 +86,15 @@ class MouseEventCore
         this.firstClick = true
         this.lastXY = { x: 0, y: 0 }
         this.sensitivity = 1
-        this.canvas = canvas
         this.dblClickCounter = 0
         this.clickCallbacks = []
         this.moveCallbacks = []
         this.dblClickCallbacks = []
-        this.canvas.addEventListener('mousedown', e=>this.onPress(e))
-        this.canvas.addEventListener('mouseup', e=>this.onRelease(e))
-        this.canvas.addEventListener('mousemove', e=>this.onMove(e))
-        this.canvas.addEventListener('click', e=>this.onClick(e))
-        this.canvas.addEventListener('dblclick', e=>this.onDblClick(e))
+        canvas.addEventListener('mousedown', e=>this.onPress(e))
+        canvas.addEventListener('mouseup', e=>this.onRelease(e))
+        canvas.addEventListener('mousemove', e=>this.onMove(e))
+        canvas.addEventListener('click', e=>this.onClick(e))
+        canvas.addEventListener('dblclick', e=>this.onDblClick(e))
     }
 
     onClick(event)
@@ -81,7 +117,7 @@ class MouseEventCore
 
     onMove(event)
     {
-        if (this.mousePress && this.enable)
+        if (this.moveCallbacks.length > 0 && this.mousePress)
         {    
             if (this.firstClick)
             {
