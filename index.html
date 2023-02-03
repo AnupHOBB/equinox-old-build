@@ -1,42 +1,99 @@
 <html>
     <head>
-        <meta name="viewport" content="width=device-width, user-scalable=no">
-        <script type="importmap">
-            {
-                "imports":
-                {
-                    "three": "/node_modules/three/src/Three.js",
-					"gltf-loader": "/node_modules/three/examples/jsm/loaders/GLTFLoader.js"
-                }
-            }
-        </script>
-        <script type="module" src="index.js"></script>
         <style>
-            @media screen and (max-aspect-ratio : 1/1)
+            #title-container
             {
-                #slider
-                {
-                    width: 50%;
-                    display : block; 
-                    margin: auto;
-                }
+                position: absolute;
+                top: 10%;
+                width: 99.6%;
             }
 
-            @media screen and (min-aspect-ratio : 1/1)
+            h1
             {
-                #slider
-                {
-                    width: 20%; 
-                    display : block; 
-                    margin: auto;
-                }
+                text-align: center;
+                color: aliceblue;
+                font-family: Georgia, 'Times New Roman', Times, serif;
+            }
+
+            #container
+            {
+                position: absolute;
+                top: 30%;
+                left: 25%;
+                display:grid; 
+                width: 50%;
+                height: 40%;
+            }
+
+            #flex-container
+            {
+                display: flex; 
+                gap: 20%;
+            }
+
+            #tile-container-commercial
+            {
+                border-radius: 5ch;
+                width: 100%;
+                background-image: url("./assets/sky.jpg");
+                background-size: cover;
+            }
+
+            #tile-container-commercial:hover
+            {
+                transform: scale(1.2);
+            }
+
+            #tile-container-residential
+            {
+                border-radius: 5ch;
+                width: 100%;
+                background-image: url("./assets/fire.jpg");
+                background-size: cover;
+            }
+
+            #tile-container-residential:hover
+            {
+                transform: scale(1.2);
+            }
+
+            #label-container
+            {
+                position: relative;
+                top: 47.5%;
+            }
+
+            p
+            {
+                display: block;
+                width: 30%;
+                margin: auto;
+                color: black;
+                text-align: center;
+                font-size: 0.75vw;
+                font-style: oblique;
+                border-radius: 5ch;
+                background-color: rgba(220, 220, 220, 0.5);
             }
         </style>
     </head>
-    <body>
-        <canvas style="background: url(assets/sky.jpg); background-size: cover; width: 100%; height: 100%;"></canvas>
-        <div style="position: absolute; top: 5%; width: 100%;">
-            <input id="slider" type="range" min="0" max="360" value="0">
+    <body style='background-image: linear-gradient(to right, #192882, #2B69AC, #192882);''>
+        <div id="title-container">
+            <h1>CHOOSE YOUR OPTION</h1>
+        </div>
+        <div id="container">
+            <div id="flex-container">
+                <div id="tile-container-commercial" onclick="location.href= 'scene.html'">
+                    <div id="label-container">
+                        <p>COMMERCIAL</p>
+                    </div>
+                </div>
+                <div id="tile-container-residential" onclick="location.href= 'scene.html'">
+                    <div id="label-container">
+                        <p>RESIDENTIAL</p>
+                    </div>
+                </div>
+            </div>
         </div>
     </body>
 </html>

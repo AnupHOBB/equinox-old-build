@@ -6,8 +6,9 @@ import { Color } from 'three'
 
 export class StaticActor
 {
-    constructor(geometry, material, supportShadow)
+    constructor(name, geometry, material, supportShadow)
     {
+        this.name = name
         this.mesh = new THREE.Mesh(geometry, material)
         this.mesh.receiveShadow = supportShadow
     }
@@ -16,16 +17,26 @@ export class StaticActor
 
     get() { return this.mesh }
 
+    onMessage(sceneManager, senderName, sceneObject) {}
+
     onSceneStart(sceneManager) {}
 
     onSceneRender(sceneManager) {}
 
     isReady() { return true }
+
+    isRayCastable() { return true }
+
+    isDrawable() { return true }
 }
 
 export class GLTFActor
 {
-    constructor(url) { this.core = new GLTFActorCore(url) }
+    constructor(name, url) 
+    {
+        this.name = name 
+        this.core = new GLTFActorCore(url) 
+    }
 
     setPosition(x, y, z) { this.core.setPosition(x, y, z) }
 
@@ -39,11 +50,17 @@ export class GLTFActor
 
     get() { return this.core.gltfModel }
 
+    onMessage(sceneManager, senderName, sceneObject) {}
+
     onSceneStart(sceneManager) { this.core.onSceneStart(sceneManager) }
 
     onSceneRender(sceneManager) { this.core.onSceneRender(sceneManager) }
 
     isReady() { return this.core.ready }
+
+    isRayCastable() { return false }
+
+    isDrawable() { return true }
 }
 
 class GLTFActorCore
@@ -57,7 +74,7 @@ class GLTFActorCore
         this.hotspots = []
         this.ready = false
         this.position = new THREE.Vector3()
-        this.roofBound = new StaticActor(new THREE.BoxGeometry(4.75, 0.5, 3.45), new THREE.MeshBasicMaterial({ transparent: true, opacity: 0 }), false)
+        this.roofBound = new StaticActor('RoofBound', new THREE.BoxGeometry(4.75, 0.5, 3.45), new THREE.MeshBasicMaterial({ transparent: true, opacity: 0 }), false)
         this.roofBound.setPosition(-0.1, 0.5, -4.7,)
     }
 
@@ -112,7 +129,7 @@ class GLTFActorCore
 
     onSceneStart(sceneManager) 
     {
-        sceneManager.add('RoofBound', this.roofBound, true)
+        sceneManager.add(this.roofBound)
     }
 
     onSceneRender(sceneManager)

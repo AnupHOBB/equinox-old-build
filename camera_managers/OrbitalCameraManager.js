@@ -3,47 +3,35 @@ import { OrbitControl } from '../core/OrbitControl.js'
 
 export class OrbitalCameraManager
 {
-    constructor(fov, axis, lookAtPosition)
-    {
-        this.core = new OrbitalCameraManagerCore(fov, axis, lookAtPosition)
+    constructor(name, fov, axis, lookAtPosition) 
+    { 
+        this.name = name
+        this.core = new OrbitalCameraManagerCore(fov, axis, lookAtPosition) 
     }
 
-    setAspectRatio(ratio)
-    {
-        this.core.camera.aspect = ratio
-    }
+    setAspectRatio(ratio) { this.core.camera.aspect = ratio }
 
-    updateMatrices()
-    {
-        this.core.updateMatrices()
-    }
+    updateMatrices() { this.core.updateMatrices() }
     
-    worldToRaster(worldPosition)
-    {
-        return this.core.worldToRaster(worldPosition)
-    }
+    worldToRaster(worldPosition) { return this.core.worldToRaster(worldPosition) }
 
-    worldToView(worldPosition)
-    {
-        return this.core.worldToView(worldPosition)
-    }
+    worldToView(worldPosition) { return this.core.worldToView(worldPosition) }
 
-    getThreeJsCamera()
-    {
-        return this.core.camera
-    }
+    getThreeJsCamera() { return this.core.camera }
 
-    onSceneStart(sceneManager) 
-    {
-        this.core.onSceneStart(sceneManager)
-    }
+    onMessage(sceneManager, senderName, sceneObject) { this.core.onMessage(sceneManager, senderName, sceneObject) }
+
+    onSceneStart(sceneManager) {}
 
     onSceneRender(sceneManager) {}
 
-    onActive(sceneManager)
-    {
-        this.core.onActive(sceneManager)
-    }
+    onActive(sceneManager) { this.core.onActive(sceneManager, this.name) }
+
+    isReady() { return true }
+
+    isRayCastable() { return false }
+
+    isDrawable() { return false }
 }
 
 class OrbitalCameraManagerCore extends PerspectiveCameraManager
@@ -55,23 +43,20 @@ class OrbitalCameraManagerCore extends PerspectiveCameraManager
         this.cameraOrbiter = new OrbitControl(this.camera, axis, lookAt)
     }
 
-    onSceneStart(sceneManager) 
+    onMessage(sceneManager, senderName, sceneObject) 
     {
-        let inputManager = sceneManager.getInputManager()
-        inputManager.registerMoveEvent((dx, dy) => this.onMouseInput(dx, dy))
-        inputManager.registerDoubleClickEvent((e, f) => this.onDoubleClick(e, f))
+        if (senderName == 'Input')
+        {
+            let inputManager = sceneObject
+            inputManager.registerMoveEvent((dx, dy) => this.onMoveEvent(dx, dy))
+            inputManager.registerDoubleClickEvent((e, f) => this.onDoubleClick(e, f))
+            inputManager.setCursorSensitivity(0.5)
+        }
     }
 
-    onActive(sceneManager)
-    {
-        let inputManager = sceneManager.getInputManager()
-        inputManager.setCursorSensitivity(0.5)
-    }
+    onActive(sceneManager, myName) { sceneManager.broadcastTo(myName, 'Input', null) }
 
-    onMouseInput(deltaX, deltaY, x, y)
-    {
-        this.cameraOrbiter.pan(deltaX)
-    }
+    onMoveEvent(deltaX, deltaY, x, y) { this.cameraOrbiter.pan(deltaX) }
 
     onDoubleClick(event, flag)
     {

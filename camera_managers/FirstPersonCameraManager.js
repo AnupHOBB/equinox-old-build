@@ -4,68 +4,53 @@ import { MATHS } from '../helpers/maths.js'
 
 export class FirstPersonCameraManager
 {
-    constructor(fov)
-    {
-        this.core = new FirstPersonCameraManagerCore(fov)
+    constructor(name, fov) 
+    { 
+        this.name = name
+        this.core = new FirstPersonCameraManagerCore(fov) 
     }
 
-    setAspectRatio(ratio)
-    {
-        this.core.camera.aspect = ratio
-    }
+    setAspectRatio(ratio) { this.core.camera.aspect = ratio }
 
-    updateMatrices()
-    {
-        this.core.updateMatrices()
-    }
+    updateMatrices() { this.core.updateMatrices() }
     
-    worldToRaster(worldPosition)
-    {
-        return this.core.worldToRaster(worldPosition)
-    }
+    worldToRaster(worldPosition) { return this.core.worldToRaster(worldPosition) }
 
-    worldToView(worldPosition)
-    {
-        return this.core.worldToView(worldPosition)
-    }
+    worldToView(worldPosition) { return this.core.worldToView(worldPosition) }
 
-    getThreeJsCamera()
-    {
-        return this.core.camera
-    }
+    getThreeJsCamera() { return this.core.camera }
 
-    onSceneStart(sceneManager) 
-    {
-        this.core.onSceneStart(sceneManager)
-    }
+    onMessage(sceneManager, senderName, sceneObject) { this.core.onMessage(sceneManager, senderName, sceneObject) }
+
+    onSceneStart(sceneManager) {}
 
     onSceneRender(sceneManager) {}
 
-    onActive(sceneManager)
-    {
-        this.core.onActive(sceneManager)
-    }
+    onActive(sceneManager) { this.core.onActive(sceneManager, this.name) }
+
+    isReady() { return true }
+
+    isRayCastable() { return false }
+
+    isDrawable() { return false }
 }
 
 class FirstPersonCameraManagerCore extends PerspectiveCameraManager
 {
-    constructor(fov)
+    constructor(fov) { super(fov) }
+
+    onMessage(sceneManager, senderName, sceneObject) 
     {
-        super(fov)
+        if (senderName == 'Input')
+        {
+            let inputManager = sceneObject
+            inputManager.registerKeyEvent((w,s,a,d)=>this.onKeyinput(w,s,a,d))
+            inputManager.registerMoveEvent((dx, dy) => this.onMoveEvent(dx, dy))
+            inputManager.setCursorSensitivity(0.05) 
+        }
     }
 
-    onSceneStart(sceneManager) 
-    {
-        let inputManager = sceneManager.getInputManager()
-        inputManager.registerKeyEvent((w,s,a,d)=>this.onKeyinput(w,s,a,d))
-        inputManager.registerMoveEvent((dx, dy) => this.onMouseInput(dx, dy))
-    }
-
-    onActive(sceneManager)
-    {
-        let inputManager = sceneManager.getInputManager()
-        inputManager.setCursorSensitivity(0.05)
-    }
+    onActive(sceneManager, myName) { sceneManager.broadcastTo(myName, 'Input', null) }
 
     onKeyinput(keyMap) 
     {
@@ -98,7 +83,7 @@ class FirstPersonCameraManagerCore extends PerspectiveCameraManager
         }
     }
 
-    onMouseInput(deltaX, deltaY, x, y)
+    onMoveEvent(deltaX, deltaY, x, y)
     {
         let pitchDeg = MATHS.toDegrees(this.camera.rotation.x - deltaY)
         if (pitchDeg > -85 && pitchDeg < 85)

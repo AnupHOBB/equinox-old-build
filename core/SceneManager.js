@@ -3,81 +3,59 @@ import { RayCast } from './RayCast.js'
 
 export class SceneManager
 {
-    constructor(canvas, inputManager)
-    {
-        this.core = new SceneCore(canvas, inputManager, this)
-    }
+    constructor(canvas) { this.core = new SceneCore(canvas, this) }
 
-    add(name, sceneObject, isRayCastable)
-    {
-        this.core.add(name, sceneObject, isRayCastable)
-    }
+    add(name, sceneObject) { this.core.add(name, sceneObject) }
 
-    addCamera(name, cameraManager)
-    {
-        this.core.addCamera(name, cameraManager)
-    }
+    remove(name) { this.core.remove(name) }
 
-    remove(name)
-    {
-        this.core.remove(name)
-    }
+    getRasterCoordIfNearest(worldPosition) { return this.core.getRasterCoordIfNearest(worldPosition) }
 
-    getRasterCoordIfNearest(worldPosition)
-    {
-        return this.core.getRasterCoordIfNearest(worldPosition)
-    }
+    setActiveCamera(name) { this.core.setActiveCamera(name) }
 
-    changeActiveCamera(name)
-    {
-        this.core.changeActiveCamera(name)
-    }
+    broadcastTo(from, to, data) { this.core.broadcastTo(from, to, data) }
 
-    getInputManager()
-    {
-        return this.core.inputManager
-    }
+    broadcastToAll(from, data) { this.core.broadcastToAll(from, data) }
 }
 
 class SceneCore
 {
-    constructor(canvas, inputManager, sceneManager)
+    constructor(canvas, sceneManager)
     {
         this.renderer = new THREE.WebGLRenderer({canvas, alpha:true, antialias:true})
         this.renderer.shadowMap.enabled = true
         this.renderer.shadowMap.type = THREE.PCFSoftShadowMap
         this.scene = new THREE.Scene()
-        this.loopStarted = false
+        this.sceneManager = sceneManager
+        this.rayCast = new RayCast()
+        this.activeCameraManager = null
         this.sceneObjectMap = new Map()
         this.inactiveObjNameMap = new Map()
-        this.cameraManagerMap = new Map()
-        this.activeCameraManager = null
-        this.rayCast = new RayCast()
-        this.inputManager = inputManager
-        this.sceneManager = sceneManager
-        this.startLoop()
+        this.noticeBoard = []
+        window.requestAnimationFrame(()=>this.animFrame())
     }
 
-    add(name, sceneObject, isRayCastable)
+    add(sceneObject)
     {
-        this.sceneObjectMap.set(name, sceneObject)
-        this.inactiveObjNameMap.set(name, null)
-        if (isRayCastable)
+        this.sceneObjectMap.set(sceneObject.name, sceneObject)
+        if (sceneObject.isDrawable())
+            this.inactiveObjNameMap.set(sceneObject.name, null)
+        if (sceneObject.isRayCastable())
             this.rayCast.addObject(sceneObject)
-        if (this.loopStarted)
-            sceneObject.onSceneStart(this.sceneManager)
+        sceneObject.onSceneStart(this.sceneManager)
+        this.popNoticeBoard(sceneObject)
     }
 
-    addCamera(name, cameraManager)
+    popNoticeBoard(sceneObject)
     {
-        this.cameraManagerMap.set(name, cameraManager)
-        if (this.activeCameraManager == null)
-        {    
-            this.activeCameraManager = cameraManager
-            this.activeCameraManager.onActive(this.sceneManager)
+        for (let notice of this.noticeBoard)
+        {
+            if (notice.to == sceneObject.name)
+            {    
+                sceneObject.onMessage(this.sceneManager, notice.from, notice.data)
+                this.noticeBoard.splice(this.noticeBoard.indexOf(notice), 1) 
+            }
         }
-        if (this.loopStarted)
-            cameraManager.onSceneStart(this.sceneManager)
     }
 
     remove(name)
@@ -104,9 +82,9 @@ class SceneCore
         return [rasterCoord, isValid]
     }
 
-    changeActiveCamera(name)
+    setActiveCamera(name)
     {
-        let cameraManager = this.cameraManagerMap.get(name)
+        let cameraManager = this.sceneObjectMap.get(name)
         if (cameraManager != null && cameraManager != undefined)
         {
             this.activeCameraManager = cameraManager
@@ -114,13 +92,21 @@ class SceneCore
         } 
     }
 
-    startLoop()
+    broadcastTo(from, to, data)
     {
-        if (!this.loopStarted)
-        { 
-            window.requestAnimationFrame(()=>this.animFrame())
-            this.loopStarted = true
-        }
+        let sceneObject = this.sceneObjectMap.get(to)
+        if (sceneObject != undefined)
+            sceneObject.onMessage(this.sceneManager, from, data)
+        else
+            this.noticeBoard.push({ from: from, to: to, data: data })
+    }
+
+    broadcastToAll(from, data)
+    {
+        let sceneObjectKeys = this.sceneObjectMap.keys()
+        for (let sceneObjectKey of sceneObjectKeys)
+            if (sceneObjectKey != from)
+                this.sceneObjectMap.get(sceneObjectKey).onMessage(this.sceneManager, from, data)     
     }
 
     animFrame()
@@ -131,13 +117,15 @@ class SceneCore
 
     renderLoop()
     {
-        this.activeCameraManager.setAspectRatio(window.innerWidth/window.innerHeight)
-        this.activeCameraManager.updateMatrices()
-        this.queryReadyObjects()
-        this.renderer.setSize(window.innerWidth, window.innerHeight)
-        this.renderer.render(this.scene, this.activeCameraManager.getThreeJsCamera())
-        this.notifyObjects()
-        this.inputManager.notifyKeyEvent()
+        if (this.activeCameraManager != null && this.activeCameraManager != undefined)
+        {
+            this.activeCameraManager.setAspectRatio(window.innerWidth/window.innerHeight)
+            this.activeCameraManager.updateMatrices()
+            this.queryReadyObjects()
+            this.renderer.setSize(window.innerWidth, window.innerHeight)
+            this.renderer.render(this.scene, this.activeCameraManager.getThreeJsCamera())
+            this.notifyObjects()
+        }
     }
 
     notifyObjects()
@@ -145,9 +133,6 @@ class SceneCore
         let sceneObjects = this.sceneObjectMap.values()
         for (let sceneObject of sceneObjects)
             sceneObject.onSceneRender(this.sceneManager)
-        let cameraManagers = this.cameraManagerMap.values()
-        for (let cameraManager of cameraManagers)
-            cameraManager.onSceneRender(this.sceneManager)
     }
 
     queryReadyObjects()

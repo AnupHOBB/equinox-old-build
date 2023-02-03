@@ -1,20 +1,15 @@
 export class InputManager
 {
-    constructor(canvas)
+    constructor(name, canvas)
     {
+        this.name = name
         this.keyEvent = new KeyEventCore()
         this.mouseEvent = new MouseEventCore(canvas)
     }
 
-    registerKeyEvent(callback)
-    {
-        this.keyEvent.register(callback)
-    }
+    registerKeyEvent(callback) { this.keyEvent.register(callback) }
 
-    notifyKeyEvent()
-    {
-        this.keyEvent.notify()
-    }
+    notifyKeyEvent() { this.keyEvent.notify() }
 
     setCursorSensitivity(sensitivity)
     {
@@ -39,6 +34,18 @@ export class InputManager
         if (onDblClick != null && onDblClick != undefined)
             this.mouseEvent.dblClickCallbacks.push(onDblClick)
     }
+
+    onMessage(sceneManager, senderName, sceneObject)  { sceneManager.broadcastTo(this.name, senderName, this) }
+
+    onSceneStart(sceneManager)  {}
+
+    onSceneRender(sceneManager) { this.keyEvent.notify() }
+
+    isReady() { return true }
+
+    isRayCastable() { return false }
+
+    isDrawable() { return false }
 }
 
 class KeyEventCore
@@ -51,10 +58,7 @@ class KeyEventCore
         window.addEventListener("keyup", e=>this.onUp(e))
     }
 
-    register(callback)
-    {
-        this.callbacks.push(callback)
-    }
+    register(callback) { this.callbacks.push(callback) }
 
     onDown(event)
     {
@@ -103,10 +107,7 @@ class MouseEventCore
             clickCallback(event.clientX, event.clientY)
     }
     
-    onPress(event)
-    {
-        this.mousePress = true
-    }
+    onPress(event) { this.mousePress = true }
 
     onRelease(event)
     {
