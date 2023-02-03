@@ -20,7 +20,7 @@ export class FirstPersonCameraManager
 
     getThreeJsCamera() { return this.core.camera }
 
-    onMessage(sceneManager, senderName, data) { this.core.onMessage(sceneManager, senderName, data) }
+    onMessage(sceneManager, senderName, sceneObject) { this.core.onMessage(sceneManager, senderName, sceneObject) }
 
     onSceneStart(sceneManager) {}
 
@@ -39,11 +39,11 @@ class FirstPersonCameraManagerCore extends PerspectiveCameraManager
 {
     constructor(fov) { super(fov) }
 
-    onMessage(sceneManager, senderName, data) 
+    onMessage(sceneManager, senderName, sceneObject) 
     {
         if (senderName == 'Input')
         {
-            let inputManager = data
+            let inputManager = sceneObject
             inputManager.registerKeyEvent((w,s,a,d)=>this.onKeyinput(w,s,a,d))
             inputManager.registerMoveEvent((dx, dy) => this.onMoveEvent(dx, dy))
             inputManager.setCursorSensitivity(0.05) 

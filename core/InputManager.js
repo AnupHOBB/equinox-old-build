@@ -35,7 +35,7 @@ export class InputManager
             this.mouseEvent.dblClickCallbacks.push(onDblClick)
     }
 
-    onMessage(sceneManager, senderName, data)  { sceneManager.broadcastTo(this.name, senderName, this) }
+    onMessage(sceneManager, senderName, sceneObject)  { sceneManager.broadcastTo(this.name, senderName, this) }
 
     onSceneStart(sceneManager)  {}
 

@@ -43,7 +43,7 @@ export class DirectLight
 
     get() { return this.core.light }
 
-    onMessage(sceneManager, senderName, data) {}
+    onMessage(sceneManager, senderName, sceneObject) {}
 
     onSceneStart(sceneManager) { sceneManager.add(this.core.mesh) }
 
@@ -78,7 +78,7 @@ class DirectLightGizmo
 
     get() { return this.gizmo }
 
-    onMessage(sceneManager, senderName, data) {}
+    onMessage(sceneManager, senderName, sceneObject) {}
 
     onSceneStart(sceneManager) {}
 

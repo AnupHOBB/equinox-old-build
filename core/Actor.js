@@ -17,7 +17,7 @@ export class StaticActor
 
     get() { return this.mesh }
 
-    onMessage(sceneManager, senderName, data) {}
+    onMessage(sceneManager, senderName, sceneObject) {}
 
     onSceneStart(sceneManager) {}
 
@@ -50,7 +50,7 @@ export class GLTFActor
 
     get() { return this.core.gltfModel }
 
-    onMessage(sceneManager, senderName, data) {}
+    onMessage(sceneManager, senderName, sceneObject) {}
 
     onSceneStart(sceneManager) { this.core.onSceneStart(sceneManager) }
 

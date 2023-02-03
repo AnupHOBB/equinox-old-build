@@ -19,9 +19,9 @@ export class OrbitalCameraManager
 
     getThreeJsCamera() { return this.core.camera }
 
-    onMessage(sceneManager, senderName, data) { this.core.onMessage(sceneManager, senderName, data) }
+    onMessage(sceneManager, senderName, sceneObject) { this.core.onMessage(sceneManager, senderName, sceneObject) }
 
-    onSceneStart(sceneManager) { this.core.onSceneStart(sceneManager) }
+    onSceneStart(sceneManager) {}
 
     onSceneRender(sceneManager) {}
 
@@ -43,18 +43,16 @@ class OrbitalCameraManagerCore extends PerspectiveCameraManager
         this.cameraOrbiter = new OrbitControl(this.camera, axis, lookAt)
     }
 
-    onMessage(sceneManager, senderName, data) 
+    onMessage(sceneManager, senderName, sceneObject) 
     {
         if (senderName == 'Input')
         {
-            let inputManager = data
+            let inputManager = sceneObject
             inputManager.registerMoveEvent((dx, dy) => this.onMoveEvent(dx, dy))
             inputManager.registerDoubleClickEvent((e, f) => this.onDoubleClick(e, f))
             inputManager.setCursorSensitivity(0.5)
         }
     }
-
-    onSceneStart(sceneManager) {}
 
     onActive(sceneManager, myName) { sceneManager.broadcastTo(myName, 'Input', null) }
 
