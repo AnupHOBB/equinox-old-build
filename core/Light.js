@@ -1,6 +1,5 @@
 import * as THREE from 'three'
 import { OrbitControl } from './OrbitControl.js'
-import { StaticActor } from './Actor.js'
 
 export class AmbientLight
 {
@@ -10,11 +9,9 @@ export class AmbientLight
         this.light = new THREE.AmbientLight(color, intensity) 
     }
 
-    get() { return this.light }
-
     onMessage(sceneManager, senderName, data) {}
 
-    onSceneStart(sceneManager) {}
+    onSceneStart(sceneManager) { sceneManager.add(this.light, false) }
 
     onSceneRender(sceneManager) {}
 
@@ -33,56 +30,34 @@ export class DirectLight
         this.core = new DirectLightCore(position, size, lookAt) 
         this.enableGizmo = false
         this.enabled = false
-        this.gizmoName = 'LightGizmo'
-        this.gizmo = new DirectLightGizmo(this.gizmoName,this.core.light.shadow.camera)
+        this.gizmo = new THREE.CameraHelper(this.core.light.shadow.camera) 
     }
 
     showGizmo(enableGizmo) { this.enableGizmo = enableGizmo }
 
     orbit(speed) { this.core.orbit(speed) }
 
-    get() { return this.core.light }
-
     onMessage(sceneManager, senderName, sceneObject) {}
 
-    onSceneStart(sceneManager) { sceneManager.add(this.core.mesh) }
+    onSceneStart(sceneManager) 
+    { 
+        sceneManager.add(this.core.light, false)
+        sceneManager.add(this.core.mesh, false)
+    }
 
     onSceneRender(sceneManager) 
     {
         if (this.enableGizmo && !this.enabled)
         {    
-            sceneManager.add(this.gizmo)
+            sceneManager.add(this.gizmo, false)
             this.enabled = true
         }
         else if (!this.enableGizmo && this.enabled) 
         {    
-            sceneManager.remove(this.gizmoName)
+            sceneManager.remove(this.gizmo)
             this.enabled = false
         }
     }
-
-    isReady() { return true }
-
-    isRayCastable() { return false }
-
-    isDrawable() { return true }
-}
-
-class DirectLightGizmo
-{
-    constructor(name, lightCamera) 
-    { 
-        this.name = name
-        this.gizmo = new THREE.CameraHelper(lightCamera) 
-    }
-
-    get() { return this.gizmo }
-
-    onMessage(sceneManager, senderName, sceneObject) {}
-
-    onSceneStart(sceneManager) {}
-
-    onSceneRender(sceneManager) {}
 
     isReady() { return true }
 
@@ -107,10 +82,10 @@ class DirectLightCore
         this.light.shadow.camera.bottom = -10
         this.light.shadow.camera.top = 10
         this.light.shadow.bias = -0.0005
-        this.mesh = new StaticActor('LightMesh', new THREE.SphereGeometry(size, 64, 32), new THREE.MeshBasicMaterial({color: 0xFCE570}), false)
-        this.mesh.setPosition(position.x, position.y, position.z)
+        this.mesh = new THREE.Mesh(new THREE.SphereGeometry(size, 64, 32), new THREE.MeshBasicMaterial({color: 0xFCE570}))
+        this.mesh.position.set(position.x, position.y, position.z)
         this.lightOrbiter = new OrbitControl(this.light, new THREE.Vector3(0, 1, 0), lookAt)
-        this.meshOrbiter = new OrbitControl(this.mesh.get(), new THREE.Vector3(0, 1, 0), lookAt)
+        this.meshOrbiter = new OrbitControl(this.mesh, new THREE.Vector3(0, 1, 0), lookAt)
     }
     
     orbit(speed)

@@ -5,9 +5,16 @@ export class SceneManager
 {
     constructor(canvas) { this.core = new SceneCore(canvas, this) }
 
-    add(name, sceneObject) { this.core.add(name, sceneObject) }
+    register(sceneObject) { this.core.register(sceneObject) }
 
-    remove(name) { this.core.remove(name) }
+    add(threeJSObject, rayCastable) 
+    { 
+        this.core.scene.add(threeJSObject) 
+        if (rayCastable)
+            this.core.rayCast.add(threeJSObject)
+    }
+
+    remove(threeJSObject) { this.core.scene.remove(threeJSObject) }
 
     getRasterCoordIfNearest(worldPosition) { return this.core.getRasterCoordIfNearest(worldPosition) }
 
@@ -35,14 +42,13 @@ class SceneCore
         window.requestAnimationFrame(()=>this.animFrame())
     }
 
-    add(sceneObject)
+    register(sceneObject)
     {
         this.sceneObjectMap.set(sceneObject.name, sceneObject)
-        if (sceneObject.isDrawable())
+        if (sceneObject.isDrawable() && !sceneObject.isReady())
             this.inactiveObjNameMap.set(sceneObject.name, null)
-        if (sceneObject.isRayCastable())
-            this.rayCast.addObject(sceneObject)
-        sceneObject.onSceneStart(this.sceneManager)
+        else if (sceneObject.isReady())
+            sceneObject.onSceneStart(this.sceneManager)
         this.popNoticeBoard(sceneObject)
     }
 
@@ -56,13 +62,6 @@ class SceneCore
                 this.noticeBoard.splice(this.noticeBoard.indexOf(notice), 1) 
             }
         }
-    }
-
-    remove(name)
-    {
-        let sceneObject = this.sceneObjectMap.get(name)
-        if (sceneObject != null && sceneObject != undefined)
-            this.scene.remove(sceneObject.get())
     }
 
     getRasterCoordIfNearest(worldPosition)
@@ -123,7 +122,7 @@ class SceneCore
             this.activeCameraManager.updateMatrices()
             this.queryReadyObjects()
             this.renderer.setSize(window.innerWidth, window.innerHeight)
-            this.renderer.render(this.scene, this.activeCameraManager.getThreeJsCamera())
+            this.renderer.render(this.scene, this.activeCameraManager.getCamera())
             this.notifyObjects()
         }
     }
@@ -145,7 +144,7 @@ class SceneCore
                 let sceneObject = this.sceneObjectMap.get(sceneObjectName)
                 if (sceneObject.isReady())
                 {   
-                    this.scene.add(sceneObject.get())
+                    sceneObject.onSceneStart(this.sceneManager)
                     this.inactiveObjNameMap.delete(sceneObjectName)
                 } 
             }

@@ -1,5 +1,6 @@
 import * as THREE from 'three'
 import { GLTFLoader } from 'gltf-loader'
+import { FBXLoader } from 'fbx-loader'
 import { MATHS } from '../helpers/maths.js'
 import { Hotspot } from './HotSpot.js'
 import { Color } from 'three'
@@ -15,11 +16,9 @@ export class StaticActor
 
     setPosition(x, y, z) { this.mesh.position.set(x, y, z) }
 
-    get() { return this.mesh }
-
     onMessage(sceneManager, senderName, sceneObject) {}
 
-    onSceneStart(sceneManager) {}
+    onSceneStart(sceneManager) { sceneManager.add(this.mesh, true) }
 
     onSceneRender(sceneManager) {}
 
@@ -30,13 +29,15 @@ export class StaticActor
     isDrawable() { return true }
 }
 
-export class GLTFActor
+export class MeshActor
 {
     constructor(name, url) 
     {
         this.name = name 
-        this.core = new GLTFActorCore(url) 
+        this.core = new MeshActorCore(url) 
     }
+
+    updateAnimationFrame(deltaSeconds) { this.core.updateAnimationFrame(deltaSeconds) } 
 
     setPosition(x, y, z) { this.core.setPosition(x, y, z) }
 
@@ -47,8 +48,6 @@ export class GLTFActor
     changeTexture() { this.core.changeTexture() }
 
     addHotSpots(imageUrl, offset, onClick, onMove) { this.core.addHotSpots(imageUrl, offset, onClick, onMove) }
-
-    get() { return this.core.gltfModel }
 
     onMessage(sceneManager, senderName, sceneObject) {}
 
@@ -63,20 +62,28 @@ export class GLTFActor
     isDrawable() { return true }
 }
 
-class GLTFActorCore
+class MeshActorCore
 {
     constructor(url)
     {
-        new GLTFLoader().load(url, (model)=>this.onModelLoad(model), (p)=>{}, (e)=>console.log(e))
-        this.gltfModel = null
+        //new GLTFLoader().load(url, (model)=>this.onModelLoad(model))
+        new FBXLoader().load(url, (model)=>this.onModelLoad(model))
+        this.meshes = []
         this.texture = null
         this.color = new Color(1, 1, 1)
         this.hotspots = []
         this.ready = false
         this.position = new THREE.Vector3()
-        this.roofBound = new StaticActor('RoofBound', new THREE.BoxGeometry(4.75, 0.5, 3.45), new THREE.MeshBasicMaterial({ transparent: true, opacity: 0 }), false)
-        this.roofBound.setPosition(-0.1, 0.5, -4.7,)
+        this.roofBound = new THREE.Mesh(new THREE.BoxGeometry(4.75, 0.5, 3.45), new THREE.MeshBasicMaterial({ transparent: true, opacity: 0 }))
+        this.roofBound.position.set(-0.1, 0.5, -4.7,)
+        this.mixer = null
     }
+
+    updateAnimationFrame(deltaSeconds) 
+    { 
+        if (this.mixer != null)
+            this.mixer.update(deltaSeconds)
+    } 
 
     setPosition(x, y, z)
     {
@@ -84,7 +91,13 @@ class GLTFActorCore
         this.position.y = y
         this.position.z = z
         if (this.ready)
-            this.gltfModel.position.set(x, y, z)
+        {
+            this.meshes.forEach(mesh => {
+                mesh.position.x += this.position.x
+                mesh.position.y += this.position.y
+                mesh.position.z += this.position.z
+            })
+        }
     }
 
     applyTexture(url)
@@ -103,22 +116,17 @@ class GLTFActorCore
 
     changeTexture()
     {
-        if (this.ready && this.texture != null)
-        {
-            this.gltfModel.children.forEach(mesh=>{
-                mesh.material.map = this.texture
+        if (this.texture != null)
+            this.meshes.forEach(mesh => { 
+                mesh.children.forEach(child => { child.material.map = this.texture })
             })
-        }
     }
 
     changeColor()
     {
-        if (this.ready)
-        {
-            this.gltfModel.children.forEach(mesh=>{
-                mesh.material.color = this.color 
-            })
-        }
+        this.meshes.forEach(mesh => { 
+            mesh.children.forEach(child => { child.material.color = this.color })
+        })   
     }
 
     addHotSpots(imageUrl, offset, onClick, onMove)
@@ -129,12 +137,13 @@ class GLTFActorCore
 
     onSceneStart(sceneManager) 
     {
-        sceneManager.add(this.roofBound)
+        sceneManager.add(this.roofBound, true)
+        this.meshes.forEach(mesh=>sceneManager.add(mesh, false))
     }
 
     onSceneRender(sceneManager)
     {
-        if (this.ready && this.hotspots.length > 0)
+        if (this.hotspots.length > 0)
         {
             for (let hotSpot of this.hotspots)
             {
@@ -152,19 +161,67 @@ class GLTFActorCore
 
     getPosition()
     {
-        if (this.gltfModel != null)
-            return this.gltfModel.position
+        return this.position
     }
 
     onModelLoad(model)
     {
-        this.gltfModel = model.scene.children[0]
-        this.gltfModel.children.forEach(mesh=>{
+        /* 
+        //for gltf
+        this.meshes = model.scene.children 
+        this.meshes.forEach(mesh => {
+            mesh.children.forEach(mesh => {
+                mesh.material.shadowSide = THREE.BackSide
+                mesh.receiveShadow = true
+                mesh.castShadow = true
+            })
+        }) 
+        
+        this.meshes.forEach(mesh => {
+            mesh.position.x += this.position.x
+            mesh.position.y += this.position.y
+            mesh.position.z += this.position.z
+        })
+        
+        */
+        //////////////////for fbx////////////////////
+        this.meshes = model.children 
+        this.meshes.forEach(mesh => {
             mesh.material.shadowSide = THREE.BackSide
             mesh.receiveShadow = true
             mesh.castShadow = true
         })
-        this.gltfModel.position.set(this.position.x, this.position.y, this.position.z)
+
+        let roofBody = this.meshes[0]
+        roofBody.scale.x = 1
+        roofBody.scale.y = 1
+        roofBody.scale.z = 1
+        roofBody.position.x += this.position.x
+        roofBody.position.y += this.position.y
+        roofBody.position.z += this.position.z
+
+        let xoffset = 0
+        let yoffset = 2.6
+        let zoffset = -1.67
+
+        for(let i=1; i< this.meshes.length; i++)
+        {
+            this.meshes[i].scale.x = 1
+            this.meshes[i].scale.y = 1
+            this.meshes[i].scale.z = 1
+            this.meshes[i].position.x = this.position.x + xoffset
+            this.meshes[i].position.y = this.position.y + yoffset
+            this.meshes[i].position.z = this.position.z + zoffset
+            xoffset-= 0.19
+        }
+
+        const clip = model.animations[0]
+        console.log(clip)
+        this.mixer = new THREE.AnimationMixer(model)
+        this.mixer.clipAction(clip).play()
+        /////////////////////////////////////////////
+        
+
         this.ready = true
         this.changeTexture()
         this.changeColor()
