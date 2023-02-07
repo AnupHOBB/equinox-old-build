@@ -66,11 +66,13 @@ class MeshActorCore
 {
     constructor(url)
     {
-        if (url.split('.')[2] == 'fbx')
+        let type = url.split('.')[2]
+        if (type == 'fbx')
             new FBXLoader().load(url, (model)=>this.onFBXModelLoad(model))
-        else
+        else if (type == 'glb' || type == 'gltf')
             new GLTFLoader().load(url, (model)=>this.onGLTFModelLoad(model))
-
+        else
+            throw 'Invalid 3D file format'
         this.meshes = []
         this.texture = null
         this.color = new Color(1, 1, 1)
@@ -169,9 +171,7 @@ class MeshActorCore
 
     onFBXModelLoad(model)
     {
-        let meshArray = model.children 
-        for (let mesh of meshArray)
-            this.meshes.push(mesh)
+        model.children.forEach(mesh=>this.meshes.push(mesh))
         this.meshes.forEach(mesh => {
             mesh.material.shadowSide = THREE.BackSide
             mesh.receiveShadow = true
@@ -211,17 +211,15 @@ class MeshActorCore
 
     onGLTFModelLoad(model)
     {
-        let meshArray = model.scene.children 
-        for (let mesh of meshArray)
-            this.meshes.push(mesh)
+        model.scene.children.forEach(mesh=>this.meshes.push(mesh))
         this.meshes.forEach(mesh => {
-            console.log(mesh)
-            mesh.children.forEach(mesh => {
-                mesh.material.shadowSide = THREE.BackSide
-                mesh.receiveShadow = true
-                mesh.castShadow = true
+            mesh.children.forEach(child => {
+                child.material.shadowSide = THREE.BackSide
+                child.material.metalness = 0
+                child.receiveShadow = true
+                child.castShadow = true
             })
-        }) 
+        })
         this.meshes.forEach(mesh => {
             mesh.position.x += this.position.x
             mesh.position.y += this.position.y
