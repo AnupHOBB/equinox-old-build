@@ -31,10 +31,10 @@ export class StaticActor
 
 export class MeshActor
 {
-    constructor(name, url) 
+    constructor(name, url, onProgress) 
     {
         this.name = name 
-        this.core = new MeshActorCore(url) 
+        this.core = new MeshActorCore(url, onProgress) 
     }
 
     updateAnimationFrame(deltaSeconds) { this.core.updateAnimationFrame(deltaSeconds) } 
@@ -64,13 +64,13 @@ export class MeshActor
 
 class MeshActorCore
 {
-    constructor(url)
+    constructor(url, onProgress)
     {
         let type = url.split('.')[2]
         if (type == 'fbx')
-            new FBXLoader().load(url, (model)=>this.onFBXModelLoad(model))
+            new FBXLoader().load(url, (model)=>this.onFBXModelLoad(model), onProgress)
         else if (type == 'glb' || type == 'gltf')
-            new GLTFLoader().load(url, (model)=>this.onGLTFModelLoad(model))
+            new GLTFLoader().load(url, (model)=>this.onGLTFModelLoad(model), onProgress)
         else
             throw 'Invalid 3D file format'
         this.meshes = []

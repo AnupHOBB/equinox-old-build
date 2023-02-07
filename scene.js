@@ -19,14 +19,51 @@ window.onload = () =>
         gltfActor.updateAnimationFrame(-(v/180))
         //directLight.orbit(v)
     })
-    const gltfActor = new MeshActor('Roof', './assets/eq_animation.glb')// './assets/eq_animation.glb'  './assets/LouveredRoof.glb'
+
+    const gltfActor = new MeshActor('Roof', './assets/eq_animation.glb', (xhr)=>{status = Math.round((xhr.loaded/ xhr.total) * 100)})
     gltfActor.setPosition(2, -2, -3)
-    gltfActor.addHotSpots('assets/hotspot.png', new THREE.Vector3(-2.15, 2.6, 0.08), (e)=> {
-        videoPlayer.setLocation(e.clientX, e.clientY)
-        videoPlayer.show()
-    }, ()=>videoPlayer.hide())
-    /* if (DEBUG)
-        gltfActor.applyTexture('./assets/fire.jpg') */
+    if (DEBUG)
+    gltfActor.applyTexture('./assets/fire.jpg')
+    
+    let loadingText = document.getElementById('loading-text')
+    let loadingBar = document.getElementById('loading-bar')
+    let dots = ''
+    let dotCount = 1
+    let status = 0    
+
+    checkLoading()
+    function checkLoading()
+    {
+        loadingBar.style.width = status + '%'
+        if (status == 100)
+        { 
+            loadingText.innerHTML = 'LOADING COMPLETE'
+            setTimeout(onLoadingComplete, 500)
+        }
+        else
+        {
+            for(let i=0; i<dotCount; i++)
+                dots += '.'
+            dotCount++
+            if (dotCount > 3)
+                dotCount = 1
+            dots += '&nbsp&nbsp&nbsp'
+            loadingText.innerHTML = 'LOADING'+ dots +status+'%'
+            dots = ''
+            loadingBar.style.width = status + '%'
+            setTimeout(checkLoading, 100)
+        }
+    }
+
+    function onLoadingComplete()
+    {
+        gltfActor.addHotSpots('assets/hotspot.png', new THREE.Vector3(-2.15, 2.6, 0.08), (e)=> {
+            videoPlayer.setLocation(e.clientX, e.clientY)
+            videoPlayer.show()
+        }, ()=>videoPlayer.hide())
+        let loadingScreen = document.getElementById('loading-screen')
+        document.body.removeChild(loadingScreen) 
+    }
 
     const canvas = document.querySelector('canvas')
 
