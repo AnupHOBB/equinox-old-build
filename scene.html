@@ -6,7 +6,8 @@
                 "imports":
                 {
                     "three": "/node_modules/three/src/Three.js",
-					"gltf-loader": "/node_modules/three/examples/jsm/loaders/GLTFLoader.js"
+					"gltf-loader": "/node_modules/three/examples/jsm/loaders/GLTFLoader.js",
+					"fbx-loader": "/node_modules/three/examples/jsm/loaders/FBXLoader.js"
                 }
             }
         </script>
@@ -36,7 +37,7 @@
     <body>
         <canvas style="background: url(assets/sky.jpg); background-size: cover; width: 100%; height: 100%;"></canvas>
         <div style="position: absolute; top: 5%; width: 100%;">
-            <input id="slider" type="range" min="0" max="360" value="0">
+            <input id="slider" type="range" min="1" max="360" value="1">
         </div>
     </body>
 </html>

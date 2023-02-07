@@ -18,7 +18,7 @@ export class FirstPersonCameraManager
 
     worldToView(worldPosition) { return this.core.worldToView(worldPosition) }
 
-    getThreeJsCamera() { return this.core.camera }
+    getCamera() { return this.core.camera }
 
     onMessage(sceneManager, senderName, sceneObject) { this.core.onMessage(sceneManager, senderName, sceneObject) }
 
