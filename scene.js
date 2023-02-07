@@ -30,19 +30,15 @@ window.onload = () =>
     let dots = ''
     let dotCount = 1
     let status = 0    
-    let text = 'LOADING'
 
     checkLoading()
     function checkLoading()
     {
+        loadingBar.style.width = status + '%'
         if (status == 100)
-        {
-            gltfActor.addHotSpots('assets/hotspot.png', new THREE.Vector3(-2.15, 2.6, 0.08), (e)=> {
-                videoPlayer.setLocation(e.clientX, e.clientY)
-                videoPlayer.show()
-            }, ()=>videoPlayer.hide())
-            let loadingScreen = document.getElementById('loading-screen')
-            document.body.removeChild(loadingScreen) 
+        { 
+            loadingText.innerHTML = 'LOADING COMPLETE'
+            setTimeout(onLoadingComplete, 500)
         }
         else
         {
@@ -51,13 +47,22 @@ window.onload = () =>
             dotCount++
             if (dotCount > 3)
                 dotCount = 1
-            dots += '&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp'
-            loadingText.innerHTML = text+ dots +status+'%'
+            dots += '&nbsp&nbsp&nbsp'
+            loadingText.innerHTML = 'LOADING'+ dots +status+'%'
             dots = ''
-
             loadingBar.style.width = status + '%'
             setTimeout(checkLoading, 100)
         }
+    }
+
+    function onLoadingComplete()
+    {
+        gltfActor.addHotSpots('assets/hotspot.png', new THREE.Vector3(-2.15, 2.6, 0.08), (e)=> {
+            videoPlayer.setLocation(e.clientX, e.clientY)
+            videoPlayer.show()
+        }, ()=>videoPlayer.hide())
+        let loadingScreen = document.getElementById('loading-screen')
+        document.body.removeChild(loadingScreen) 
     }
 
     const canvas = document.querySelector('canvas')
