@@ -16,7 +16,7 @@ window.onload = () =>
 
     const videoPlayer = new VideoPlayer('./assets/vid.mp4', 480, 270)
 
-    const gltfActor = new MeshActor('Roof', './assets/eq_animation.fbx')// './assets/eq_animation.glb'  './assets/LouveredRoof.glb'
+    const gltfActor = new MeshActor('Roof', './assets/eq_animation.glb')// './assets/eq_animation.glb'  './assets/LouveredRoof.glb'
     gltfActor.setPosition(2, -2, -3)
     gltfActor.addHotSpots('assets/hotspot.png', new THREE.Vector3(-2.15, 2.6, 0.08), (e)=> {
         videoPlayer.setLocation(e.clientX, e.clientY)
@@ -24,14 +24,7 @@ window.onload = () =>
     }, ()=>videoPlayer.hide())
     /* if (DEBUG)
         gltfActor.applyTexture('./assets/fire.jpg') */
-    new SliderUI((v)=>{
-        //directLight.orbit(v)
-        let ds = v/180//0.01
-        console.log(ds)
-        if (v > 0)
-            ds = -ds
-        gltfActor.updateAnimationFrame(ds)
-    }) 
+    new SliderUI((v)=>gltfActor.updateAnimationFrame(-(v/180)))
 
     const canvas = document.querySelector('canvas')
 

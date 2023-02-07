@@ -66,8 +66,11 @@ class MeshActorCore
 {
     constructor(url)
     {
-        //new GLTFLoader().load(url, (model)=>this.onModelLoad(model))
-        new FBXLoader().load(url, (model)=>this.onModelLoad(model))
+        if (url.split('.')[2] == 'fbx')
+            new FBXLoader().load(url, (model)=>this.onFBXModelLoad(model))
+        else
+            new GLTFLoader().load(url, (model)=>this.onGLTFModelLoad(model))
+
         this.meshes = []
         this.texture = null
         this.color = new Color(1, 1, 1)
@@ -164,28 +167,11 @@ class MeshActorCore
         return this.position
     }
 
-    onModelLoad(model)
+    onFBXModelLoad(model)
     {
-        /* 
-        //for gltf
-        this.meshes = model.scene.children 
-        this.meshes.forEach(mesh => {
-            mesh.children.forEach(mesh => {
-                mesh.material.shadowSide = THREE.BackSide
-                mesh.receiveShadow = true
-                mesh.castShadow = true
-            })
-        }) 
-        
-        this.meshes.forEach(mesh => {
-            mesh.position.x += this.position.x
-            mesh.position.y += this.position.y
-            mesh.position.z += this.position.z
-        })
-        
-        */
-        //////////////////for fbx////////////////////
-        this.meshes = model.children 
+        let meshArray = model.children 
+        for (let mesh of meshArray)
+            this.meshes.push(mesh)
         this.meshes.forEach(mesh => {
             mesh.material.shadowSide = THREE.BackSide
             mesh.receiveShadow = true
@@ -216,12 +202,37 @@ class MeshActorCore
         }
 
         const clip = model.animations[0]
-        console.log(clip)
         this.mixer = new THREE.AnimationMixer(model)
         this.mixer.clipAction(clip).play()
-        /////////////////////////////////////////////
-        
+        this.ready = true
+        this.changeTexture()
+        this.changeColor()
+    }
 
+    onGLTFModelLoad(model)
+    {
+        let meshArray = model.scene.children 
+        for (let mesh of meshArray)
+            this.meshes.push(mesh)
+        this.meshes.forEach(mesh => {
+            console.log(mesh)
+            mesh.children.forEach(mesh => {
+                mesh.material.shadowSide = THREE.BackSide
+                mesh.receiveShadow = true
+                mesh.castShadow = true
+            })
+        }) 
+        this.meshes.forEach(mesh => {
+            mesh.position.x += this.position.x
+            mesh.position.y += this.position.y
+            mesh.position.z += this.position.z
+        })
+        const clip = model.animations[0]
+        if (clip != null && clip != undefined)
+        {
+            this.mixer = new THREE.AnimationMixer(model.scene)
+            this.mixer.clipAction(clip).play()
+        }
         this.ready = true
         this.changeTexture()
         this.changeColor()
