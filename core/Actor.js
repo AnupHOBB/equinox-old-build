@@ -90,8 +90,8 @@ class MeshActorCore
         this.hotspots = []
         this.ready = false
         this.position = new THREE.Vector3()
-        this.roofBound = new THREE.Mesh(new THREE.BoxGeometry(4.75, 0.5, 3.45), new THREE.MeshBasicMaterial({ transparent: true, opacity: 0 }))
-        this.roofBound.position.set(-0.1, 0.5, -4.7,)
+        this.roofBound = new THREE.Mesh(new THREE.BoxGeometry(4.75, 0.5, 3.3), new THREE.MeshBasicMaterial({ transparent: true, opacity: 0 }))
+        this.roofBound.position.set(-0.1, 0.5, -4.65)
         this.mixer = null
     }
 
