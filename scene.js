@@ -22,7 +22,6 @@ window.onload = () =>
     let status = 0    
 
     checkLoading()
-
     function checkLoading()
     {
         loadingBar.style.width = status + '%'
@@ -48,27 +47,36 @@ window.onload = () =>
 
     function onLoadingComplete()
     {
-        gltfActor.addHotSpots('assets/hotspot.png', new THREE.Vector3(-2.15, 2.6, 0.08), (e)=> {
-            videoPlayer.setLocation(e.clientX, e.clientY)
-            videoPlayer.show()
-        }, ()=>videoPlayer.hide())
+        gltfActor.addHotSpots('assets/hotspot.png', new THREE.Vector3(-3.55, 2.4, 0.027), showVideo, ()=>videoPlayer.hide())
+        gltfActor.addHotSpots('assets/hotspot.png', new THREE.Vector3(-0.85, 2.4, 0.027), showVideo, ()=>videoPlayer.hide())
+        gltfActor.addHotSpots('assets/hotspot.png', new THREE.Vector3(-3.25, 2.4, -3.35), showVideo, ()=>videoPlayer.hide())
         let loadingScreen = document.getElementById('loading-screen')
         document.body.removeChild(loadingScreen) 
     }
 
-    let colorItemId = 'color-item'
-    let noOfColorItems = 4
+    function showVideo(e)
+    {
+        videoPlayer.setLocation(e.clientX, e.clientY)
+        videoPlayer.show()
+    }
+
+    let colors = ['#ECF9FF', '#FFFBEB', '#FFE7CC', '#F8CBA6']
     registerColorClicks()
     function registerColorClicks()
     {
-        for(let i=0; i<noOfColorItems; i++)
+        let colorMenu = document.getElementById('color-menu')
+        for(let i=0; i<colors.length; i++)
         {
-            let colorItem = document.getElementById(colorItemId+i)
+            let colorItem = document.createElement('div')
+            colorItem.id = 'color-item'+i
+            colorItem.className = 'color-item'
+            colorItem.style.backgroundColor = colors[i]
             colorItem.onclick = ()=>{
                 let style = window.getComputedStyle(colorItem)
                 let color = toColor(style.getPropertyValue('background-color'))
                 gltfActor.applyColor(color)
             }
+            colorMenu.appendChild(colorItem)
         }
     }
 
