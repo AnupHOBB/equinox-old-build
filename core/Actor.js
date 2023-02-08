@@ -3,7 +3,6 @@ import { GLTFLoader } from 'gltf-loader'
 import { FBXLoader } from 'fbx-loader'
 import { MATHS } from '../helpers/maths.js'
 import { Hotspot } from './HotSpot.js'
-import { Color } from 'three'
 
 export class StaticActor
 {
@@ -13,6 +12,16 @@ export class StaticActor
         this.mesh = new THREE.Mesh(geometry, material)
         this.mesh.receiveShadow = supportShadow
     }
+
+    applyTexture(url)
+    {
+        let texture = new THREE.TextureLoader().load(url)
+        texture.wrapS = THREE.RepeatWrapping
+        texture.wrapT = THREE.RepeatWrapping
+        this.mesh.material.map = texture
+    }
+
+    applyColor(color) { this.mesh.material.color = color }
 
     setPosition(x, y, z) { this.mesh.position.set(x, y, z) }
 
@@ -75,7 +84,7 @@ class MeshActorCore
             throw 'Invalid 3D file format'
         this.meshes = []
         this.texture = null
-        this.color = new Color(1, 1, 1)
+        this.color = new THREE.Color(1, 1, 1)
         this.hotspots = []
         this.ready = false
         this.position = new THREE.Vector3()

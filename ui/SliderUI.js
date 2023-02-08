@@ -1,18 +1,18 @@
 export class SliderUI
 {
-    constructor(onChangeCallback)
+    constructor(element, onChangeCallback)
     {
-        this.core = new SliderUICore(onChangeCallback)
+        this.core = new SliderUICore(element, onChangeCallback)
     }
 }
 
 class SliderUICore
 {
-    constructor(onChangeCallback)
+    constructor(element, onChangeCallback)
     {
         this.prevSliderValue = 0
         this.onChangeCallback = onChangeCallback
-        this.slider = document.getElementById('slider')
+        this.slider = element
         this.slider.addEventListener('input', ()=>this.onChange())
     }
 
