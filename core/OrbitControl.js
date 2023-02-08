@@ -50,7 +50,6 @@ class OrbitControlCore
 
     orbit(speed)
     {
-
         let vLookAt2Src = MATHS.subtractVectors(this.object3D.position, this.lookAtPosition)
         let vLookAt2Dest = new THREE.Vector3(vLookAt2Src.x, vLookAt2Src.y, vLookAt2Src.z)
         vLookAt2Dest.applyAxisAngle(this.axis, MATHS.toRadians(speed))

@@ -1,8 +1,6 @@
 import * as THREE from 'three'
 import { GLTFLoader } from 'gltf-loader'
 import { FBXLoader } from 'fbx-loader'
-import { MATHS } from '../helpers/maths.js'
-import { Hotspot } from './HotSpot.js'
 
 export class StaticActor
 {
@@ -52,13 +50,15 @@ export class MeshActor
 
     setPosition(x, y, z) { this.core.setPosition(x, y, z) }
 
+    getPosition() { return this.core.position }
+
     applyTexture(url) { this.core.applyTexture(url) }
 
     applyColor(color) { this.core.applyColor(color) }
 
     changeTexture() { this.core.changeTexture() }
 
-    addHotSpots(imageUrl, offset, onClick, onMove) { this.core.addHotSpots(imageUrl, offset, onClick, onMove) }
+    addHotSpots(hotSpot) { this.core.hotspots.push(hotSpot) }
 
     onMessage(sceneManager, senderName, sceneObject) {}
 
@@ -145,12 +145,6 @@ class MeshActorCore
         })   
     }
 
-    addHotSpots(imageUrl, offset, onClick, onMove)
-    {
-        let position = MATHS.addVectors(this.position, offset)
-        this.hotspots.push(new Hotspot(imageUrl, position, onClick, onMove))
-    }
-
     onSceneStart(sceneManager) 
     {
         sceneManager.add(this.roofBound, true)
@@ -173,11 +167,6 @@ class MeshActorCore
                     hotSpot.hide()
             }
         }
-    }
-
-    getPosition()
-    {
-        return this.position
     }
 
     onFBXModelLoad(model)

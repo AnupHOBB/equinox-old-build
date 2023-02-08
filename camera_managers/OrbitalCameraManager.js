@@ -1,5 +1,7 @@
+import * as THREE from 'three'
 import { PerspectiveCameraManager } from './PerspectiveCameraManager.js'
 import { OrbitControl } from '../core/OrbitControl.js'
+import { MATHS } from '.././helpers/maths.js'
 
 export class OrbitalCameraManager
 {
@@ -41,6 +43,8 @@ class OrbitalCameraManagerCore extends PerspectiveCameraManager
         super(fov)
         this.orbitSpeed = 60
         this.cameraOrbiter = new OrbitControl(this.camera, axis, lookAt)
+        this.zoom = false
+        this.ogPosition = this.camera.position
     }
 
     onMessage(sceneManager, senderName, sceneObject) 
@@ -52,17 +56,42 @@ class OrbitalCameraManagerCore extends PerspectiveCameraManager
             inputManager.registerDoubleClickEvent((e, f) => this.onDoubleClick(e, f))
             inputManager.setCursorSensitivity(0.5)
         }
+        else if (senderName == 'Roof')
+        {       
+            if(!this.zoom)
+            {
+                let objectPosition = sceneObject
+                let front = new THREE.Vector3()
+                this.camera.getWorldDirection(front)
+                let targetPosition = MATHS.subtractVectors(objectPosition, front)
+                this.ogPosition = new THREE.Vector3(this.camera.position.x, this.camera.position.y, this.camera.position.z)
+                this.camera.position.set(targetPosition.x, targetPosition.y, targetPosition.z)
+                this.zoom = true
+            }
+            else
+            {
+                this.camera.position.set(this.ogPosition.x, this.ogPosition.y, this.ogPosition.z)
+                this.zoom = false
+            }
+        }
     }
 
     onActive(sceneManager, myName) { sceneManager.broadcastTo(myName, 'Input', null) }
 
-    onMoveEvent(deltaX, deltaY, x, y) { this.cameraOrbiter.pan(deltaX) }
+    onMoveEvent(deltaX, deltaY, x, y) 
+    { 
+        if (!this.zoom)
+            this.cameraOrbiter.pan(deltaX) 
+    }
 
     onDoubleClick(event, flag)
     {
-        if (flag)
-            this.cameraOrbiter.start(this.orbitSpeed)
-        else
-            this.cameraOrbiter.stop()
+        if (!this.zoom)
+        {
+            if (flag)
+                this.cameraOrbiter.start(this.orbitSpeed)
+            else
+                this.cameraOrbiter.stop()
+        }
     }
 }

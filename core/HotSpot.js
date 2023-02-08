@@ -1,14 +1,28 @@
 export class Hotspot
 {
-    constructor(imageUrl, worldPosition, onClick, onMove)
+    constructor(imageUrl, worldPosition)
     {
         this.img = document.createElement('img')
         this.img.src = imageUrl
-        this.img.onclick = onClick
         this.isVisible = false
         this.lastRasterCoord = { x: -1, y: -1 }
-        this.onMove = onMove
         this.worldPosition = worldPosition
+        this.onMove = ()=>{}
+    }
+
+    setOnClick(onClick)
+    {
+        this.img.onclick = onClick
+    }
+
+    setOnDblClick(onDblClick)
+    {
+        this.img.ondblclick = onDblClick
+    }
+
+    setOnMove(onMove)
+    {
+        this.onMove = onMove
     }
 
     getWorldPosition()
