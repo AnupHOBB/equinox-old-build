@@ -56,19 +56,24 @@ window.onload = () =>
         document.body.removeChild(loadingScreen) 
     }
 
-    let colorItemId = 'color-item'
-    let noOfColorItems = 4
+    let colors = ['#ECF9FF', '#FFFBEB', '#FFE7CC', '#F8CBA6']
+
     registerColorClicks()
     function registerColorClicks()
     {
-        for(let i=0; i<noOfColorItems; i++)
+        let colorMenu = document.getElementById('color-menu')
+        for(let i=0; i<colors.length; i++)
         {
-            let colorItem = document.getElementById(colorItemId+i)
+            let colorItem = document.createElement('div')
+            colorItem.id = 'color-item'+i
+            colorItem.className = 'color-item'
+            colorItem.style.backgroundColor = colors[i]
             colorItem.onclick = ()=>{
                 let style = window.getComputedStyle(colorItem)
                 let color = toColor(style.getPropertyValue('background-color'))
                 gltfActor.applyColor(color)
             }
+            colorMenu.appendChild(colorItem)
         }
     }
 
