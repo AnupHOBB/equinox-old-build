@@ -18,6 +18,8 @@ export class StaticActor
         let texture = new THREE.TextureLoader().load(url)
         texture.wrapS = THREE.RepeatWrapping
         texture.wrapT = THREE.RepeatWrapping
+        texture.repeat = new THREE.Vector2(100, 200)
+        texture.anisotropy = 100
         this.mesh.material.map = texture
     }
 
