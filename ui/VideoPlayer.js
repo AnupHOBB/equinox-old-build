@@ -13,7 +13,7 @@ export class VideoPlayer
 
     setLocation(xPosition, yPosition)
     {
-        this.core.setLocation(xPosition, yPosition)
+        this.core.setLocation(xPosition+10, yPosition+10)
     }
 
     show()

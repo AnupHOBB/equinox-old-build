@@ -8,6 +8,7 @@ import { MATHS } from './helpers/maths.js'
 import { MeshActor, StaticActor } from './core/Actor.js'
 import { SliderUI } from './ui/SliderUI.js'
 import { InputManager } from './core/InputManager.js'
+import { Hotspot } from './core/HotSpot.js'
 
 window.onload = () =>
 {
@@ -47,9 +48,21 @@ window.onload = () =>
 
     function onLoadingComplete()
     {
-        gltfActor.addHotSpots('assets/hotspot.png', new THREE.Vector3(-3.55, 2.4, 0.027), showVideo, ()=>videoPlayer.hide())
-        gltfActor.addHotSpots('assets/hotspot.png', new THREE.Vector3(-0.85, 2.4, 0.027), showVideo, ()=>videoPlayer.hide())
-        gltfActor.addHotSpots('assets/hotspot.png', new THREE.Vector3(-3.25, 2.4, -3.35), showVideo, ()=>videoPlayer.hide())
+        let hotSpot1 = new Hotspot('assets/hotspot.png', MATHS.addVectors(gltfActor.getPosition(), new THREE.Vector3(-3.55, 2.4, 0.027)))
+        hotSpot1.setOnClick(showVideo)
+        hotSpot1.setOnMove(()=>videoPlayer.hide())
+        hotSpot1.setOnDblClick(()=>{ sceneManager.broadcastTo(gltfActor.name, cameraManager.name, hotSpot1.worldPosition) })
+        let hotSpot2 = new Hotspot('assets/hotspot.png', MATHS.addVectors(gltfActor.getPosition(), new THREE.Vector3(-0.85, 2.4, 0.027)))
+        hotSpot2.setOnClick(showVideo)
+        hotSpot2.setOnMove(()=>videoPlayer.hide())
+        hotSpot2.setOnDblClick(()=>{ sceneManager.broadcastTo(gltfActor.name, cameraManager.name, hotSpot2.worldPosition) })
+        let hotSpot3 = new Hotspot('assets/hotspot.png', MATHS.addVectors(gltfActor.getPosition(), new THREE.Vector3(-3.25, 2.4, -3.35)))
+        hotSpot3.setOnClick(showVideo)
+        hotSpot3.setOnMove(()=>videoPlayer.hide())
+        hotSpot3.setOnDblClick(()=>{ sceneManager.broadcastTo(gltfActor.name, cameraManager.name, hotSpot3.worldPosition) })
+        gltfActor.addHotSpots(hotSpot1)
+        gltfActor.addHotSpots(hotSpot2)
+        gltfActor.addHotSpots(hotSpot3)
         let loadingScreen = document.getElementById('loading-screen')
         document.body.removeChild(loadingScreen) 
     }
