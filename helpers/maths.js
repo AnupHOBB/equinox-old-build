@@ -10,6 +10,11 @@ export const MATHS =
         return { x: v1.x - v2.x, y: v1.y - v2.y, z: v1.z - v2.z }
     },
 
+    scaleVector : function(v, s)
+    {
+        return { x: v.x * s, y: v.y * s, z: v.z * s }
+    },
+
     toRadians : function(degrees)
     {
         return (degrees * 22) / (7 * 180)
