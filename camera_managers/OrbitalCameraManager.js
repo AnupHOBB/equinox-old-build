@@ -21,7 +21,7 @@ export class OrbitalCameraManager
 
     getCamera() { return this.core.camera }
 
-    onMessage(sceneManager, senderName, sceneObject) { this.core.onMessage(sceneManager, senderName, sceneObject) }
+    onMessage(sceneManager, senderName, data) { this.core.onMessage(sceneManager, senderName, data) }
 
     onSceneStart(sceneManager) {}
 
@@ -53,11 +53,11 @@ class OrbitalCameraManagerCore extends PerspectiveCameraManager
         this.targetDistance = 0
     }
 
-    onMessage(sceneManager, senderName, sceneObject) 
+    onMessage(sceneManager, senderName, data) 
     {
         if (senderName == 'Input')
         {
-            let inputManager = sceneObject
+            let inputManager = data
             inputManager.registerMoveEvent((dx, dy) => this.onMoveEvent(dx, dy))
             inputManager.registerDoubleClickEvent((e, f) => this.onDoubleClick(e, f))
             inputManager.setCursorSensitivity(0.5)
@@ -68,28 +68,23 @@ class OrbitalCameraManagerCore extends PerspectiveCameraManager
             {
                 if(!this.zoom)
                 {
-                    let objectPosition = sceneObject
+                    let objectPosition = data
                     let front = new THREE.Vector3()
                     this.camera.getWorldDirection(front)
                     this.ogPosition = new THREE.Vector3(this.camera.position.x, this.camera.position.y, this.camera.position.z)
-                    this.sourcePosition = new THREE.Vector3(this.camera.position.x, this.camera.position.y, this.camera.position.z)
                     this.targetPosition = MATHS.subtractVectors(objectPosition, front)
-                    let vDisplacementActual = MATHS.subtractVectors(this.targetPosition, this.sourcePosition)
-                    this.targetDistance = MATHS.length(vDisplacementActual)
-                    this.vDisplacement = MATHS.scaleVector(MATHS.normalize(vDisplacementActual), 0.1)
-                    this.isZooming = true
-                    this.zoom = true
+                    this.zoom = true 
                 }
                 else
                 {
-                    this.sourcePosition = new THREE.Vector3(this.camera.position.x, this.camera.position.y, this.camera.position.z)
                     this.targetPosition = this.ogPosition
-                    let vDisplacementActual = MATHS.subtractVectors(this.targetPosition, this.sourcePosition)
-                    this.targetDistance = MATHS.length(vDisplacementActual)
-                    this.vDisplacement = MATHS.scaleVector(MATHS.normalize(vDisplacementActual), 0.1)
-                    this.isZooming = true
-                    this.zoom = false
+                    this.zoom = false            
                 }
+                this.sourcePosition = new THREE.Vector3(this.camera.position.x, this.camera.position.y, this.camera.position.z)
+                let vDisplacementActual = MATHS.subtractVectors(this.targetPosition, this.sourcePosition)
+                this.targetDistance = MATHS.length(vDisplacementActual)
+                this.vDisplacement = MATHS.scaleVector(MATHS.normalize(vDisplacementActual), 0.1)
+                this.isZooming = true
             }
         }
     }

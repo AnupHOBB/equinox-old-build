@@ -25,7 +25,7 @@ export class StaticActor
 
     setPosition(x, y, z) { this.mesh.position.set(x, y, z) }
 
-    onMessage(sceneManager, senderName, sceneObject) {}
+    onMessage(sceneManager, senderName, data) {}
 
     onSceneStart(sceneManager) { sceneManager.add(this.mesh, true) }
 
@@ -60,7 +60,7 @@ export class MeshActor
 
     addHotSpots(hotSpot) { this.core.hotspots.push(hotSpot) }
 
-    onMessage(sceneManager, senderName, sceneObject) {}
+    onMessage(sceneManager, senderName, data) {}
 
     onSceneStart(sceneManager) { this.core.onSceneStart(sceneManager) }
 

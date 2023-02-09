@@ -37,7 +37,7 @@ export class DirectLight
 
     orbit(speed) { this.core.orbit(speed) }
 
-    onMessage(sceneManager, senderName, sceneObject) {}
+    onMessage(sceneManager, senderName, data) {}
 
     onSceneStart(sceneManager) 
     { 
