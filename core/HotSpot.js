@@ -36,7 +36,7 @@ export class Hotspot
         if (aspect < 1)
             this.img.style = 'position: absolute; top: '+y+'; left: '+x+'; width: auto; height: 3%; user-select: none;'
         else
-            this.img.style = 'position: absolute; top: '+y+'; left: '+x+'; width: 3%; height: auto; user-select: none;'
+            this.img.style = 'position: absolute; top: '+y+'; left: '+x+'; width: 2%; height: auto; user-select: none;'
         if (this.lastRasterCoord.x != x || this.lastRasterCoord.y != y)
             this.onMove()
         this.lastRasterCoord = { x: x, y: y }

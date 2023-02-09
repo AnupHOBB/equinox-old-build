@@ -48,15 +48,15 @@ window.onload = () =>
 
     function onLoadingComplete()
     {
-        let hotSpot1 = new Hotspot('assets/hotspot.png', MATHS.addVectors(gltfActor.getPosition(), new THREE.Vector3(-3.55, 2.4, 0.027)))
+        let hotSpot1 = new Hotspot('assets/hotspot.png', MATHS.addVectors(gltfActor.getPosition(), new THREE.Vector3(-3.55, 2.4, 0.01)))
         hotSpot1.setOnClick(showVideo)
         hotSpot1.setOnMove(()=>videoPlayer.hide())
         hotSpot1.setOnDblClick(()=>{ sceneManager.broadcastTo(gltfActor.name, cameraManager.name, hotSpot1.worldPosition) })
-        let hotSpot2 = new Hotspot('assets/hotspot.png', MATHS.addVectors(gltfActor.getPosition(), new THREE.Vector3(-0.85, 2.4, 0.027)))
+        let hotSpot2 = new Hotspot('assets/hotspot.png', MATHS.addVectors(gltfActor.getPosition(), new THREE.Vector3(-0.85, 2.4, 0.01)))
         hotSpot2.setOnClick(showVideo)
         hotSpot2.setOnMove(()=>videoPlayer.hide())
         hotSpot2.setOnDblClick(()=>{ sceneManager.broadcastTo(gltfActor.name, cameraManager.name, hotSpot2.worldPosition) })
-        let hotSpot3 = new Hotspot('assets/hotspot.png', MATHS.addVectors(gltfActor.getPosition(), new THREE.Vector3(-3.25, 2.4, -3.35)))
+        let hotSpot3 = new Hotspot('assets/hotspot.png', MATHS.addVectors(gltfActor.getPosition(), new THREE.Vector3(-3.25, 2.4, -3.4)))
         hotSpot3.setOnClick(showVideo)
         hotSpot3.setOnMove(()=>videoPlayer.hide())
         hotSpot3.setOnDblClick(()=>{ sceneManager.broadcastTo(gltfActor.name, cameraManager.name, hotSpot3.worldPosition) })
