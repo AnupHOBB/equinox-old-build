@@ -21,11 +21,11 @@ export class OrbitalCameraManager
 
     getCamera() { return this.core.camera }
 
-    onMessage(sceneManager, senderName, sceneObject) { this.core.onMessage(sceneManager, senderName, sceneObject) }
+    onMessage(sceneManager, senderName, data) { this.core.onMessage(sceneManager, senderName, data) }
 
     onSceneStart(sceneManager) {}
 
-    onSceneRender(sceneManager) {}
+    onSceneRender(sceneManager) { this.core.onSceneRender(sceneManager) }
 
     onActive(sceneManager) { this.core.onActive(sceneManager, this.name) }
 
@@ -44,35 +44,61 @@ class OrbitalCameraManagerCore extends PerspectiveCameraManager
         this.orbitSpeed = 60
         this.cameraOrbiter = new OrbitControl(this.camera, axis, lookAt)
         this.zoom = false
+        this.isZooming = false
         this.ogPosition = this.camera.position
+    
+        this.vDisplacement = new THREE.Vector3()
+        this.sourcePosition = this.camera.position
+        this.targetPosition = this.camera.position
+        this.targetDistance = 0
     }
 
-    onMessage(sceneManager, senderName, sceneObject) 
+    onMessage(sceneManager, senderName, data) 
     {
         if (senderName == 'Input')
         {
-            let inputManager = sceneObject
+            let inputManager = data
             inputManager.registerMoveEvent((dx, dy) => this.onMoveEvent(dx, dy))
             inputManager.registerDoubleClickEvent((e, f) => this.onDoubleClick(e, f))
             inputManager.setCursorSensitivity(0.5)
         }
         else if (senderName == 'Roof')
         {       
-            if(!this.zoom)
+            if (!this.isZooming)
             {
-                let objectPosition = sceneObject
-                let front = new THREE.Vector3()
-                this.camera.getWorldDirection(front)
-                let targetPosition = MATHS.subtractVectors(objectPosition, front)
-                this.ogPosition = new THREE.Vector3(this.camera.position.x, this.camera.position.y, this.camera.position.z)
-                this.camera.position.set(targetPosition.x, targetPosition.y, targetPosition.z)
-                this.zoom = true
+                if(!this.zoom)
+                {
+                    let objectPosition = data
+                    let front = new THREE.Vector3()
+                    this.camera.getWorldDirection(front)
+                    this.ogPosition = new THREE.Vector3(this.camera.position.x, this.camera.position.y, this.camera.position.z)
+                    this.targetPosition = MATHS.subtractVectors(objectPosition, front)
+                    this.zoom = true 
+                }
+                else
+                {
+                    this.targetPosition = this.ogPosition
+                    this.zoom = false            
+                }
+                this.sourcePosition = new THREE.Vector3(this.camera.position.x, this.camera.position.y, this.camera.position.z)
+                let vDisplacementActual = MATHS.subtractVectors(this.targetPosition, this.sourcePosition)
+                this.targetDistance = MATHS.length(vDisplacementActual)
+                this.vDisplacement = MATHS.scaleVector(MATHS.normalize(vDisplacementActual), 0.1)
+                this.isZooming = true
             }
+        }
+    }
+
+    onSceneRender(sceneManager) 
+    {
+        if (this.isZooming)
+        {
+            let newPosition = MATHS.addVectors(this.camera.position, this.vDisplacement)
+            let travelDistance = MATHS.length(MATHS.subtractVectors(newPosition, this.sourcePosition))
+            if (travelDistance <= this.targetDistance)   
+                this.camera.position.set(newPosition.x, newPosition.y, newPosition.z)
             else
-            {
-                this.camera.position.set(this.ogPosition.x, this.ogPosition.y, this.ogPosition.z)
-                this.zoom = false
-            }
+                this.isZooming = false
         }
     }
 
@@ -80,13 +106,13 @@ class OrbitalCameraManagerCore extends PerspectiveCameraManager
 
     onMoveEvent(deltaX, deltaY, x, y) 
     { 
-        if (!this.zoom)
+        if (!this.zoom && !this.isZooming)
             this.cameraOrbiter.pan(deltaX) 
     }
 
     onDoubleClick(event, flag)
     {
-        if (!this.zoom)
+        if (!this.zoom && !this.isZooming)
         {
             if (flag)
                 this.cameraOrbiter.start(this.orbitSpeed)

@@ -48,15 +48,15 @@ window.onload = () =>
 
     function onLoadingComplete()
     {
-        let hotSpot1 = new Hotspot('assets/hotspot.png', MATHS.addVectors(gltfActor.getPosition(), new THREE.Vector3(-3.55, 2.4, 0.027)))
+        let hotSpot1 = new Hotspot('assets/hotspot.png', MATHS.addVectors(gltfActor.getPosition(), new THREE.Vector3(-3.55, 2.4, 0.01)))
         hotSpot1.setOnClick(showVideo)
         hotSpot1.setOnMove(()=>videoPlayer.hide())
         hotSpot1.setOnDblClick(()=>{ sceneManager.broadcastTo(gltfActor.name, cameraManager.name, hotSpot1.worldPosition) })
-        let hotSpot2 = new Hotspot('assets/hotspot.png', MATHS.addVectors(gltfActor.getPosition(), new THREE.Vector3(-0.85, 2.4, 0.027)))
+        let hotSpot2 = new Hotspot('assets/hotspot.png', MATHS.addVectors(gltfActor.getPosition(), new THREE.Vector3(-0.85, 2.4, 0.01)))
         hotSpot2.setOnClick(showVideo)
         hotSpot2.setOnMove(()=>videoPlayer.hide())
         hotSpot2.setOnDblClick(()=>{ sceneManager.broadcastTo(gltfActor.name, cameraManager.name, hotSpot2.worldPosition) })
-        let hotSpot3 = new Hotspot('assets/hotspot.png', MATHS.addVectors(gltfActor.getPosition(), new THREE.Vector3(-3.25, 2.4, -3.35)))
+        let hotSpot3 = new Hotspot('assets/hotspot.png', MATHS.addVectors(gltfActor.getPosition(), new THREE.Vector3(-3.25, 2.4, -3.4)))
         hotSpot3.setOnClick(showVideo)
         hotSpot3.setOnMove(()=>videoPlayer.hide())
         hotSpot3.setOnDblClick(()=>{ sceneManager.broadcastTo(gltfActor.name, cameraManager.name, hotSpot3.worldPosition) })
@@ -88,7 +88,7 @@ window.onload = () =>
                 let style = window.getComputedStyle(colorItem)
                 let color = toColor(style.getPropertyValue('background-color'))
                 gltfActor.applyColor(color)
-            }
+            }  
             colorMenu.appendChild(colorItem)
         }
     }
@@ -99,7 +99,13 @@ window.onload = () =>
         return match ? new THREE.Color(match[1]/255, match[2]/255, match[3]/255) : new THREE.Color()
     }
 
+    function hexToColor(hex) {
+        var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
+        return result ? new THREE.Color(parseInt(result[1], 16)/255, parseInt(result[2], 16)/255, parseInt(result[3], 16)/255) : new THREE.Color()
+    }
+
     const gltfActor = new MeshActor('Roof', './assets/eq_animation.glb', (xhr)=>{status = Math.round((xhr.loaded/ xhr.total) * 100)})
+    gltfActor.applyColor(hexToColor(colors[0]))
     gltfActor.setPosition(2, -2, -3)
 
     const canvas = document.querySelector('canvas')
