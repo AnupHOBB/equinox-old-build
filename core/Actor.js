@@ -17,7 +17,7 @@ export class StaticActor
         texture.wrapS = THREE.RepeatWrapping
         texture.wrapT = THREE.RepeatWrapping
         texture.repeat = new THREE.Vector2(100, 200)
-        texture.anisotropy = 100
+        texture.anisotropy = 2
         this.mesh.material.map = texture
     }
 
