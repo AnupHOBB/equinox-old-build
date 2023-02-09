@@ -94,15 +94,27 @@
                     border-color: black;
                     border-style: solid;
                 }
+
+                #color-menu-outer
+                {
+                    display: block;
+                    margin: auto;
+                    padding: 1%;
+                    width: 80%;
+                    height: 90%;
+                    background-color: rgba(0, 0, 0, 0.4);
+                    border-radius: 2ch;
+                }
             }
 
             @media screen and (min-aspect-ratio : 1/1)
             {
                 #slider-light
                 {
+                    position: absolute;
+                    top: 5%;
+                    left: 5%;
                     width: 20%; 
-                    display : block; 
-                    margin: auto;
                     -webkit-appearance: none;
                     color: #d3d3d3;
                     border-radius: 5ch;  
@@ -126,9 +138,10 @@
 
                 #slider-roof
                 {
+                    position: absolute;
+                    top: 5%;
+                    right: 5%;
                     width: 20%; 
-                    display : block; 
-                    margin: auto;
                     -webkit-appearance: none;
                     color: #d3d3d3;
                     border-radius: 5ch;  
@@ -176,6 +189,17 @@
                     border-radius: 5ch;
                     border-color: black;
                     border-style: solid;
+                }
+
+                #color-menu-outer
+                {
+                    display: block;
+                    margin: auto;
+                    padding: 1%;
+                    width: 30%;
+                    height: 100%;
+                    background-color: rgba(0, 0, 0, 0.4);
+                    border-radius: 2ch;
                 }
             }
             
@@ -229,22 +253,11 @@
                 height: 10%;
             }
 
-            #color-menu-outer
-            {
-                display: block;
-                margin: auto;
-                padding: 1%;
-                width: 20%;
-                height: 100%;
-                background-color: rgba(0, 0, 0, 0.4);
-                border-radius: 2ch;
-            }
-
             #color-menu
             {
                 display: flex;
                 overflow-x: auto;
-                gap: 5%;
+                gap: 6%;
                 width: 100%;
                 height: 100%;
             }

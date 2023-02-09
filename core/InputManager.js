@@ -97,6 +97,9 @@ class MouseEventCore
         canvas.addEventListener('mousedown', e=>this.onPress(e))
         canvas.addEventListener('mouseup', e=>this.onRelease(e))
         canvas.addEventListener('mousemove', e=>this.onMove(e))
+        canvas.addEventListener('touchstart', e=>this.onPress(e))
+        canvas.addEventListener('touchend', e=>this.onRelease(e))
+        canvas.addEventListener('touchmove', e=>this.onMove(e))
         canvas.addEventListener('click', e=>this.onClick(e))
         canvas.addEventListener('dblclick', e=>this.onDblClick(e))
     }
@@ -120,6 +123,8 @@ class MouseEventCore
     {
         if (this.moveCallbacks.length > 0 && this.mousePress)
         {    
+            if (event.type == 'touchmove') 
+                event = event.touches[0]
             if (this.firstClick)
             {
                 this.lastXY = { x: event.clientX, y: event.clientY }
