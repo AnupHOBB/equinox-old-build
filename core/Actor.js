@@ -1,8 +1,7 @@
 import * as THREE from 'three'
 import { GLTFLoader } from 'gltf-loader'
-import { FBXLoader } from 'fbx-loader'
 
-export class StaticActor
+export class FloorActor
 {
     constructor(name, geometry, material, supportShadow)
     {
@@ -77,13 +76,7 @@ class MeshActorCore
 {
     constructor(url, onProgress)
     {
-        let type = url.split('.')[2]
-        if (type == 'fbx')
-            new FBXLoader().load(url, (model)=>this.onFBXModelLoad(model), onProgress)
-        else if (type == 'glb' || type == 'gltf')
-            new GLTFLoader().load(url, (model)=>this.onGLTFModelLoad(model), onProgress)
-        else
-            throw 'Invalid 3D file format'
+        new GLTFLoader().load(url, (model)=>this.onModelLoad(model), onProgress)
         this.meshes = []
         this.texture = null
         this.color = new THREE.Color(1, 1, 1)
@@ -169,47 +162,7 @@ class MeshActorCore
         }
     }
 
-    onFBXModelLoad(model)
-    {
-        model.children.forEach(mesh=>this.meshes.push(mesh))
-        this.meshes.forEach(mesh => {
-            mesh.material.shadowSide = THREE.BackSide
-            mesh.receiveShadow = true
-            mesh.castShadow = true
-        })
-
-        let roofBody = this.meshes[0]
-        roofBody.scale.x = 1
-        roofBody.scale.y = 1
-        roofBody.scale.z = 1
-        roofBody.position.x += this.position.x
-        roofBody.position.y += this.position.y
-        roofBody.position.z += this.position.z
-
-        let xoffset = 0
-        let yoffset = 2.6
-        let zoffset = -1.67
-
-        for(let i=1; i< this.meshes.length; i++)
-        {
-            this.meshes[i].scale.x = 1
-            this.meshes[i].scale.y = 1
-            this.meshes[i].scale.z = 1
-            this.meshes[i].position.x = this.position.x + xoffset
-            this.meshes[i].position.y = this.position.y + yoffset
-            this.meshes[i].position.z = this.position.z + zoffset
-            xoffset-= 0.19
-        }
-
-        const clip = model.animations[0]
-        this.mixer = new THREE.AnimationMixer(model)
-        this.mixer.clipAction(clip).play()
-        this.ready = true
-        this.changeTexture()
-        this.changeColor()
-    }
-
-    onGLTFModelLoad(model)
+    onModelLoad(model)
     {
         model.scene.children.forEach(mesh=>this.meshes.push(mesh))
         this.meshes.forEach(mesh => {

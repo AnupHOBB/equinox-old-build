@@ -4,11 +4,12 @@ import { OrbitalCameraManager } from './camera_managers/OrbitalCameraManager.js'
 import { DirectLight } from './core/Light.js'
 import { AmbientLight } from './core/Light.js'
 import { VideoPlayer } from './ui/VideoPlayer.js'
-import { MATHS } from './helpers/maths.js'
-import { MeshActor, StaticActor } from './core/Actor.js'
+import { MeshActor, FloorActor } from './core/Actor.js'
 import { SliderUI } from './ui/SliderUI.js'
 import { InputManager } from './core/InputManager.js'
 import { Hotspot } from './core/HotSpot.js'
+import { MATHS } from './helpers/maths.js'
+import { MISC } from './helpers/misc.js'
 
 window.onload = () =>
 {
@@ -74,38 +75,24 @@ window.onload = () =>
     }
 
     let colors = ['#ECF9FF', '#FFFBEB', '#FFE7CC', '#F8CBA6']
-    registerColorClicks()
-    function registerColorClicks()
+    let colorMenu = document.getElementById('color-menu')
+    for(let i=0; i<colors.length; i++)
     {
-        let colorMenu = document.getElementById('color-menu')
-        for(let i=0; i<colors.length; i++)
+        let colorItem = document.createElement('div')
+        colorItem.id = 'color-item'+i
+        colorItem.className = 'color-item'
+        colorItem.style.backgroundColor = colors[i]
+        colorItem.onclick = ()=>
         {
-            let colorItem = document.createElement('div')
-            colorItem.id = 'color-item'+i
-            colorItem.className = 'color-item'
-            colorItem.style.backgroundColor = colors[i]
-            colorItem.onclick = ()=>{
-                let style = window.getComputedStyle(colorItem)
-                let color = toColor(style.getPropertyValue('background-color'))
-                gltfActor.applyColor(color)
-            }  
-            colorMenu.appendChild(colorItem)
-        }
-    }
-
-    function toColor(str)
-    {
-        let match = str.match(/rgba?\((\d{1,3}), ?(\d{1,3}), ?(\d{1,3})\)?(?:, ?(\d(?:\.\d?))\))?/)
-        return match ? new THREE.Color(match[1]/255, match[2]/255, match[3]/255) : new THREE.Color()
-    }
-
-    function hexToColor(hex) {
-        var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
-        return result ? new THREE.Color(parseInt(result[1], 16)/255, parseInt(result[2], 16)/255, parseInt(result[3], 16)/255) : new THREE.Color()
+            let style = window.getComputedStyle(colorItem)
+            let color = MISC.toColor(style.getPropertyValue('background-color'))
+            gltfActor.applyColor(color)
+        }  
+        colorMenu.appendChild(colorItem)
     }
 
     const gltfActor = new MeshActor('Roof', './assets/eq_animation.glb', (xhr)=>{status = Math.round((xhr.loaded/ xhr.total) * 100)})
-    gltfActor.applyColor(hexToColor(colors[0]))
+    gltfActor.applyColor(MISC.hexToColor(colors[0]))
     gltfActor.setPosition(2, -2, -3)
 
     const canvas = document.querySelector('canvas')
@@ -123,7 +110,7 @@ window.onload = () =>
     const directLight = new DirectLight('DirectLight', new THREE.Vector3(0, 150, 100), 5, lookAtPosition)
     sceneManager.register(directLight)
 
-    const floor = new StaticActor('Floor', new THREE.BoxGeometry(100, 0.1, 100), new THREE.MeshLambertMaterial(), true)
+    const floor = new FloorActor('Floor', new THREE.BoxGeometry(100, 0.1, 100), new THREE.MeshLambertMaterial(), true)
     floor.applyTexture('./assets/Colored_Paving_Bricks.png')
     floor.setPosition(0, -2, 0)
     sceneManager.register(floor)
