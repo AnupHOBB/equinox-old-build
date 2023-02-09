@@ -88,7 +88,7 @@ window.onload = () =>
                 let style = window.getComputedStyle(colorItem)
                 let color = toColor(style.getPropertyValue('background-color'))
                 gltfActor.applyColor(color)
-            }
+            }  
             colorMenu.appendChild(colorItem)
         }
     }
@@ -99,7 +99,13 @@ window.onload = () =>
         return match ? new THREE.Color(match[1]/255, match[2]/255, match[3]/255) : new THREE.Color()
     }
 
+    function hexToColor(hex) {
+        var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
+        return result ? new THREE.Color(parseInt(result[1], 16)/255, parseInt(result[2], 16)/255, parseInt(result[3], 16)/255) : new THREE.Color()
+    }
+
     const gltfActor = new MeshActor('Roof', './assets/eq_animation.glb', (xhr)=>{status = Math.round((xhr.loaded/ xhr.total) * 100)})
+    gltfActor.applyColor(hexToColor(colors[0]))
     gltfActor.setPosition(2, -2, -3)
 
     const canvas = document.querySelector('canvas')
