@@ -1,5 +1,12 @@
+/**
+ * Represents the hotspots that appera attached onto a 3D model
+ */
 export class Hotspot
 {
+    /**
+     * @param {String} imageUrl url of the image that is displayed as a hotspot
+     * @param {THREE.Vector3} worldPosition position of the hotspot in world space
+     */
     constructor(imageUrl, worldPosition)
     {
         this.img = document.createElement('img')
@@ -10,26 +17,35 @@ export class Hotspot
         this.onMove = ()=>{}
     }
 
-    setOnClick(onClick)
-    {
-        this.img.onclick = onClick
-    }
+    /**
+     * Sets the click callback
+     * @param {Function} onClick callback function that is called when the user clicks on the hot spot 
+     */
+    setOnClick(onClick) { this.img.onclick = onClick }
 
-    setOnDblClick(onDblClick)
-    {
-        this.img.ondblclick = onDblClick
-    }
+    /**
+     * Sets the double click callback
+     * @param {Function} onDblClick callback function that is called when the user double clicks on the hot spot 
+     */
+    setOnDblClick(onDblClick) { this.img.ondblclick = onDblClick }
 
-    setOnMove(onMove)
-    {
-        this.onMove = onMove
-    }
+    /**
+     * Sets the mouse move callback
+     * @param {Function} onMove callback function that is called when the mouse or touch cursor is moved 
+     */
+    setOnMove(onMove) { this.onMove = onMove }
 
-    getWorldPosition()
-    {
-        return this.worldPosition
-    }
+    /**
+     * Returns the world space position of hot spot
+     * @returns {THREE.Vector3} position of the hot spot in world space
+     */
+    getWorldPosition() { return this.worldPosition }
 
+    /**
+     * Sets the raster coordinate of hotspot. This function is called by the actor that the hotspot belongs to
+     * @param {Number} x x-coordinate of hotspot in raster space 
+     * @param {Number} y y-coordinate of hotspot in raster space 
+     */
     setRasterCoordinates(x, y)
     {
         let aspect = window.innerWidth/window.innerHeight
@@ -42,6 +58,9 @@ export class Hotspot
         this.lastRasterCoord = { x: x, y: y }
     }
 
+    /**
+     * Displays the hotspot
+     */
     show()
     {
         if (!this.isVisible)
@@ -51,6 +70,9 @@ export class Hotspot
         }
     }
 
+    /**
+     * Hides the hotspot
+     */
     hide()
     {
         if (this.isVisible)

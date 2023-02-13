@@ -1,34 +1,52 @@
+/**
+ * Wrapper VideoPlayerCore
+ */
 export class VideoPlayer
 {
-    constructor(url, width, height)
-    {
-        this.core = new VideoPlayerCore(url, width, height)
-    }
+    /**
+     * @param {String} url url of video file
+     * @param {Number} width video width
+     * @param {Number} height video height
+     */
+    constructor(url, width, height) { this.core = new VideoPlayerCore(url, width, height) }
     
+    /**
+     * Resizes the video
+     * @param {Number} width video width
+     * @param {Number} height video height
+     */
     resize(width, height)
     {
         this.core.video.width = width
         this.core.video.height = height
     }
 
-    setLocation(xPosition, yPosition)
-    {
-        this.core.setLocation(xPosition+10, yPosition+10)
-    }
+    /**
+     * Delegates call to VideoPlayerCore setLocation
+     * @param {Number} xPosition x-coordinate of the video in raster space
+     * @param {Number} yPosition y-coordinate of the video in raster space
+     */
+    setLocation(xPosition, yPosition) { this.core.setLocation(xPosition+10, yPosition+10) }
 
-    show()
-    {
-        this.core.show()
-    }
+    /**
+     * Delegates call to VideoPlayerCore show
+     */
+    show() { this.core.show() }
 
-    hide()
-    {
-        this.core.hide()
-    }
+    /**
+     * Delegates call to VideoPlayerCore hide
+     */
+    hide() { this.core.hide() }
 }
 
 class VideoPlayerCore
 {
+
+    /**
+     * @param {String} url url of video file
+     * @param {Number} width video width
+     * @param {Number} height video height
+     */
     constructor(url, width, height)
     {
         this.video = document.createElement('video')
@@ -39,6 +57,11 @@ class VideoPlayerCore
         this.isShowing = false
     }
 
+    /**
+     * Sets the location of the video in raster space.
+     * @param {Number} xPosition x-coordinate of the video in raster space
+     * @param {Number} yPosition y-coordinate of the video in raster space
+     */
     setLocation(xPosition, yPosition)
     {
         let xBound = xPosition + this.video.width
@@ -50,6 +73,9 @@ class VideoPlayerCore
         this.video.style = 'position: absolute; top : '+yPosition+'; left: '+xPosition+';'
     }
 
+    /**
+     * Shows the video in screen
+     */
     show()
     {
         if (!this.isShowing)
@@ -60,6 +86,9 @@ class VideoPlayerCore
         }
     }
 
+    /**
+     * Removes the video from screen
+     */
     hide()
     {
         if (this.isShowing)
