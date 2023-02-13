@@ -78,35 +78,11 @@ export class InputManager extends SceneObject
     onMessage(sceneManager, senderName, data)  { sceneManager.broadcastTo(this.name, senderName, this) }
 
     /**
-     * Called by SceneManager as soon as the object gets registered in SceneManager.
-     * @param {SceneManager} sceneManager the SceneManager object
-     */
-    onSceneStart(sceneManager)  {}
-
-    /**
      * Called by SceneManager every frame.
      * This function delegates call to KeyEventCore notify
      * @param {SceneManager} sceneManager the SceneManager object
      */
     onSceneRender(sceneManager) { this.keyEvent.notify() }
-
-    /**
-     * Used for notifying the SceneManager if this object is ready to be included in scene.
-     * @returns {Boolean} ready status of object
-     */
-    isReady() { return true }
-
-    /**
-     * Used for notifying the SceneManager if this object should be included in raycasting.
-     * @returns {Boolean} ray castable status of camera
-     */
-    isRayCastable() { return false }
-
-    /**
-     * Used for notifying the SceneManager if this object is drawable in screen.
-     * @returns {Boolean} drawable status of camera
-     */
-    isDrawable() { return false }
 }
 
 /**
