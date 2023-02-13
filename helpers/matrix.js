@@ -1,5 +1,11 @@
 export const MATRIX =
 {
+    /**
+     * Multiplies 4x4 matrix with 3D vector
+     * @param {Float32Array} m 4x4 matrix
+     * @param {THREE.Vector3} v 3D vector
+     * @returns {THREE.Vector3} multiplied 3D vector
+     */
     mat4XVec3 : function (m, v)
     {
         let x = m[0][0] * v.x + m[0][1] * v.y + m[0][2] * v.z + m[0][3]
@@ -8,6 +14,12 @@ export const MATRIX =
         return { x: x, y: y, z: z }
     },
 
+    /**
+     * Multiplies two 4x4 matrices
+     * @param {Float32Array} m1 4x4 matrix
+     * @param {Float32Array} m2 4x4 matrix
+     * @returns {Float32Array} multiplied 4x4 matrix
+     */
     mat4Xmat4 : function (m1, m2)
     {
         let m3 = []

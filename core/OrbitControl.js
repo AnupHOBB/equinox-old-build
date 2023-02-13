@@ -3,10 +3,7 @@ import { MATHS } from '../helpers/maths.js'
 
 export class OrbitControl
 {
-    constructor(object3D, axis, lookAtPosition)
-    {
-        this.core = new OrbitControlCore(object3D, axis, lookAtPosition)
-    }
+    constructor(object3D, axis, lookAtPosition) { this.core = new OrbitControlCore(object3D, axis, lookAtPosition) }
 
     pan(speed)
     {
@@ -23,10 +20,7 @@ export class OrbitControl
         }
     }
 
-    stop()
-    {
-        this.core.isOrbit = false
-    }
+    stop() { this.core.isOrbit = false }
 }
 
 class OrbitControlCore

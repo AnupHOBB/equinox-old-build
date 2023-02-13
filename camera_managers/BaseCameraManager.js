@@ -1,9 +1,34 @@
 import * as THREE from 'three'
+import { SceneObject } from '../core/SceneManager.js'
 import { MATHS } from '../helpers/maths.js'
 import { MATRIX } from '../helpers/matrix.js'
 
-export class PerspectiveCameraManager
+/**
+ * Parent class for all camera managers
+ */
+export class BaseCameraManager extends SceneObject
 {
+    /**
+     * Returns the threejs camera object stored within
+     * @returns {THREE.PerspectiveCamera} threejs camera object
+     */
+    getCamera() { return null }
+
+    /**
+     * Called by SceneManager when this camera object is set as active.
+     * @param {SceneManager} sceneManager the SceneManager object
+     */
+    onActive(sceneManager) {}
+}
+
+/**
+ * Base class for all perspective cameras
+ */
+export class PerspectiveCamera
+{
+    /**
+     * @param {Number} fov camera field of view
+     */
     constructor(fov)
     {
         this.camera = new THREE.PerspectiveCamera(fov, window.innerWidth/window.innerHeight, 0.1, 1000)
@@ -11,11 +36,13 @@ export class PerspectiveCameraManager
         this.viewMatrix = this.getViewMatrix()
     }
 
-    setAspectRatio(ratio)
-    {
-        this.camera.aspect = ratio
-    }
-
+    /**
+     * Converts the world coordinate value of a point in raster coordinate and also returns a boolean to indicate
+     * whether that raster coordinate is valid or not 
+     * @param {THREE.Vector3} worldPosition position of point in world whose raster coordinate is required
+     * @returns {[THREE.Vector2, Boolean]} [raster coordinate of the point whose world coordinate was given, 
+     * boolean value to indicate whether the raster coordinate is valid or not]
+     */
     worldToRaster(worldPosition)
     {
         let viewPosition = MATRIX.mat4XVec3(this.viewMatrix, worldPosition)
@@ -36,17 +63,29 @@ export class PerspectiveCameraManager
         return [{ x: rasterX, y: rasterY }, true]
     }
 
+    /**
+     * Converts the world coordinate value of a point in view space or camera space coordinate
+     * @param {THREE.Vector3} worldPosition position of point in world whose view space coordinate is required
+     * @returns {THREE.Vector3} position of point in view space whose world coordinate was given
+     */
     worldToView(worldPosition)
     {
         return MATRIX.mat4XVec3(this.viewMatrix, worldPosition)
     }
 
+    /**
+     * Called to update the camera view matrix whenever any camera properties is changed
+     */
     updateMatrices()
     {
         this.camera.updateProjectionMatrix()
         this.viewMatrix = this.getViewMatrix()
     }
 
+    /**
+     * Generates and returns camera view matrix
+     * @returns {Float32Array} Multi-dimension float array that stores the view matrix
+     */
     getViewMatrix()
     {
         let front = new THREE.Vector3()

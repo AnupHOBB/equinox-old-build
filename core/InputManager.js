@@ -1,53 +1,117 @@
-export class InputManager
-{
+import { SceneObject } from '../core/SceneManager.js'
+
+/**
+ * Responsible for notifying objects whenever user provides a mouse, touch or key input
+ */
+export class InputManager extends SceneObject
+{ 
+    /**
+     * @param {String} name name of the object which is used in sending or receiving message
+     * @param {HTMLCanvasElement} canvas HTML canvas element
+     */
     constructor(name, canvas)
     {
+        super()
         this.name = name
         this.keyEvent = new KeyEventCore()
         this.mouseEvent = new MouseEventCore(canvas)
     }
 
-    registerKeyEvent(callback) { this.keyEvent.register(callback) }
+    /**
+     * Registers key event callbacks
+     * @param {Function} callback callback that is called whenever user presses a key in keyboard 
+     */
+    registerKeyEvent(callback) { this.keyEvent.callbacks.push(callback) }
 
+    /**
+     * Delegates call to KeyEventCore notify
+     */
     notifyKeyEvent() { this.keyEvent.notify() }
 
+    /**
+     * Sets the mouse sensitivity value
+     * @param {Number} sensitivity 
+     */
     setCursorSensitivity(sensitivity)
     {
         if (sensitivity != null && sensitivity != undefined)
             this.mouseEvent.sensitivity = sensitivity
     }
 
+    /**
+     * Registers mouse click callbacks
+     * @param {Function} onClick callback that is called whenever user click on mouse
+     */
     registerClickEvent(onClick)
     {
         if (onClick != null && onClick != undefined)
             this.mouseEvent.clickCallbacks.push(onClick)
     }
 
+    /**
+     * Registers mouse or touch cursor movement callbacks
+     * @param {Function} onMoveEvent callback that is called whenever the mouse or touch cursor is relocated
+     */
     registerMoveEvent(onMoveEvent)
     {
         if (onMoveEvent != null && onMoveEvent != undefined)
             this.mouseEvent.moveCallbacks.push(onMoveEvent)
     }
 
+    /**
+     * Registers mouse double click callbacks
+     * @param {Function} onDblClick callback that is called whenever user double clicks on mouse
+     */
     registerDoubleClickEvent(onDblClick)
     {
         if (onDblClick != null && onDblClick != undefined)
             this.mouseEvent.dblClickCallbacks.push(onDblClick)
     }
 
+    /**
+     * Called by SceneManager when there is a message for this object posted by any other object registered in SceneManager.
+     * This function broadcasts itself back to the sender.
+     * @param {SceneManager} sceneManager the SceneManager object
+     * @param {String} senderName name of the object who posted the message
+     * @param {any} data any object sent as part of the message
+     */
     onMessage(sceneManager, senderName, data)  { sceneManager.broadcastTo(this.name, senderName, this) }
 
+    /**
+     * Called by SceneManager as soon as the object gets registered in SceneManager.
+     * @param {SceneManager} sceneManager the SceneManager object
+     */
     onSceneStart(sceneManager)  {}
 
+    /**
+     * Called by SceneManager every frame.
+     * This function delegates call to KeyEventCore notify
+     * @param {SceneManager} sceneManager the SceneManager object
+     */
     onSceneRender(sceneManager) { this.keyEvent.notify() }
 
+    /**
+     * Used for notifying the SceneManager if this object is ready to be included in scene.
+     * @returns {Boolean} ready status of object
+     */
     isReady() { return true }
 
+    /**
+     * Used for notifying the SceneManager if this object should be included in raycasting.
+     * @returns {Boolean} ray castable status of camera
+     */
     isRayCastable() { return false }
 
+    /**
+     * Used for notifying the SceneManager if this object is drawable in screen.
+     * @returns {Boolean} drawable status of camera
+     */
     isDrawable() { return false }
 }
 
+/**
+ * Responsible for detecting and notifying key events
+ */
 class KeyEventCore
 {
     constructor()
@@ -58,8 +122,11 @@ class KeyEventCore
         window.addEventListener("keyup", e=>this.onUp(e))
     }
 
-    register(callback) { this.callbacks.push(callback) }
-
+    /**
+     * Called by window whenever it detects a key press.
+     * This function stores the key in keymap
+     * @param {KeyboardEvent} event 
+     */
     onDown(event)
     {
         let entry = this.keyMap.get(event.key)
@@ -67,6 +134,11 @@ class KeyEventCore
             this.keyMap.set(event.key, true)
     }
 
+    /**
+     * Called by window whenever it detects a key release.
+     * This function remove the key from keymap
+     * @param {KeyboardEvent} event 
+     */
     onUp(event)
     {
         let entry = this.keyMap.get(event.key)
@@ -74,6 +146,9 @@ class KeyEventCore
             this.keyMap.delete(event.key)
     }
 
+    /**.
+     * This function calls all the keyevent callbacks on every frame
+     */
     notify()
     {
         for (let callback of this.callbacks)
@@ -81,6 +156,9 @@ class KeyEventCore
     }
 }
 
+/**
+ * Responsible for detecting and notifying mouse and touch events
+ */
 class MouseEventCore
 {
     constructor(canvas)
@@ -90,7 +168,6 @@ class MouseEventCore
         this.firstClick = true
         this.lastXY = { x: 0, y: 0 }
         this.sensitivity = 1
-        this.dblClickCounter = 0
         this.clickCallbacks = []
         this.moveCallbacks = []
         this.dblClickCallbacks = []
@@ -104,14 +181,30 @@ class MouseEventCore
         canvas.addEventListener('dblclick', e=>this.onDblClick(e))
     }
 
+    /**
+     * Called by canvas event listener whenever it detects a mouse click.
+     * This function notifies all the registered click callbacks.
+     * @param {MouseEvent} event mouse event object
+     */
     onClick(event)
     {
         for (let clickCallback of this.clickCallbacks)
             clickCallback(event.clientX, event.clientY)
     }
     
+    /**
+     * Called whenever user presses the mouse button or touches the screen
+     * This function sets the mousePress flag to true
+     * @param {Event} event mouse or touch event object
+     */
     onPress(event) { this.mousePress = true }
 
+    /**
+     * Called whenever user releases the mouse button or touches the screen
+     * This function sets the mousePress flag to false and firstClick value to true
+     * and also resets the value of lastXY object.
+     * @param {Event} event mouse or touch event object
+     */
     onRelease(event)
     {
         this.mousePress = false
@@ -119,6 +212,13 @@ class MouseEventCore
         this.lastXY = { x: 0, y: 0 }
     }
 
+    /**
+     * Called whenever the mouse or touch cursor is relocated.
+     * If there are registered move callbacks and if the mousePress is true, then this function will 
+     * calculate the displacement of the cursor and call the callbacks by providing the displacement
+     * as well as the cursor positions.
+     * @param {*} event mouse or touch event object
+     */
     onMove(event)
     {
         if (this.moveCallbacks.length > 0 && this.mousePress)
@@ -139,12 +239,14 @@ class MouseEventCore
         }
     }
 
+    /**
+     * Called by canvas event listener whenever it detects a mouse double click.
+     * This function notifies all the registered double click callbacks.
+     * @param {MouseEvent} event mouse event object
+     */
     onDblClick(event)
     {
-        this.dblClickCounter++
-        if (this.dblClickCounter == 2)
-            this.dblClickCounter = 0
         for (let dblClickCallback of this.dblClickCallbacks)
-            dblClickCallback(event, this.dblClickCounter == 1)
+            dblClickCallback(event)
     }
 }

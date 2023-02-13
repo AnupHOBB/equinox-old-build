@@ -1,6 +1,7 @@
 import * as THREE from 'three'
 import { SceneManager } from './core/SceneManager.js'
 import { OrbitalCameraManager } from './camera_managers/OrbitalCameraManager.js'
+import { FirstPersonCameraManager } from './camera_managers/FirstPersonCameraManager.js'
 import { DirectLight } from './core/Light.js'
 import { AmbientLight } from './core/Light.js'
 import { VideoPlayer } from './ui/VideoPlayer.js'

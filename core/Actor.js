@@ -1,15 +1,31 @@
 import * as THREE from 'three'
 import { GLTFLoader } from 'gltf-loader'
+import { SceneManager, SceneObject } from '../core/SceneManager.js'
+import { Hotspot } from './HotSpot.js'
 
-export class FloorActor
+/**
+ * Represents the floor onto which the louver roof stands. It wraps Threejs Mesh.
+ */
+export class FloorActor extends SceneObject
 {
+    /**
+     * @param {String} name name of the object which is used in sending or receiving message
+     * @param {THREE.BoxGeometry} geometry threejs geometry class that holds the vertex data 
+     * @param {THREE.MeshLambertMaterial} material threejs material class that holds the shader
+     * @param {Boolean} supportShadow used to set receiveShadow varible of the mesh
+     */
     constructor(name, geometry, material, supportShadow)
     {
+        super()
         this.name = name
         this.mesh = new THREE.Mesh(geometry, material)
         this.mesh.receiveShadow = supportShadow
     }
 
+    /**
+     * Applies texture on the floor object.
+     * @param {String} url url of the texture
+     */
     applyTexture(url)
     {
         let texture = new THREE.TextureLoader().load(url)
@@ -20,60 +36,170 @@ export class FloorActor
         this.mesh.material.map = texture
     }
 
+    /**
+     * Applies color on the floor object.
+     * @param {THREE.Color} color threejs color object 
+     */
     applyColor(color) { this.mesh.material.color = color }
 
+    /**
+     * Sets the position of the floor in world space
+     * @param {Number} x x-coordinate in world space
+     * @param {Number} y y-coordinate in world space
+     * @param {Number} z z-coordinate in world space 
+     */
     setPosition(x, y, z) { this.mesh.position.set(x, y, z) }
 
+    /**
+     * Called by SceneManager when there is a message for this object posted by any other object registered in SceneManager.
+     * @param {SceneManager} sceneManager the SceneManager object
+     * @param {String} senderName name of the object who posted the message
+     * @param {any} data any object sent as part of the message
+     */
     onMessage(sceneManager, senderName, data) {}
 
+    /**
+     * Called by SceneManager as soon as the object gets registered in SceneManager.
+     * @param {SceneManager} sceneManager the SceneManager object
+     */
     onSceneStart(sceneManager) { sceneManager.add(this.mesh, true) }
 
+    /**
+     * Called by SceneManager every frame.
+     * @param {SceneManager} sceneManager the SceneManager object
+     */
     onSceneRender(sceneManager) {}
 
+    /**
+     * Used for notifying the SceneManager if this object is ready to be included in scene.
+     * @returns {Boolean} ready status of object
+     */
     isReady() { return true }
 
+    /**
+     * Used for notifying the SceneManager if this object should be included in raycasting.
+     * @returns {Boolean} ray castable status of object
+     */
     isRayCastable() { return true }
 
+    /**
+     * Used for notifying the SceneManager if this object should be included in raycasting.
+     * @returns {Boolean} drawable status of object
+     */
     isDrawable() { return true }
 }
 
-export class MeshActor
+/**
+ * Wraps MeshActorCore object.
+ */
+export class MeshActor extends SceneObject
 {
+    /**
+     * @param {String} name name of the object which is used in sending or receiving message
+     * @param {String} url url of the 3D model
+     * @param {Function} onProgress callback for notifying model loading status
+     */
     constructor(name, url, onProgress) 
     {
+        super()
         this.name = name 
         this.core = new MeshActorCore(url, onProgress) 
     }
 
+    /**
+     * Delegates call to MeshActorCore updateAnimationFrame
+     * @param {*} deltaSeconds the time difference of the target animation frame from the current animation frame
+     */
     updateAnimationFrame(deltaSeconds) { this.core.updateAnimationFrame(deltaSeconds) } 
 
+    /**
+     * Delegates call to MeshActorCore setPosition
+     * @param {Number} x x-coordinate in world space
+     * @param {Number} y y-coordinate in world space
+     * @param {Number} z z-coordinate in world space 
+     */
     setPosition(x, y, z) { this.core.setPosition(x, y, z) }
 
+    /**
+     * Returns world space position of the mesh
+     * @returns {THREE.Vector3} world space position of mesh 
+     */
     getPosition() { return this.core.position }
 
+    /**
+     * Delegates call to MeshActorCore applyTexture
+     * @param {String} url url of the texture
+     */
     applyTexture(url) { this.core.applyTexture(url) }
 
+    /**
+     * Delegates call to MeshActorCore applyColor
+     * @param {THREE.Color} color threejs color object 
+     */
     applyColor(color) { this.core.applyColor(color) }
 
+    /**
+     * Delegates call to MeshActorCore changeTexture
+     * @param {THREE.Color} color threejs color object 
+     */
     changeTexture() { this.core.changeTexture() }
 
+    /**
+     * Adds a selectable hot spot object in the mesh
+     * @param {Hotspot} hotSpot hotspot object to be added as part of mesh
+     */
     addHotSpots(hotSpot) { this.core.hotspots.push(hotSpot) }
 
+    /**
+     * Called by SceneManager when there is a message for this object posted by any other object registered in SceneManager.
+     * @param {SceneManager} sceneManager the SceneManager object
+     * @param {String} senderName name of the object who posted the message
+     * @param {any} data any object sent as part of the message
+     */
     onMessage(sceneManager, senderName, data) {}
 
+    /**
+     * Called by SceneManager as soon as the object gets registered in SceneManager.
+     * However, this function only delegates call to MeshActorCore's onSceneStart.
+     * @param {SceneManager} sceneManager the SceneManager object
+     */
     onSceneStart(sceneManager) { this.core.onSceneStart(sceneManager) }
 
+    /**
+     * Called by SceneManager as soon as the object gets registered in SceneManager.
+     * However, this function only delegates call to MeshActorCore's onSceneRender.
+     * @param {SceneManager} sceneManager the SceneManager object
+     */
     onSceneRender(sceneManager) { this.core.onSceneRender(sceneManager) }
 
+    /**
+     * Used for notifying the SceneManager if this object is ready to be included in scene.
+     * @returns {Boolean} ready status of object
+     */
     isReady() { return this.core.ready }
 
+    /**
+     * Used for notifying the SceneManager if this object should be included in raycasting.
+     * @returns {Boolean} ray castable status of object 
+     */
     isRayCastable() { return false }
 
+    /**
+     * Used for notifying the SceneManager if this object is drawable in screen.
+     * @returns {Boolean} drawable status of object 
+     */
     isDrawable() { return true }
 }
 
+/**
+ * Core class that represents any GLTF 3D model. Here, it wraps the GLTF model. 
+ */
 class MeshActorCore
 {
+    /**
+     * @param {String} url url of the 3D model
+     * @param {Function} onProgress callback for notifying model loading status
+     */
     constructor(url, onProgress)
     {
         new GLTFLoader().load(url, (model)=>this.onModelLoad(model), onProgress)
@@ -88,12 +214,22 @@ class MeshActorCore
         this.mixer = null
     }
 
+    /**
+     * Renders new animation frame
+     * @param {Number} deltaSeconds the time difference of the target animation frame from the current animation frame  
+     */
     updateAnimationFrame(deltaSeconds) 
     { 
         if (this.mixer != null)
             this.mixer.update(deltaSeconds)
     } 
 
+    /**
+     * Sets the position of the mesh in world space
+     * @param {Number} x x-coordinate in world space
+     * @param {Number} y y-coordinate in world space
+     * @param {Number} z z-coordinate in world space 
+     */
     setPosition(x, y, z)
     {
         this.position.x = x
@@ -109,6 +245,10 @@ class MeshActorCore
         }
     }
 
+    /**
+     * Stores the new texture that needs to be applied
+     * @param {String} url url of the texture
+     */
     applyTexture(url)
     {
         this.texture = new THREE.TextureLoader().load(url)
@@ -117,12 +257,19 @@ class MeshActorCore
         this.changeTexture()
     }
 
+    /**
+     * Stores the new color that needs to be applied
+     * @param {THREE.Color} color threejs color object 
+     */
     applyColor(color) 
     { 
         this.color = color
         this.changeColor() 
     }
 
+    /**
+     * Chnages the texture of the 3D model
+     */
     changeTexture()
     {
         if (this.texture != null)
@@ -131,6 +278,9 @@ class MeshActorCore
             })
     }
 
+    /**
+     * Changes the color of the 3D model
+     */
     changeColor()
     {
         this.meshes.forEach(mesh => { 
@@ -138,12 +288,22 @@ class MeshActorCore
         })   
     }
 
+    /**
+     * Called by MeshActor every frame.
+     * This functions adds additional 3D meshes that are supposed to be part of the 3D model. 
+     * @param {SceneManager} sceneManager the SceneManager object
+     */
     onSceneStart(sceneManager) 
     {
         sceneManager.add(this.roofBound, true)
         this.meshes.forEach(mesh=>sceneManager.add(mesh, false))
     }
 
+    /**
+     * Called by OrbitalCameraManager every frame.
+     * This function performs the actual zoom in and out process once it has started in onMessage.
+     * @param {SceneManager} sceneManager the SceneManager object
+     */
     onSceneRender(sceneManager)
     {
         if (this.hotspots.length > 0)
@@ -162,6 +322,10 @@ class MeshActorCore
         }
     }
 
+    /**
+     * Callback function that is called when the GLTFLoader finishes loading the 3D model
+     * @param {any} model GLTF 3D model taht is loaded
+     */
     onModelLoad(model)
     {
         model.scene.children.forEach(mesh=>this.meshes.push(mesh))
