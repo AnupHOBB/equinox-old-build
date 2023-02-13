@@ -51,36 +51,10 @@ export class FloorActor extends SceneObject
     setPosition(x, y, z) { this.mesh.position.set(x, y, z) }
 
     /**
-     * Called by SceneManager when there is a message for this object posted by any other object registered in SceneManager.
-     * @param {SceneManager} sceneManager the SceneManager object
-     * @param {String} senderName name of the object who posted the message
-     * @param {any} data any object sent as part of the message
+     * Returns the list of drawable threejs meshes
+     * @returns {Array} array of threejs mesh objects
      */
-    onMessage(sceneManager, senderName, data) {}
-
-    /**
-     * Called by SceneManager as soon as the object gets registered in SceneManager.
-     * @param {SceneManager} sceneManager the SceneManager object
-     */
-    onSceneStart(sceneManager) { sceneManager.add(this.mesh, true) }
-
-    /**
-     * Called by SceneManager every frame.
-     * @param {SceneManager} sceneManager the SceneManager object
-     */
-    onSceneRender(sceneManager) {}
-
-    /**
-     * Used for notifying the SceneManager if this object is ready to be included in scene.
-     * @returns {Boolean} ready status of object
-     */
-    isReady() { return true }
-
-    /**
-     * Used for notifying the SceneManager if this object should be included in raycasting.
-     * @returns {Boolean} ray castable status of object
-     */
-    isRayCastable() { return true }
+    getDrawables() { return [{object: this.mesh, isRayCastable: true}] }
 
     /**
      * Used for notifying the SceneManager if this object should be included in raycasting.
@@ -151,21 +125,6 @@ export class MeshActor extends SceneObject
     addHotSpots(hotSpot) { this.core.hotspots.push(hotSpot) }
 
     /**
-     * Called by SceneManager when there is a message for this object posted by any other object registered in SceneManager.
-     * @param {SceneManager} sceneManager the SceneManager object
-     * @param {String} senderName name of the object who posted the message
-     * @param {any} data any object sent as part of the message
-     */
-    onMessage(sceneManager, senderName, data) {}
-
-    /**
-     * Called by SceneManager as soon as the object gets registered in SceneManager.
-     * However, this function only delegates call to MeshActorCore's onSceneStart.
-     * @param {SceneManager} sceneManager the SceneManager object
-     */
-    onSceneStart(sceneManager) { this.core.onSceneStart(sceneManager) }
-
-    /**
      * Called by SceneManager as soon as the object gets registered in SceneManager.
      * However, this function only delegates call to MeshActorCore's onSceneRender.
      * @param {SceneManager} sceneManager the SceneManager object
@@ -179,10 +138,10 @@ export class MeshActor extends SceneObject
     isReady() { return this.core.ready }
 
     /**
-     * Used for notifying the SceneManager if this object should be included in raycasting.
-     * @returns {Boolean} ray castable status of object 
+     * Returns the list of drawable threejs meshes
+     * @returns {Array} array of threejs mesh objects
      */
-    isRayCastable() { return false }
+    getDrawables() { return this.core.getDrawables() }
 
     /**
      * Used for notifying the SceneManager if this object is drawable in screen.
@@ -273,31 +232,13 @@ class MeshActorCore
     changeTexture()
     {
         if (this.texture != null)
-            this.meshes.forEach(mesh => { 
-                mesh.children.forEach(child => { child.material.map = this.texture })
-            })
+            this.meshes.forEach(mesh => mesh.children.forEach(child => child.material.map = this.texture))
     }
 
     /**
      * Changes the color of the 3D model
      */
-    changeColor()
-    {
-        this.meshes.forEach(mesh => { 
-            mesh.children.forEach(child => { child.material.color = this.color })
-        })   
-    }
-
-    /**
-     * Called by MeshActor every frame.
-     * This functions adds additional 3D meshes that are supposed to be part of the 3D model. 
-     * @param {SceneManager} sceneManager the SceneManager object
-     */
-    onSceneStart(sceneManager) 
-    {
-        sceneManager.add(this.roofBound, true)
-        this.meshes.forEach(mesh=>sceneManager.add(mesh, false))
-    }
+    changeColor() { this.meshes.forEach(mesh => mesh.children.forEach(child => child.material.color = this.color )) }
 
     /**
      * Called by OrbitalCameraManager every frame.
@@ -320,6 +261,18 @@ class MeshActorCore
                     hotSpot.hide()
             }
         }
+    }
+
+    /**
+     * Returns the list of drawable threejs meshes
+     * @returns {Array} array of threejs mesh objects
+     */
+    getDrawables() 
+    {
+        let drawables = []
+        drawables.push({object: this.roofBound, isRayCastable: true}) 
+        this.meshes.forEach(mesh => drawables.push({object: mesh, isRayCastable: false}) )
+        return drawables
     }
 
     /**

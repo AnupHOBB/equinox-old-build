@@ -15,37 +15,16 @@ export class AmbientLight extends SceneObject
     }
 
     /**
-     * Called by SceneManager when there is a message for this object posted by any other object registered in SceneManager.
-     * @param {SceneManager} sceneManager the SceneManager object
-     * @param {String} senderName name of the object who posted the message
-     * @param {any} data any object sent as part of the message
-     */
-    onMessage(sceneManager, senderName, data) {}
-
-    /**
-     * Called by SceneManager as soon as the object gets registered in SceneManager.
-     * This function adds the threejs light object into the scene.
-     * @param {SceneManager} sceneManager the SceneManager object
-     */
-    onSceneStart(sceneManager) { sceneManager.add(this.light, false) }
-
-    /**
-     * Called by SceneManager every frame.
-     * @param {SceneManager} sceneManager the SceneManager object
-     */
-    onSceneRender(sceneManager) {}
-
-    /**
      * Used for notifying the SceneManager if this object is ready to be included in scene.
      * @returns {Boolean} ready status of object
      */
     isReady() { return true }
 
     /**
-     * Used for notifying the SceneManager if this object should be included in raycasting.
-     * @returns {Boolean} ray castable status of camera
+     * Returns the list of drawable threejs meshes
+     * @returns {Array} array of threejs mesh objects
      */
-    isRayCastable() { return false }
+    getDrawables() { return [{object: this.light, isRayCastable: false}] }
 
     /**
      * Used for notifying the SceneManager if this object is drawable in screen.
@@ -101,26 +80,6 @@ export class DirectLight extends SceneObject
     }
 
     /**
-     * Called by SceneManager when there is a message for this object posted by any other object registered in SceneManager.
-     * However, this function only delegates call to FirstPersonCameraManagerCore's onMessage.
-     * @param {SceneManager} sceneManager the SceneManager object
-     * @param {String} senderName name of the object who posted the message
-     * @param {any} data any object sent as part of the message
-     */
-    onMessage(sceneManager, senderName, data) {}
-
-    /**
-     * Called by SceneManager as soon as the object gets registered in SceneManager.
-     * This function adds the threejs light and sphere mesh object into the scene.
-     * @param {SceneManager} sceneManager the SceneManager object
-     */
-    onSceneStart(sceneManager) 
-    { 
-        sceneManager.add(this.light, false)
-        sceneManager.add(this.mesh, false)
-    }
-
-    /**
      * Called by SceneManager every frame.
      * If enableGizmo is true, then this function will add the gizmo into the scene for display.
      * If enableGizmo is false, then this function will remove the gizmo from the scene.
@@ -145,12 +104,11 @@ export class DirectLight extends SceneObject
      * @returns {Boolean} ready status of object
      */
     isReady() { return true }
-
     /**
-     * Used for notifying the SceneManager if this object should be included in raycasting.
-     * @returns {Boolean} ray castable status of object 
+     * Returns the list of drawable threejs meshes
+     * @returns {Array} array of threejs mesh objects
      */
-    isRayCastable() { return false }
+    getDrawables() { return [{object: this.light, isRayCastable: false}, {object: this.mesh, isRayCastable: false}] }
 
     /**
      * Used for notifying the SceneManager if this object is drawable in screen.

@@ -33,16 +33,16 @@ export class SceneObject
     isReady() { return true }
 
     /**
-     * Used for notifying the SceneManager if this object should be included in raycasting.
-     * @returns {Boolean}
+     * Returns the list of drawable threejs meshes
+     * @returns {Array} array of threejs mesh objects
      */
-    isRayCastable() { return true }
+    getDrawables() { return [] }
 
     /**
      * Used for notifying the SceneManager if this object should be included in raycasting.
      * @returns {Boolean}
      */
-    isDrawable() { return true }
+    isDrawable() { return false }
 }
 
 /**
@@ -60,20 +60,6 @@ export class SceneManager
      * @param {SceneObject} sceneObject sceneObject that needs to be registered in the scene manager
      */
     register(sceneObject) { this.core.register(sceneObject) }
-
-    /**
-     * Adds a threejs object into the threejs scene within SceneCore and ragisters that same object as ray castable 
-     * if rayCastable value is true.
-     * The object provided to this function will not receive callback but will be drawn into the threejs scene.
-     * @param {THREE.Object3D} threeJSObject instance of object3D that needs to be drawn into the scene
-     * @param {Boolean} rayCastable true if the provided object should be included in ray casting.
-     */
-    add(threeJSObject, rayCastable) 
-    { 
-        this.core.scene.add(threeJSObject) 
-        if (rayCastable)
-            this.core.rayCast.add(threeJSObject)
-    } 
 
     /**
      * Removes the threejs object from the active scene.
@@ -147,7 +133,10 @@ class SceneCore
         if (sceneObject.isDrawable() && !sceneObject.isReady())
             this.inactiveObjNameMap.set(sceneObject.name, null)
         else if (sceneObject.isReady())
+        {
+            this.addToScene(sceneObject.getDrawables())     
             sceneObject.onSceneStart(this.sceneManager)
+        }
         this.popNoticeBoard(sceneObject)
     }
 
@@ -277,10 +266,25 @@ class SceneCore
                 let sceneObject = this.sceneObjectMap.get(sceneObjectName)
                 if (sceneObject.isReady())
                 {   
+                    this.addToScene(sceneObject.getDrawables())
                     sceneObject.onSceneStart(this.sceneManager)
                     this.inactiveObjNameMap.delete(sceneObjectName)
                 } 
             }
         }
     }
+
+    /**
+     * Adds a threejs object into the threejs scene within SceneCore and ragisters that same object as ray castable if rayCastable value is true.
+     * @param {Array} drawables array of drawable object in this format : {object: THREE.Object3D, isRayCastable: Boolean}
+     */
+    addToScene(drawables) 
+    { 
+        for (let drawable of drawables)
+        {
+            this.scene.add(drawable.object) 
+            if (drawable.isRayCastable)
+                this.rayCast.add(drawable.object)
+        }
+    } 
 }

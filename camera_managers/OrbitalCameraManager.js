@@ -63,12 +63,6 @@ export class OrbitalCameraManager extends BaseCameraManager
     onMessage(sceneManager, senderName, data) { this.core.onMessage(sceneManager, senderName, data) }
 
     /**
-     * Called by SceneManager as soon as the object gets registered in SceneManager.
-     * @param {SceneManager} sceneManager the SceneManager object
-     */
-    onSceneStart(sceneManager) {}
-
-    /**
      * Called by SceneManager every frame.
      * However, this function only delegates call to OrbitalCameraManagerCore's onSceneRender.
      * @param {SceneManager} sceneManager the SceneManager object
@@ -81,24 +75,6 @@ export class OrbitalCameraManager extends BaseCameraManager
      * @param {SceneManager} sceneManager the SceneManager object
      */
     onActive(sceneManager) { this.core.onActive(sceneManager, this.name) }
-
-    /**
-     * Used for notifying the SceneManager if this object is ready to be included in scene.
-     * @returns {Boolean} ready status of camera
-     */
-    isReady() { return true }
-
-    /**
-     * Used for notifying the SceneManager if this object should be included in raycasting.
-     * @returns {Boolean} ray castable status of camera
-     */
-    isRayCastable() { return false }
-
-    /**
-     * Used for notifying the SceneManager if this object is drawable in screen.
-     * @returns {Boolean} drawable status of camera
-     */
-    isDrawable() { return false }
 }
 
 /**
