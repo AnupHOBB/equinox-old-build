@@ -1,3 +1,5 @@
+import { MISC } from '../helpers/misc.js'
+
 /**
  * Wrapper VideoPlayerCore
  */
@@ -5,33 +7,15 @@ export class VideoPlayer
 {
     /**
      * @param {String} url url of video file
-     * @param {Number} width video width
-     * @param {Number} height video height
      */
-    constructor(url, width, height) { this.core = new VideoPlayerCore(url, width, height) }
-    
-    /**
-     * Resizes the video
-     * @param {Number} width video width
-     * @param {Number} height video height
-     */
-    resize(width, height)
-    {
-        this.core.video.width = width
-        this.core.video.height = height
-    }
-
-    /**
-     * Delegates call to VideoPlayerCore setLocation
-     * @param {Number} xPosition x-coordinate of the video in raster space
-     * @param {Number} yPosition y-coordinate of the video in raster space
-     */
-    setLocation(xPosition, yPosition) { this.core.setLocation(xPosition+10, yPosition+10) }
+    constructor(url) { this.core = new VideoPlayerCore(url) }
 
     /**
      * Delegates call to VideoPlayerCore show
+     * @param {Number} xPosition x-coordinate of the video in raster space
+     * @param {Number} yPosition y-coordinate of the video in raster space
      */
-    show() { this.core.show() }
+    show(xPosition, yPosition) { this.core.show(xPosition, yPosition) }
 
     /**
      * Delegates call to VideoPlayerCore hide
@@ -41,20 +25,30 @@ export class VideoPlayer
 
 class VideoPlayerCore
 {
-
     /**
      * @param {String} url url of video file
-     * @param {Number} width video width
-     * @param {Number} height video height
      */
-    constructor(url, width, height)
+    constructor(url)
     {
         this.video = document.createElement('video')
         this.video.src = url
         this.video.loop = true
-        this.video.width = width
-        this.video.height = height
+        this.video.style = 'position: absolute; top : 0px; left: 0px; width: 10%; height: auto;'
         this.isShowing = false
+    }
+
+    /**
+     * Shows the video in screen
+     */
+    show(xPosition, yPosition)
+    {
+        if (!this.isShowing)
+        {
+            document.body.appendChild(this.video)
+            this.setLocation(xPosition, yPosition)
+            this.video.play()
+            this.isShowing = true
+        }
     }
 
     /**
@@ -64,26 +58,16 @@ class VideoPlayerCore
      */
     setLocation(xPosition, yPosition)
     {
-        let xBound = xPosition + this.video.width
-        let yBound = yPosition + this.video.height
+        let style = window.getComputedStyle(this.video)
+        let videoWidth = MISC.pxStringToNumber(style.getPropertyValue('width'))
+        let videoHeight = MISC.pxStringToNumber(style.getPropertyValue('height'))
+        let xBound = xPosition + videoWidth
+        let yBound = yPosition + videoHeight
         if (xBound > window.innerWidth)
-            xPosition -= this.video.width
+            xPosition -= videoWidth
         if (yBound > window.innerHeight)
-            yPosition -= this.video.height
-        this.video.style = 'position: absolute; top : '+yPosition+'; left: '+xPosition+';'
-    }
-
-    /**
-     * Shows the video in screen
-     */
-    show()
-    {
-        if (!this.isShowing)
-        {
-            this.video.play()
-            document.body.appendChild(this.video)
-            this.isShowing = true
-        }
+            yPosition -= videoHeight
+        this.video.style = 'position: absolute; top : '+yPosition+'; left: '+xPosition+'; width: 20%; height: auto;'
     }
 
     /**

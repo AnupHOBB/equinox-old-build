@@ -137,6 +137,10 @@ class KeyEventCore
  */
 class MouseEventCore
 {
+    /**
+     * 
+     * @param {HTMLCanvasElement} canvas html canvas element
+     */
     constructor(canvas)
     {
         this.mousePress = false
@@ -147,6 +151,16 @@ class MouseEventCore
         this.clickCallbacks = []
         this.moveCallbacks = []
         this.dblClickCallbacks = []
+        this.dblTapCounter = 0
+        this.registerCanvasEvents(canvas)
+    }
+
+    /**
+     * Registers event listeners to the canvas element that is passed.
+     * @param {HTMLCanvasElement} canvas html canvas element
+     */
+    registerCanvasEvents(canvas)
+    {
         canvas.addEventListener('mousedown', e=>this.onPress(e))
         canvas.addEventListener('mouseup', e=>this.onRelease(e))
         canvas.addEventListener('mousemove', e=>this.onMove(e))
@@ -154,7 +168,6 @@ class MouseEventCore
         canvas.addEventListener('touchend', e=>this.onRelease(e))
         canvas.addEventListener('touchmove', e=>this.onMove(e))
         canvas.addEventListener('click', e=>this.onClick(e))
-        canvas.addEventListener('dblclick', e=>this.onDblClick(e))
     }
 
     /**
@@ -169,14 +182,27 @@ class MouseEventCore
     }
     
     /**
-     * Called whenever user presses the mouse button or touches the screen
-     * This function sets the mousePress flag to true
+     * Called whenever user presses the mouse button or touches the screen.
+     * This function sets the mousePress flag to true and notifies all the registered double click callbacks
+     * on detecting double taps.
      * @param {Event} event mouse or touch event object
      */
-    onPress(event) { this.mousePress = true }
+    onPress(event) 
+    { 
+        this.mousePress = true 
+        this.dblTapCounter++
+        if (this.dblTapCounter > 1)
+        {
+            for (let dblClickCallback of this.dblClickCallbacks)
+                dblClickCallback(event)
+            this.dblTapCounter = 0
+        }
+        else
+            setTimeout(()=>{this.dblTapCounter = 0}, 500)
+    }
 
     /**
-     * Called whenever user releases the mouse button or touches the screen
+     * Called whenever user releases the mouse button or touches the screen.
      * This function sets the mousePress flag to false and firstClick value to true
      * and also resets the value of lastXY object.
      * @param {Event} event mouse or touch event object
@@ -193,7 +219,7 @@ class MouseEventCore
      * If there are registered move callbacks and if the mousePress is true, then this function will 
      * calculate the displacement of the cursor and call the callbacks by providing the displacement
      * as well as the cursor positions.
-     * @param {*} event mouse or touch event object
+     * @param {Event} event mouse or touch event object
      */
     onMove(event)
     {
