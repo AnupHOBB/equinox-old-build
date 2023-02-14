@@ -22,5 +22,15 @@ export const MISC =
     {
         var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
         return result ? new Color(parseInt(result[1], 16)/255, parseInt(result[2], 16)/255, parseInt(result[3], 16)/255) : new Color()
+    },
+
+    /**
+     * Converts dimension value in px as string to valid numerical valu without format appended to it.
+     * @param {String} pxString 
+     */
+    pxStringToNumber : function(pxString)
+    {
+        let pxValue = pxString.substring(0, pxString.length - 2)
+        return Number.parseFloat(pxValue, 10)
     }
 }

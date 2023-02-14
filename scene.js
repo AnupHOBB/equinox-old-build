@@ -13,7 +13,7 @@ import { MISC } from './helpers/misc.js'
 
 window.onload = () =>
 {
-    const videoPlayer = new VideoPlayer('./assets/vid.mp4', 480, 270)
+    const videoPlayer = new VideoPlayer('./assets/vid.mp4')
     new SliderUI(document.getElementById('slider-light'), (v)=>directLight.orbit(v))
     new SliderUI(document.getElementById('slider-roof'), (v)=>gltfActor.updateAnimationFrame(-(v/180)))
     
@@ -50,15 +50,15 @@ window.onload = () =>
     function onLoadingComplete()
     {
         let hotSpot1 = new Hotspot('assets/hotspot.png', MATHS.addVectors(gltfActor.getPosition(), new THREE.Vector3(-3.55, 2.4, 0.01)))
-        hotSpot1.setOnClick(showVideo)
+        hotSpot1.setOnHold((e)=>videoPlayer.show(e.clientX, e.clientY))
         hotSpot1.setOnMove(()=>videoPlayer.hide())
         hotSpot1.setOnDblClick(()=>sceneManager.broadcastTo(gltfActor.name, cameraManager.name, hotSpot1.worldPosition))
         let hotSpot2 = new Hotspot('assets/hotspot.png', MATHS.addVectors(gltfActor.getPosition(), new THREE.Vector3(-0.85, 2.4, 0.01)))
-        hotSpot2.setOnClick(showVideo)
+        hotSpot2.setOnHold((e)=>videoPlayer.show(e.clientX, e.clientY))
         hotSpot2.setOnMove(()=>videoPlayer.hide())
         hotSpot2.setOnDblClick(()=>sceneManager.broadcastTo(gltfActor.name, cameraManager.name, hotSpot2.worldPosition))
         let hotSpot3 = new Hotspot('assets/hotspot.png', MATHS.addVectors(gltfActor.getPosition(), new THREE.Vector3(-3.25, 2.4, -3.4)))
-        hotSpot3.setOnClick(showVideo)
+        hotSpot3.setOnHold((e)=>videoPlayer.show(e.clientX, e.clientY))
         hotSpot3.setOnMove(()=>videoPlayer.hide())
         hotSpot3.setOnDblClick(()=>sceneManager.broadcastTo(gltfActor.name, cameraManager.name, hotSpot3.worldPosition))
         gltfActor.addHotSpots(hotSpot1)
@@ -66,12 +66,6 @@ window.onload = () =>
         gltfActor.addHotSpots(hotSpot3)
         let loadingScreen = document.getElementById('loading-screen')
         document.body.removeChild(loadingScreen) 
-    }
-
-    function showVideo(e)
-    {
-        videoPlayer.setLocation(e.clientX, e.clientY)
-        videoPlayer.show()
     }
 
     let colors = ['#ECF9FF', '#FFFBEB', '#FFE7CC', '#F8CBA6']
