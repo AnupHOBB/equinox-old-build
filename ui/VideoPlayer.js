@@ -33,6 +33,7 @@ class VideoPlayerCore
         this.video = document.createElement('video')
         this.video.src = url
         this.video.loop = true
+        this.video.muted = true
         this.setLocation(0,0)
         this.isShowing = false
     }

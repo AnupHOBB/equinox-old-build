@@ -21,7 +21,7 @@ export class Hotspot
      * Sets the click callback
      * @param {Function} onClick callback function that is called when the user clicks on the hot spot 
      */
-    setOnClick(onClick) { this.input.img.onclick = onClick }
+    setOnClick(onClick) { this.img.onclick = onClick }
 
     /**
      * Sets the double click callback
