@@ -33,7 +33,7 @@ class VideoPlayerCore
         this.video = document.createElement('video')
         this.video.src = url
         this.video.loop = true
-        this.video.style = 'position: absolute; top : 0px; left: 0px; width: 10%; height: auto;'
+        this.setLocation(0,0)
         this.isShowing = false
     }
 
@@ -45,8 +45,8 @@ class VideoPlayerCore
         if (!this.isShowing)
         {
             document.body.appendChild(this.video)
-            this.setLocation(xPosition, yPosition)
             this.video.play()
+            this.setLocation(xPosition, yPosition)
             this.isShowing = true
         }
     }
@@ -67,7 +67,11 @@ class VideoPlayerCore
             xPosition -= videoWidth
         if (yBound > window.innerHeight)
             yPosition -= videoHeight
-        this.video.style = 'position: absolute; top : '+yPosition+'; left: '+xPosition+'; width: 20%; height: auto;'
+        let aspect = window.innerWidth/window.innerHeight
+        if (aspect < 1)
+            this.video.style = 'position: absolute; top : '+yPosition+'; left: '+xPosition+'; width: 20%; height: auto; min-width: 200px; max-width: 400px;'
+        else
+            this.video.style = 'position: absolute; top : '+yPosition+'; left: '+xPosition+'; width: 20%; height: auto; min-width: 100px; max-width: 400px;'
     }
 
     /**
