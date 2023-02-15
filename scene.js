@@ -27,7 +27,7 @@ window.onload = () =>
     function checkLoading()
     {
         loadingBar.style.width = status + '%'
-        if (status == 100)
+        if (status > 99)
         { 
             loadingText.innerHTML = 'LOADING COMPLETE'
             setTimeout(onLoadingComplete, 500)
