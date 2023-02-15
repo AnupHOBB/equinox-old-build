@@ -26,7 +26,6 @@ window.onload = () =>
     checkLoading()
     function checkLoading()
     {
-        loadingBar.style.width = status + '%'
         if (status > 99)
         { 
             loadingText.innerHTML = 'LOADING COMPLETE'
