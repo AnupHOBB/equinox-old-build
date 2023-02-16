@@ -75,6 +75,12 @@ export class OrbitalCameraManager extends BaseCameraManager
      * @param {SceneManager} sceneManager the SceneManager object
      */
     onActive(sceneManager) { this.core.onActive(sceneManager, this.name) }
+
+    /**
+     * Returns a boolean value that indicates whether the camera is zoomed in or not,
+     * @returns {Boolean} the zoom status of camera
+     */
+    isZoomed() { return this.core.zoom }
 }
 
 /**
@@ -83,9 +89,9 @@ export class OrbitalCameraManager extends BaseCameraManager
 class OrbitalCameraManagerCore extends PerspectiveCamera
 {
     /**
-     * @param {*} fov camera field of view
-     * @param {*} axis orbit axis
-     * @param {*} lookAt point to focus on during orbit
+     * @param {Number} fov camera field of view
+     * @param {THREE.Vector3} axis orbit axis
+     * @param {THREE.Vector3} lookAt point to focus on during orbit
      */
     constructor(fov, axis, lookAt)
     {

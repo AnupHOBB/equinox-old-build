@@ -21,7 +21,7 @@ export class Hotspot
      * Sets the click callback
      * @param {Function} onClick callback function that is called when the user clicks on the hot spot 
      */
-    setOnClick(onClick) { this.img.onclick = onClick }
+    setOnClick(onClick) { this.input.onClick = onClick }
 
     /**
      * Sets the double click callback
@@ -56,9 +56,9 @@ export class Hotspot
     {
         let aspect = window.innerWidth/window.innerHeight
         if (aspect < 1)
-            this.img.style = 'position: absolute; top: '+y+'; left: '+x+'; width: auto; height: 3%; user-select: none;'
+            this.img.style = 'position: absolute; top: '+y+'; left: '+x+'; width: auto; height: 4%; user-select: none;'
         else
-            this.img.style = 'position: absolute; top: '+y+'; left: '+x+'; width: 2%; height: auto; user-select: none;'
+            this.img.style = 'position: absolute; top: '+y+'; left: '+x+'; width: 3%; height: auto; user-select: none;'
         if (this.lastRasterCoord.x != x || this.lastRasterCoord.y != y)
         {    
             this.input.onMove()
@@ -107,11 +107,12 @@ class HotspotInput
         this.imageElement.onmouseup = e=>this.onRelease(e)
         this.imageElement.ontouchstart = e=>this.onPress(e)
         this.imageElement.ontouchend = e=>this.onRelease(e)
+        this.onClick = ()=>{}
         this.onMove = ()=>{}
         this.onHold = ()=>{}
         this.onDoubleClick = ()=>{}
         this.press = false
-        this.dblTapCount = 0
+        this.clickCount = 0
     }
 
     /**
@@ -120,23 +121,23 @@ class HotspotInput
      */
     onPress(event)
     {
-        this.press = true
-        setTimeout(()=>{
-            if (this.press)
-            {
-                if (event.type == 'touchstart') 
-                    event = event.touches[0]
-                this.onHold(event)
-            }
-        }, 500)
-        this.dblTapCount++
-        if (this.dblTapCount > 1)
+        let isDevice = navigator.userAgent.includes('iPad') || navigator.userAgent.includes('iPhone') || navigator.userAgent.includes('Android')
+        if ((isDevice && event.type == 'touchstart') || (!isDevice && event.type == 'mousedown'))
         {
-            this.dblTapCount = 0   
-            this.onDoubleClick(event)
-        }
-        else
-            setTimeout(()=>{this.dblTapCount = 0}, 500) 
+            if (event.type == 'touchstart')
+                event = event.touches[0]
+            this.press = true
+            this.clickCount++
+            if (this.clickCount > 2)
+                this.clickCount = 2
+            setTimeout(()=>{
+                if (this.clickCount > 1)
+                    this.onDoubleClick(event)
+                else
+                   this.onClick(event)
+                this.clickCount = 0
+            }, 250)
+        }        
     }
 
     /**

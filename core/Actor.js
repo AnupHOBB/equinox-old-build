@@ -24,17 +24,9 @@ export class FloorActor extends SceneObject
 
     /**
      * Applies texture on the floor object.
-     * @param {String} url url of the texture
+     * @param {THREE.Texture} texture threejs texture object
      */
-    applyTexture(url)
-    {
-        let texture = new THREE.TextureLoader().load(url)
-        texture.wrapS = THREE.RepeatWrapping
-        texture.wrapT = THREE.RepeatWrapping
-        texture.repeat = new THREE.Vector2(100, 200)
-        texture.anisotropy = 2
-        this.mesh.material.map = texture
-    }
+    applyTexture(texture) { this.mesh.material.map = texture }
 
     /**
      * Applies color on the floor object.
@@ -72,12 +64,13 @@ export class MeshActor extends SceneObject
      * @param {String} name name of the object which is used in sending or receiving message
      * @param {String} url url of the 3D model
      * @param {Function} onProgress callback for notifying model loading status
+     * @param {Function} onLoad callback for notifying that the model is loaded
      */
-    constructor(name, url, onProgress) 
+    constructor(name, url, onProgress, onLoad) 
     {
         super()
         this.name = name 
-        this.core = new MeshActorCore(url, onProgress) 
+        this.core = new MeshActorCore(url, onProgress, onLoad)
     }
 
     /**
@@ -101,10 +94,10 @@ export class MeshActor extends SceneObject
     getPosition() { return this.core.position }
 
     /**
-     * Delegates call to MeshActorCore applyTexture
-     * @param {String} url url of the texture
+     * Applies texture on the floor object.
+     * @param {THREE.Texture} texture threejs texture object
      */
-    applyTexture(url) { this.core.applyTexture(url) }
+    applyTexture(texture) { this.core.applyTexture(texture) }
 
     /**
      * Delegates call to MeshActorCore applyColor
@@ -158,8 +151,9 @@ class MeshActorCore
     /**
      * @param {String} url url of the 3D model
      * @param {Function} onProgress callback for notifying model loading status
+     * @param {Function} onLoad callback for notifying that the model is loaded
      */
-    constructor(url, onProgress)
+    constructor(url, onProgress, onLoad)
     {
         new GLTFLoader().load(url, (model)=>this.onModelLoad(model), onProgress)
         this.meshes = []
@@ -171,6 +165,7 @@ class MeshActorCore
         this.roofBound = new THREE.Mesh(new THREE.BoxGeometry(4.75, 0.5, 3.3), new THREE.MeshBasicMaterial({ transparent: true, opacity: 0 }))
         this.roofBound.position.set(-0.1, 0.5, -4.65)
         this.mixer = null
+        this.onLoad = onLoad
     }
 
     /**
@@ -205,14 +200,12 @@ class MeshActorCore
     }
 
     /**
-     * Stores the new texture that needs to be applied
-     * @param {String} url url of the texture
+     * Applies texture on the floor object.
+     * @param {THREE.Texture} texture threejs texture object
      */
-    applyTexture(url)
+    applyTexture(texture)
     {
-        this.texture = new THREE.TextureLoader().load(url)
-        this.texture.wrapS = THREE.ClampToEdgeWrapping
-        this.texture.wrapT = THREE.ClampToEdgeWrapping
+        this.texture = texture
         this.changeTexture()
     }
 
@@ -301,8 +294,9 @@ class MeshActorCore
             this.mixer = new THREE.AnimationMixer(model.scene)
             this.mixer.clipAction(clip).play()
         }
-        this.ready = true
         this.changeTexture()
         this.changeColor()
+        this.ready = true
+        this.onLoad()
     }
 }
