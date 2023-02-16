@@ -11,6 +11,7 @@ window.onload = () =>
     let directLight
     let floor
     let videoPlayer
+    let MISC
 
     new SliderUI(document.getElementById('slider-light'), (v)=>directLight.orbit(v))
     new SliderUI(document.getElementById('slider-roof'), (v)=>gltfActor.updateAnimationFrame(-(v/180)))
@@ -99,7 +100,7 @@ window.onload = () =>
                 sceneManager = new M.SceneManager(canvas)
                 jsFilesStatus += 12.5
                 import("./helpers/misc.js").then((M)=>{
-                    let MISC = M.MISC
+                    MISC = M.MISC
                     import("./core/Actor.js").then((M)=>{
                         gltfActor = new M.MeshActor('Roof', './assets/eq_animation.glb', (xhr)=>{modelStatus = Math.round((xhr.loaded/ xhr.total) * 100)})
                         gltfActor.applyColor(MISC.hexToColor(colors[0]))
