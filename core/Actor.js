@@ -24,17 +24,9 @@ export class FloorActor extends SceneObject
 
     /**
      * Applies texture on the floor object.
-     * @param {String} url url of the texture
+     * @param {THREE.Texture} texture threejs texture object
      */
-    applyTexture(url)
-    {
-        let texture = new THREE.TextureLoader().load(url)
-        texture.wrapS = THREE.RepeatWrapping
-        texture.wrapT = THREE.RepeatWrapping
-        texture.repeat = new THREE.Vector2(100, 200)
-        texture.anisotropy = 2
-        this.mesh.material.map = texture
-    }
+    applyTexture(texture) { this.mesh.material.map = texture }
 
     /**
      * Applies color on the floor object.
@@ -101,10 +93,10 @@ export class MeshActor extends SceneObject
     getPosition() { return this.core.position }
 
     /**
-     * Delegates call to MeshActorCore applyTexture
-     * @param {String} url url of the texture
+     * Applies texture on the floor object.
+     * @param {THREE.Texture} texture threejs texture object
      */
-    applyTexture(url) { this.core.applyTexture(url) }
+    applyTexture(texture) { this.core.applyTexture(texture) }
 
     /**
      * Delegates call to MeshActorCore applyColor
@@ -205,14 +197,12 @@ class MeshActorCore
     }
 
     /**
-     * Stores the new texture that needs to be applied
-     * @param {String} url url of the texture
+     * Applies texture on the floor object.
+     * @param {THREE.Texture} texture threejs texture object
      */
-    applyTexture(url)
+    applyTexture(texture)
     {
-        this.texture = new THREE.TextureLoader().load(url)
-        this.texture.wrapS = THREE.ClampToEdgeWrapping
-        this.texture.wrapT = THREE.ClampToEdgeWrapping
+        this.texture = texture
         this.changeTexture()
     }
 
