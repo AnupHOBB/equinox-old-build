@@ -64,12 +64,13 @@ export class MeshActor extends SceneObject
      * @param {String} name name of the object which is used in sending or receiving message
      * @param {String} url url of the 3D model
      * @param {Function} onProgress callback for notifying model loading status
+     * @param {Function} onLoad callback for notifying that the model is loaded
      */
-    constructor(name, url, onProgress) 
+    constructor(name, url, onProgress, onLoad) 
     {
         super()
         this.name = name 
-        this.core = new MeshActorCore(url, onProgress) 
+        this.core = new MeshActorCore(url, onProgress, onLoad)
     }
 
     /**
@@ -150,8 +151,9 @@ class MeshActorCore
     /**
      * @param {String} url url of the 3D model
      * @param {Function} onProgress callback for notifying model loading status
+     * @param {Function} onLoad callback for notifying that the model is loaded
      */
-    constructor(url, onProgress)
+    constructor(url, onProgress, onLoad)
     {
         new GLTFLoader().load(url, (model)=>this.onModelLoad(model), onProgress)
         this.meshes = []
@@ -163,6 +165,7 @@ class MeshActorCore
         this.roofBound = new THREE.Mesh(new THREE.BoxGeometry(4.75, 0.5, 3.3), new THREE.MeshBasicMaterial({ transparent: true, opacity: 0 }))
         this.roofBound.position.set(-0.1, 0.5, -4.65)
         this.mixer = null
+        this.onLoad = onLoad
     }
 
     /**
@@ -291,8 +294,9 @@ class MeshActorCore
             this.mixer = new THREE.AnimationMixer(model.scene)
             this.mixer.clipAction(clip).play()
         }
-        this.ready = true
         this.changeTexture()
         this.changeColor()
+        this.ready = true
+        this.onLoad()
     }
 }

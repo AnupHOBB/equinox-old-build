@@ -167,20 +167,8 @@ class MouseEventCore
         canvas.addEventListener('touchstart', e=>this.onPress(e))
         canvas.addEventListener('touchend', e=>this.onRelease(e))
         canvas.addEventListener('touchmove', e=>this.onMove(e))
-        canvas.addEventListener('click', e=>this.onClick(e))
     }
 
-    /**
-     * Called by canvas event listener whenever it detects a mouse click.
-     * This function notifies all the registered click callbacks.
-     * @param {MouseEvent} event mouse event object
-     */
-    onClick(event)
-    {
-        for (let clickCallback of this.clickCallbacks)
-            clickCallback(event.clientX, event.clientY)
-    }
-    
     /**
      * Called whenever user presses the mouse button or touches the screen.
      * This function sets the mousePress flag to true and notifies all the registered double click callbacks
@@ -189,16 +177,29 @@ class MouseEventCore
      */
     onPress(event) 
     { 
-        this.mousePress = true 
-        this.dblTapCounter++
-        if (this.dblTapCounter > 1)
+        let isDevice = navigator.userAgent.includes('iPad') || navigator.userAgent.includes('iPhone') || navigator.userAgent.includes('Android')
+        if ((isDevice && event.type == 'touchstart') || (!isDevice && event.type == 'mousedown'))
         {
-            for (let dblClickCallback of this.dblClickCallbacks)
-                dblClickCallback(event)
-            this.dblTapCounter = 0
-        }
-        else
-            setTimeout(()=>{this.dblTapCounter = 0}, 500)
+            if (event.type == 'touchstart')
+                event = event.touches[0]
+            this.mousePress = true 
+            this.dblTapCounter++
+            if (this.dblTapCounter > 2)
+                this.dblTapCounter = 2   
+            setTimeout(()=>{
+                if (this.dblTapCounter > 1)
+                {
+                    for (let dblClickCallback of this.dblClickCallbacks)
+                        dblClickCallback(event)
+                }
+                else
+                {
+                    for (let clickCallback of this.clickCallbacks)
+                        clickCallback(event.clientX, event.clientY)
+                }
+                this.dblTapCounter = 0
+            }, 250) 
+        }  
     }
 
     /**
