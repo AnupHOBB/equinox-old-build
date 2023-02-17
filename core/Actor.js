@@ -6,7 +6,7 @@ import { Hotspot } from './HotSpot.js'
 /**
  * Represents the floor onto which the louver roof stands. It wraps Threejs Mesh.
  */
-export class FloorActor extends SceneObject
+export class ShapeActor extends SceneObject
 {
     /**
      * @param {String} name name of the object which is used in sending or receiving message
