@@ -14,11 +14,11 @@ export class OrbitalCameraManager extends BaseCameraManager
      * @param {THREE.Vector3} axis orbit axis
      * @param {THREE.Vector3} lookAtPosition point to focus on during orbit
      */
-    constructor(name, fov, axis, lookAtPosition) 
+    constructor(name, fov, lookAtPosition) 
     { 
         super()
         this.name = name
-        this.core = new OrbitalCameraManagerCore(fov, axis, lookAtPosition) 
+        this.core = new OrbitalCameraManagerCore(fov, lookAtPosition) 
     }
 
     /**
@@ -93,11 +93,12 @@ class OrbitalCameraManagerCore extends PerspectiveCamera
      * @param {THREE.Vector3} axis orbit axis
      * @param {THREE.Vector3} lookAt point to focus on during orbit
      */
-    constructor(fov, axis, lookAt)
+    constructor(fov, lookAt)
     {
         super(fov)
         this.orbitSpeed = 60
-        this.cameraOrbiter = new OrbitControl(this.camera, axis, lookAt)
+        this.cameraOrbiterYaw = new OrbitControl(this.camera, lookAt)
+        this.cameraOrbiterPitch = new OrbitControl(this.camera, lookAt, (newPosition) => {return (newPosition.y >= -1.7 && newPosition.y <= 4.9)})
         this.zoom = false
         this.isZooming = false
         this.ogPosition = this.camera.position
@@ -122,7 +123,6 @@ class OrbitalCameraManagerCore extends PerspectiveCamera
         {
             let inputManager = data
             inputManager.registerMoveEvent((dx, dy) => this.onMoveEvent(dx, dy))
-            inputManager.registerDoubleClickEvent((e, f) => this.onDoubleClick(e, f))
             inputManager.setCursorSensitivity(0.5)
         }
         else if (senderName == 'Roof')
@@ -189,28 +189,10 @@ class OrbitalCameraManagerCore extends PerspectiveCamera
     onMoveEvent(deltaX, deltaY, x, y) 
     { 
         if (!this.zoom && !this.isZooming)
-            this.cameraOrbiter.pan(deltaX) 
-    }
-
-    /**
-     * Called by InputManager whenever it detects double click event.
-     * This function starts auto orbit on detecting double click and stops auto orbit on detecting double click again.
-     * @param {MouseEvent} event mouse event instance
-     */
-    onDoubleClick(event)
-    {
-        if (!this.zoom && !this.isZooming)
-        {
-            if (!this.autoOrbiting)
-            {    
-                this.cameraOrbiter.start(this.orbitSpeed)
-                this.autoOrbiting = true
-            }
-            else
-            {
-                this.cameraOrbiter.stop()
-                this.autoOrbiting = false
-            }
+        {    
+            this.cameraOrbiterYaw.pan(new THREE.Vector3(0, 1, 0), -deltaX) 
+            //if (this.camera.position.y >= -1.7 && this.camera.position.y <= 4.9)
+                this.cameraOrbiterPitch.pan(this.right, -deltaY)
         }
     }
 }

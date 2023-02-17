@@ -3,20 +3,20 @@ import { MATHS } from '../helpers/maths.js'
 
 export class OrbitControl
 {
-    constructor(object3D, axis, lookAtPosition) { this.core = new OrbitControlCore(object3D, axis, lookAtPosition) }
+    constructor(object3D, lookAtPosition, shouldMoveFunction) { this.core = new OrbitControlCore(object3D, lookAtPosition, shouldMoveFunction) }
 
-    pan(speed)
+    pan(axis, speed)
     {
         if (!this.core.isOrbit)
-            this.core.orbit(speed)
+            this.core.orbit(axis, speed)
     }
 
-    start(speed)
+    start(axis, speed)
     {
         if (!this.core.isOrbit)
         {
             this.core.isOrbit = true
-            this.core.auto(speed)
+            this.core.auto(axis, speed)
         }
     }
 
@@ -25,31 +25,34 @@ export class OrbitControl
 
 class OrbitControlCore
 {
-    constructor(object3D, axis, lookAtPosition)
+    constructor(object3D, lookAtPosition, shouldMoveFunction)
     {
         this.object3D = object3D
-        this.axis = axis
         this.lookAtPosition = lookAtPosition
+        this.shouldMoveFunction = (shouldMoveFunction == undefined) ? (v)=>{return true} : shouldMoveFunction
         this.isOrbit = false
     }
 
-    auto(speed)
+    auto(axis, speed)
     {
         if (this.isOrbit)
         {
-            this.orbit(1)
-            setTimeout(()=>this.auto(speed), 1000/speed)
+            this.orbit(axis, 1)
+            setTimeout(()=>this.auto(axis, speed), 1000/speed)
         }
     }
 
-    orbit(speed)
+    orbit(axis, speed, shouldMoveFunction)
     {
         let vLookAt2Src = MATHS.subtractVectors(this.object3D.position, this.lookAtPosition)
         let vLookAt2Dest = new THREE.Vector3(vLookAt2Src.x, vLookAt2Src.y, vLookAt2Src.z)
-        vLookAt2Dest.applyAxisAngle(this.axis, MATHS.toRadians(speed))
-        let offset = MATHS.subtractVectors(vLookAt2Dest, vLookAt2Src)
-        let destination = MATHS.addVectors(this.object3D.position, offset)
-        this.object3D.position.set(destination.x, destination.y, destination.z)
-        this.object3D.lookAt(this.lookAtPosition)
+        vLookAt2Dest.applyAxisAngle(axis, MATHS.toRadians(speed))
+        if (this.shouldMoveFunction(vLookAt2Dest))
+        {
+            let offset = MATHS.subtractVectors(vLookAt2Dest, vLookAt2Src)
+            let destination = MATHS.addVectors(this.object3D.position, offset)
+            this.object3D.position.set(destination.x, destination.y, destination.z)
+            this.object3D.lookAt(this.lookAtPosition)
+        }
     }
 }

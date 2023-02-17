@@ -39,6 +39,9 @@ export class PerspectiveCamera
     {
         this.camera = new THREE.PerspectiveCamera(fov, window.innerWidth/window.innerHeight, 0.1, 1000)
         this.camera.rotation.order = 'YXZ'
+        this.front = new THREE.Vector3()
+        this.right = new THREE.Vector3()
+        this.up = new THREE.Vector3()
         this.viewMatrix = this.getViewMatrix()
     }
 
@@ -94,14 +97,13 @@ export class PerspectiveCamera
      */
     getViewMatrix()
     {
-        let front = new THREE.Vector3()
-        this.camera.getWorldDirection(front)
-        let right = MATHS.cross(front, new THREE.Vector3(0, 1, 0))
-        let up = MATHS.cross(right, front)
+        this.camera.getWorldDirection(this.front)
+        this.right = MATHS.cross(this.front, new THREE.Vector3(0, 1, 0))
+        this.up = MATHS.cross(this.right, this.front)
         return [
-            [ right.x, right.y, right.z, -MATHS.dot(this.camera.position, right) ],
-            [ up.x, up.y, up.z, -MATHS.dot(this.camera.position, up) ],
-            [ front.x, front.y, front.z, -MATHS.dot(this.camera.position, front)],
+            [ this.right.x, this.right.y, this.right.z, -MATHS.dot(this.camera.position, this.right) ],
+            [ this.up.x, this.up.y, this.up.z, -MATHS.dot(this.camera.position, this.up) ],
+            [ this.front.x, this.front.y, this.front.z, -MATHS.dot(this.camera.position, this.front)],
             [ 0, 0, 0, 1 ]
         ]
     }
