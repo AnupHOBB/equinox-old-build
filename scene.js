@@ -107,7 +107,6 @@ window.onload = () =>
             THREE = THR
             const canvas = document.querySelector('canvas')
             const lookAtPosition = new THREE.Vector3(0, 0, -5)
-            const axis = new THREE.Vector3(0, -1, 0)
             import("./core/SceneManager.js").then((M)=>{
                 sceneManager = new M.SceneManager(canvas)
                 jsFilesStatus += 12.5
@@ -140,8 +139,7 @@ window.onload = () =>
                                 jsFilesStatus += 12.5
                             })     
                             import("./camera_managers/OrbitalCameraManager.js").then((M)=>{
-                                axis.applyAxisAngle(new THREE.Vector3(0, 0, -1), MATHS.toRadians(20))
-                                cameraManager = new M.OrbitalCameraManager('Camera', 90, axis, lookAtPosition)
+                                cameraManager = new M.OrbitalCameraManager('Camera', 90, lookAtPosition)
                                 sceneManager.register(cameraManager)
                                 sceneManager.setActiveCamera('Camera')
                                 jsFilesStatus += 12.5

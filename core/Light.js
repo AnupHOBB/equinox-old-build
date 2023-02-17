@@ -59,8 +59,8 @@ export class DirectLight extends SceneObject
         this.gizmo = new THREE.CameraHelper(this.light.shadow.camera) 
         this.mesh = new THREE.Mesh(new THREE.SphereGeometry(size, 64, 32), new THREE.MeshBasicMaterial({color: 0xFCE570}))
         this.mesh.position.set(position.x, position.y, position.z)
-        this.lightOrbiter = new OrbitControl(this.light, new THREE.Vector3(0, 1, 0), lookAt)
-        this.meshOrbiter = new OrbitControl(this.mesh, new THREE.Vector3(0, 1, 0), lookAt)
+        this.lightOrbiter = new OrbitControl(this.light, lookAt)
+        this.meshOrbiter = new OrbitControl(this.mesh, lookAt)
     }
 
     /**
@@ -75,8 +75,8 @@ export class DirectLight extends SceneObject
      */
     orbit(speed) 
     { 
-        this.lightOrbiter.pan(speed)
-        this.meshOrbiter.pan(speed)
+        this.lightOrbiter.pan(new THREE.Vector3(0, 1, 0), speed)
+        this.meshOrbiter.pan(new THREE.Vector3(0, 1, 0), speed)
     }
 
     /**
