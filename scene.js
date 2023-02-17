@@ -118,10 +118,15 @@ window.onload = () =>
                     import("./helpers/misc.js").then((M)=>{
                         MISC = M.MISC
                         import("./core/Actor.js").then((M)=>{
-                            let floor = new M.FloorActor('Floor', new THREE.BoxGeometry(100, 0.1, 100), new THREE.MeshLambertMaterial(), true)
+                            let floor = new M.ShapeActor('Floor', new THREE.BoxGeometry(100, 0.1, 100), new THREE.MeshLambertMaterial(), true)
                             floor.applyTexture(texture)
                             floor.setPosition(0, -2, 0)
                             sceneManager.register(floor)
+                            new THREE.TextureLoader().load('./assets/envmap.png', (texture)=>{
+                                let background = new M.ShapeActor('Background', new THREE.SphereGeometry(100, 256, 16),  new THREE.MeshBasicMaterial( { color: 0xffffff,  map: texture, side: THREE.BackSide }))
+                                background.setPosition(0, 0, -4.5)
+                                sceneManager.register(background)
+                            })
                             gltfActor = new M.MeshActor('Roof', './assets/eq_animation.glb', (xhr)=>{ 
                                 let loadStat = Math.round((xhr.loaded/ xhr.total) * 100) 
                                 if (loadStat < 100)
