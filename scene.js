@@ -1,5 +1,55 @@
 import { ImportManager } from './core/ImportManager.js'
 
+let colorContainer = document.getElementById('color-menu-container')
+let sliderContainer = document.getElementById('slider-container')
+let colorVisible = false
+let sliderVisible = true
+let sliderHTML = document.getElementById('slider-bar')
+
+let navBarLight = document.getElementById('nav-bar-light')
+navBarLight.addEventListener('click', (e)=>{
+    if (!sliderVisible)
+    {    
+        document.body.appendChild(sliderContainer)
+        sliderVisible = true
+    }
+    sliderHTML.className = 'slider-light'
+    if (colorVisible)
+    {    
+        document.body.removeChild(colorContainer)
+        colorVisible = false
+    }
+})
+
+let navBarRoof = document.getElementById('nav-bar-roof')
+navBarRoof.addEventListener('click', (e)=>{
+    if (!sliderVisible)
+    {    
+        document.body.appendChild(sliderContainer)
+        sliderVisible = true
+    }
+    sliderHTML.className = 'slider-roof'
+    if (colorVisible)
+    {    
+        document.body.removeChild(colorContainer)
+        colorVisible = false
+    }
+})
+
+let navBarColor = document.getElementById('nav-bar-color')
+navBarColor.addEventListener('click', (e)=>{
+    if (!colorVisible)
+    {    
+        document.body.appendChild(colorContainer)
+        colorVisible = true
+    }
+    if (sliderVisible)
+    {    
+        document.body.removeChild(sliderContainer)
+        sliderVisible = false
+    }
+})
+
 let modelViewer = document.createElement('model-viewer')
 modelViewer.style = 'width:0%; height:0%'
 modelViewer.ar = true
@@ -7,8 +57,8 @@ modelViewer.arScale = 'fixed'
 modelViewer.src = './assets/LouveredRoof.glb'
 document.body.appendChild(modelViewer)
 
-let arButton = document.getElementById('ar-button')
-arButton.addEventListener('click', (e)=>modelViewer.activateAR()) 
+let navBarAr = document.getElementById('nav-bar-ar')
+navBarAr.addEventListener('click', (e)=>modelViewer.activateAR()) 
 
 function changeModelViewerColor(colorInHex)
 {
@@ -74,8 +124,12 @@ window.onload = () =>
     function onImportComplete(importMap)
     {
         let SLIDER = importMap.get('SLIDER')
-        new SLIDER.SliderUI(document.getElementById('slider-light'), (v)=>directLight.orbit(v))
-        new SLIDER.SliderUI(document.getElementById('slider-roof'), (v)=>gltfActor.updateAnimationFrame(-(v/180))) 
+        new SLIDER.SliderUI(sliderHTML, (v)=>{
+            if (sliderHTML.className == 'slider-light')
+                directLight.orbit(v)
+            else if (sliderHTML.className == 'slider-roof')
+                gltfActor.updateAnimationFrame(-(v/180))
+        })
         let THREE = importMap.get('THREE')
         const canvas = document.querySelector('canvas')
         const lookAtPosition = new THREE.Vector3(0, 0, -5)
@@ -175,5 +229,6 @@ window.onload = () =>
         queryLoadStatus = false
         let loadingScreen = document.getElementById('loading-screen')
         document.body.removeChild(loadingScreen) 
+        document.body.removeChild(colorContainer)
     }
 }
