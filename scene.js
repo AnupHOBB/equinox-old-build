@@ -1,5 +1,22 @@
 import { ImportManager } from './core/ImportManager.js'
 
+let modelViewer = document.createElement('model-viewer')
+modelViewer.style = 'width:0%; height:0%'
+modelViewer.ar = true
+modelViewer.arScale = 'fixed'
+modelViewer.src = './assets/LouveredRoof.glb'
+document.body.appendChild(modelViewer)
+
+let arButton = document.getElementById('ar-button')
+arButton.addEventListener('click', (e)=>modelViewer.activateAR()) 
+
+function changeModelViewerColor(colorInHex)
+{
+    const materials = modelViewer.model.materials
+    for (let material of materials)
+        material.pbrMetallicRoughness.setBaseColorFactor(colorInHex)
+}
+
 window.onload = () =>
 {    
     let loadingText = document.getElementById('loading-text')
@@ -91,6 +108,7 @@ window.onload = () =>
             onLoadingComplete(sceneManager, cameraManager, gltfActor, importMap)
         })
         gltfActor.applyColor(MISC.MISC.hexToColor(colors[0]))
+        modelViewer.color = colors[0]
         gltfActor.setPosition(2, -2, -3)
         sceneManager.register(gltfActor) 
         let ORBITCAM = importMap.get('ORBITCAM')
@@ -149,6 +167,8 @@ window.onload = () =>
                 let style = window.getComputedStyle(colorItem)
                 let color = MISC.MISC.toColor(style.getPropertyValue('background-color'))
                 gltfActor.applyColor(color)
+                modelViewer.color = colors[i]
+                changeModelViewerColor(colors[i])
             }  
             colorMenu.appendChild(colorItem)
         }
@@ -156,5 +176,4 @@ window.onload = () =>
         let loadingScreen = document.getElementById('loading-screen')
         document.body.removeChild(loadingScreen) 
     }
-
 }
