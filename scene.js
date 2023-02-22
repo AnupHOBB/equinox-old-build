@@ -14,6 +14,7 @@ navBarLight.addEventListener('click', (e)=>{
         sliderVisible = true
     }
     sliderHTML.className = 'slider-light'
+    changeNavButtonClass('nav-bar-item-outer-selected', 'nav-bar-item-outer', 'nav-bar-item-outer', 'nav-bar-item-outer')
     if (colorVisible)
     {    
         document.body.removeChild(colorContainer)
@@ -29,6 +30,7 @@ navBarRoof.addEventListener('click', (e)=>{
         sliderVisible = true
     }
     sliderHTML.className = 'slider-roof'
+    changeNavButtonClass('nav-bar-item-outer', 'nav-bar-item-outer-selected', 'nav-bar-item-outer')
     if (colorVisible)
     {    
         document.body.removeChild(colorContainer)
@@ -43,6 +45,7 @@ navBarColor.addEventListener('click', (e)=>{
         document.body.appendChild(colorContainer)
         colorVisible = true
     }
+    changeNavButtonClass('nav-bar-item-outer', 'nav-bar-item-outer', 'nav-bar-item-outer-selected')
     if (sliderVisible)
     {    
         document.body.removeChild(sliderContainer)
@@ -57,14 +60,35 @@ modelViewer.arScale = 'fixed'
 modelViewer.src = './assets/LouveredRoof.glb'
 document.body.appendChild(modelViewer)
 
-let navBarAr = document.getElementById('nav-bar-ar')
-navBarAr.addEventListener('click', (e)=>modelViewer.activateAR()) 
+let arButton = document.getElementById('ar-button')
+arButton.addEventListener('click', (e)=>modelViewer.activateAR()) 
+
+let videoScreen = document.getElementById('video-screen')
+let videoHTML = document.querySelector('video')
+let crossIcon = document.getElementById('cross-icon')
+crossIcon.addEventListener('click', (e)=>document.body.removeChild(videoScreen))
+
+function changeNavButtonClass(navBarLightClass, navBarRoofClass, navBarColorClass)
+{
+    navBarLight.className = navBarLightClass
+    navBarRoof.className = navBarRoofClass
+    navBarColor.className = navBarColorClass
+}
 
 function changeModelViewerColor(colorInHex)
 {
     const materials = modelViewer.model.materials
     for (let material of materials)
         material.pbrMetallicRoughness.setBaseColorFactor(colorInHex)
+}
+
+function setupStartupUI()
+{
+    let loadingScreen = document.getElementById('loading-screen')
+    document.body.removeChild(loadingScreen) 
+    document.body.removeChild(colorContainer)
+    document.body.removeChild(videoScreen)
+    changeNavButtonClass('nav-bar-item-outer-selected', 'nav-bar-item-outer', 'nav-bar-item-outer')
 }
 
 window.onload = () =>
@@ -186,23 +210,32 @@ window.onload = () =>
         let MISC = importMap.get('MISC')
         let videoPlayer = new VIDEO.VideoPlayer('./assets/vid.mp4')
         let hotSpot1 = new HOTSPOT.Hotspot('assets/hotspot.png', MATHS.MATHS.addVectors(gltfActor.getPosition(), new THREE.Vector3(-3.55, 2.4, 0.01)))
-        hotSpot1.setOnClick((e)=>{
+        hotSpot1.setOnClick((e)=>{   
             if (!cameraManager.isZoomed())
-                videoPlayer.show(e.clientX, e.clientY)
+            {    
+                document.body.appendChild(videoScreen)
+                videoHTML.play()
+            }
         })
         hotSpot1.setOnMove(()=>videoPlayer.hide())
         hotSpot1.setOnDblClick(()=>sceneManager.broadcastTo(gltfActor.name, cameraManager.name, hotSpot1.worldPosition))
         let hotSpot2 = new HOTSPOT.Hotspot('assets/hotspot.png', MATHS.MATHS.addVectors(gltfActor.getPosition(), new THREE.Vector3(-0.85, 2.4, 0.01)))
         hotSpot2.setOnClick((e)=>{
             if (!cameraManager.isZoomed())
-                videoPlayer.show(e.clientX, e.clientY)
+            {    
+                document.body.appendChild(videoScreen)
+                videoHTML.play()
+            }
         })
         hotSpot2.setOnMove(()=>videoPlayer.hide())
         hotSpot2.setOnDblClick(()=>sceneManager.broadcastTo(gltfActor.name, cameraManager.name, hotSpot2.worldPosition))
         let hotSpot3 = new HOTSPOT.Hotspot('assets/hotspot.png', MATHS.MATHS.addVectors(gltfActor.getPosition(), new THREE.Vector3(-3.25, 2.4, -3.4)))
         hotSpot3.setOnClick((e)=>{
             if (!cameraManager.isZoomed())
-                videoPlayer.show(e.clientX, e.clientY)
+            {    
+                document.body.appendChild(videoScreen)
+                videoHTML.play()
+            }
         })
         hotSpot3.setOnMove(()=>videoPlayer.hide())
         hotSpot3.setOnDblClick(()=>sceneManager.broadcastTo(gltfActor.name, cameraManager.name, hotSpot3.worldPosition))
@@ -221,14 +254,11 @@ window.onload = () =>
                 let style = window.getComputedStyle(colorItem)
                 let color = MISC.MISC.toColor(style.getPropertyValue('background-color'))
                 gltfActor.applyColor(color)
-                modelViewer.color = colors[i]
                 changeModelViewerColor(colors[i])
             }  
             colorMenu.appendChild(colorItem)
         }
         queryLoadStatus = false
-        let loadingScreen = document.getElementById('loading-screen')
-        document.body.removeChild(loadingScreen) 
-        document.body.removeChild(colorContainer)
+        setupStartupUI()
     }
 }

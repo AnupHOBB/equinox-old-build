@@ -130,13 +130,16 @@ class HotspotInput
             this.clickCount++
             if (this.clickCount > 2)
                 this.clickCount = 2
-            setTimeout(()=>{
-                if (this.clickCount > 1)
-                    this.onDoubleClick(event)
-                else
-                   this.onClick(event)
-                this.clickCount = 0
-            }, 250)
+            if (this.clickCount == 1)
+            {
+                setTimeout(()=>{
+                    if (this.clickCount > 1)
+                        this.onDoubleClick(event)
+                    else
+                        this.onClick(event)
+                    this.clickCount = 0
+                }, 250)
+            }
         }        
     }
 

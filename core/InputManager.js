@@ -186,19 +186,22 @@ class MouseEventCore
             this.dblTapCounter++
             if (this.dblTapCounter > 2)
                 this.dblTapCounter = 2   
-            setTimeout(()=>{
-                if (this.dblTapCounter > 1)
-                {
-                    for (let dblClickCallback of this.dblClickCallbacks)
-                        dblClickCallback(event)
-                }
-                else
-                {
-                    for (let clickCallback of this.clickCallbacks)
-                        clickCallback(event.clientX, event.clientY)
-                }
-                this.dblTapCounter = 0
-            }, 250) 
+            if (this.dblTapCounter == 1)
+            {
+                setTimeout(()=>{
+                    if (this.dblTapCounter > 1)
+                    {
+                        for (let dblClickCallback of this.dblClickCallbacks)
+                            dblClickCallback(event)
+                    }
+                    else
+                    {
+                        for (let clickCallback of this.clickCallbacks)
+                            clickCallback(event.clientX, event.clientY)
+                    }
+                    this.dblTapCounter = 0
+                }, 250) 
+            }
         }  
     }
 
