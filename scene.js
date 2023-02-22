@@ -185,6 +185,8 @@ window.onload = () =>
             textureStatus = 100
         })
         let MISC = importMap.get('MISC')
+        if (!MISC.MISC.isHandHeldDevice())
+            document.body.removeChild(arButton)
         let ACTOR = importMap.get('ACTOR')
         new THREE.TextureLoader().load('./assets/envmap.png', (texture)=>{
             let background = new ACTOR.ShapeActor('Background', new THREE.SphereGeometry(100, 256, 16),  new THREE.MeshBasicMaterial( { color: 0xffffff,  map: texture, side: THREE.BackSide }))
