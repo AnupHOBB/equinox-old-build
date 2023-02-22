@@ -80,6 +80,32 @@
                     font-size: 3vh;
                 }
 
+                #ar-button
+                {
+                    position: absolute;
+                    top: 3%;
+                    right: 5%;
+                    width: auto;
+                    height: 5%;
+                    border-radius: 1ch;
+                }
+
+                video
+                {
+                    display: block;
+                    margin: auto;
+                    width: 90%;
+                    max-width: 600px;
+                }
+
+                #cross-icon-container
+                {
+                    display: block;
+                    margin: auto;
+                    width: 85%;
+                    max-width: 550px;
+                }
+
                 @media screen and (max-width : 500px)
                 {
                     .slider-light
@@ -166,6 +192,12 @@
                         left: 0%;
                         width: 100%;
                         height: 5%;
+                    }
+
+                    .nav-bar-item-outer-selected
+                    {
+                        background-color: gray;
+                        width: 33.33%;
                     }
                 }
 
@@ -256,6 +288,13 @@
                         left: 0%;
                         width: 100%;
                         height: 5%;
+                    }
+
+                    .nav-bar-item-outer-selected
+                    {
+                        background-color: gray;
+                        border-radius: 1ch;
+                        width: 33.33%;
                     }
                 }
             }
@@ -370,6 +409,37 @@
                     border-radius: 1ch;
                     background-color: rgba(0, 0, 0, 0.4);
                     height: 100%;
+                }
+
+                #ar-button
+                {
+                    position: absolute;
+                    top: 3%;
+                    right: 5%;
+                    width: 5%;
+                    height: auto;
+                    border-radius: 1ch;
+                }
+
+                .nav-bar-item-outer-selected
+                {
+                    background-color: gray;
+                    border-radius: 1ch;
+                    width: 33.33%;
+                }
+
+                video
+                {
+                    display: block;
+                    margin: auto;
+                    width: 40%;
+                }
+
+                #cross-icon-container
+                {
+                    display: block;
+                    margin: auto;
+                    width: 40%;
                 }
 
                 @media screen and (min-height : 600px)
@@ -515,6 +585,7 @@
             {
                 display: flex;
                 overflow-x: auto;
+                overflow-y: auto;
                 gap: 6%;
                 width: 100%;
                 height: 100%;
@@ -531,14 +602,7 @@
 
             .nav-bar-item-outer
             {
-                width: 25%;
-            }
-
-            .nav-bar-item-outer-selected
-            {
-                background-color: gray;
-                border-radius: 1ch;
-                width: 25%;
+                width: 33.33%;
             }
             
             .nav-bar-item
@@ -577,30 +641,22 @@
                 margin: auto;
             }
 
-            video
-            {
-                display: block;
-                margin: auto;
-                width: 40%;
-            }
-
-            #cross-icon-container
-            {
-                display: block;
-                margin: auto;
-                width: 40%;
-            }
-
             #cross-icon
             {
                 position: relative;
                 top: 0%;
                 left: 100%;
             }
+
+            /* .color-item:hover
+            {
+                transform: scale(1.2);
+            } */
         </style>
     </head>
     <body style="overflow: hidden">
         <canvas></canvas>
+        <img id="ar-button" src="assets/ar-icon.png"/>
         <div id="slider-container">
             <input id="slider-bar" class="slider-light" type="range" min="1" max="359" value="1"/>
         </div>
@@ -627,11 +683,11 @@
                             <img class="nav-bar-icon" src="assets/color-icon.png"/>
                         </div>
                     </div>
-                    <div id="nav-bar-ar" class="nav-bar-item-outer">
+                    <!-- <div id="nav-bar-ar" class="nav-bar-item-outer">
                         <div class="nav-bar-item">
                             <img class="nav-bar-icon" src="assets/ar-icon.png"/>
                         </div>
-                    </div>
+                    </div> -->
                 </div>
             </div>
         </div>

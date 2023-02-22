@@ -30,7 +30,7 @@ navBarRoof.addEventListener('click', (e)=>{
         sliderVisible = true
     }
     sliderHTML.className = 'slider-roof'
-    changeNavButtonClass('nav-bar-item-outer', 'nav-bar-item-outer-selected', 'nav-bar-item-outer', 'nav-bar-item-outer')
+    changeNavButtonClass('nav-bar-item-outer', 'nav-bar-item-outer-selected', 'nav-bar-item-outer')
     if (colorVisible)
     {    
         document.body.removeChild(colorContainer)
@@ -45,7 +45,7 @@ navBarColor.addEventListener('click', (e)=>{
         document.body.appendChild(colorContainer)
         colorVisible = true
     }
-    changeNavButtonClass('nav-bar-item-outer', 'nav-bar-item-outer', 'nav-bar-item-outer-selected', 'nav-bar-item-outer')
+    changeNavButtonClass('nav-bar-item-outer', 'nav-bar-item-outer', 'nav-bar-item-outer-selected')
     if (sliderVisible)
     {    
         document.body.removeChild(sliderContainer)
@@ -60,23 +60,19 @@ modelViewer.arScale = 'fixed'
 modelViewer.src = './assets/LouveredRoof.glb'
 document.body.appendChild(modelViewer)
 
-let navBarAr = document.getElementById('nav-bar-ar')
-navBarAr.addEventListener('click', (e)=>{
-    modelViewer.activateAR()
-    changeNavButtonClass('nav-bar-item-outer', 'nav-bar-item-outer', 'nav-bar-item-outer', 'nav-bar-item-outer-selected')
-}) 
+let arButton = document.getElementById('ar-button')
+arButton.addEventListener('click', (e)=>modelViewer.activateAR()) 
 
 let videoScreen = document.getElementById('video-screen')
 let videoHTML = document.querySelector('video')
 let crossIcon = document.getElementById('cross-icon')
 crossIcon.addEventListener('click', (e)=>document.body.removeChild(videoScreen))
 
-function changeNavButtonClass(navBarLightClass, navBarRoofClass, navBarColorClass, navBarArClass)
+function changeNavButtonClass(navBarLightClass, navBarRoofClass, navBarColorClass)
 {
     navBarLight.className = navBarLightClass
     navBarRoof.className = navBarRoofClass
     navBarColor.className = navBarColorClass
-    navBarAr.className = navBarArClass
 }
 
 function changeModelViewerColor(colorInHex)
@@ -92,7 +88,7 @@ function setupStartupUI()
     document.body.removeChild(loadingScreen) 
     document.body.removeChild(colorContainer)
     document.body.removeChild(videoScreen)
-    changeNavButtonClass('nav-bar-item-outer-selected', 'nav-bar-item-outer', 'nav-bar-item-outer', 'nav-bar-item-outer')
+    changeNavButtonClass('nav-bar-item-outer-selected', 'nav-bar-item-outer', 'nav-bar-item-outer')
 }
 
 window.onload = () =>
@@ -258,7 +254,6 @@ window.onload = () =>
                 let style = window.getComputedStyle(colorItem)
                 let color = MISC.MISC.toColor(style.getPropertyValue('background-color'))
                 gltfActor.applyColor(color)
-                modelViewer.color = colors[i]
                 changeModelViewerColor(colors[i])
             }  
             colorMenu.appendChild(colorItem)
