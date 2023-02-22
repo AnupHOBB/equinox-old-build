@@ -14,6 +14,7 @@ navBarLight.addEventListener('click', (e)=>{
         sliderVisible = true
     }
     sliderHTML.className = 'slider-light'
+    changeNavButtonClass('nav-bar-item-outer-selected', 'nav-bar-item-outer', 'nav-bar-item-outer', 'nav-bar-item-outer')
     if (colorVisible)
     {    
         document.body.removeChild(colorContainer)
@@ -29,6 +30,7 @@ navBarRoof.addEventListener('click', (e)=>{
         sliderVisible = true
     }
     sliderHTML.className = 'slider-roof'
+    changeNavButtonClass('nav-bar-item-outer', 'nav-bar-item-outer-selected', 'nav-bar-item-outer', 'nav-bar-item-outer')
     if (colorVisible)
     {    
         document.body.removeChild(colorContainer)
@@ -43,6 +45,7 @@ navBarColor.addEventListener('click', (e)=>{
         document.body.appendChild(colorContainer)
         colorVisible = true
     }
+    changeNavButtonClass('nav-bar-item-outer', 'nav-bar-item-outer', 'nav-bar-item-outer-selected', 'nav-bar-item-outer')
     if (sliderVisible)
     {    
         document.body.removeChild(sliderContainer)
@@ -58,13 +61,32 @@ modelViewer.src = './assets/LouveredRoof.glb'
 document.body.appendChild(modelViewer)
 
 let navBarAr = document.getElementById('nav-bar-ar')
-navBarAr.addEventListener('click', (e)=>modelViewer.activateAR()) 
+navBarAr.addEventListener('click', (e)=>{
+    modelViewer.activateAR()
+    changeNavButtonClass('nav-bar-item-outer', 'nav-bar-item-outer', 'nav-bar-item-outer', 'nav-bar-item-outer-selected')
+}) 
+
+function changeNavButtonClass(navBarLightClass, navBarRoofClass, navBarColorClass, navBarArClass)
+{
+    navBarLight.className = navBarLightClass
+    navBarRoof.className = navBarRoofClass
+    navBarColor.className = navBarColorClass
+    navBarAr.className = navBarArClass
+}
 
 function changeModelViewerColor(colorInHex)
 {
     const materials = modelViewer.model.materials
     for (let material of materials)
         material.pbrMetallicRoughness.setBaseColorFactor(colorInHex)
+}
+
+function setupStartupUI()
+{
+    let loadingScreen = document.getElementById('loading-screen')
+    document.body.removeChild(loadingScreen) 
+    document.body.removeChild(colorContainer)
+    changeNavButtonClass('nav-bar-item-outer-selected', 'nav-bar-item-outer', 'nav-bar-item-outer', 'nav-bar-item-outer')
 }
 
 window.onload = () =>
@@ -227,8 +249,6 @@ window.onload = () =>
             colorMenu.appendChild(colorItem)
         }
         queryLoadStatus = false
-        let loadingScreen = document.getElementById('loading-screen')
-        document.body.removeChild(loadingScreen) 
-        document.body.removeChild(colorContainer)
+        setupStartupUI()
     }
 }
