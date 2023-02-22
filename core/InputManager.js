@@ -1,4 +1,5 @@
 import { SceneObject } from '../core/SceneManager.js'
+import { MISC } from '../helpers/misc.js'
 
 /**
  * Responsible for notifying objects whenever user provides a mouse, touch or key input
@@ -177,7 +178,7 @@ class MouseEventCore
      */
     onPress(event) 
     { 
-        let isDevice = navigator.userAgent.includes('iPad') || navigator.userAgent.includes('iPhone') || navigator.userAgent.includes('Android')
+        let isDevice = MISC.isHandHeldDevice()
         if ((isDevice && event.type == 'touchstart') || (!isDevice && event.type == 'mousedown'))
         {
             if (event.type == 'touchstart')
