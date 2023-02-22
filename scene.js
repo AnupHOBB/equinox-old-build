@@ -5,6 +5,8 @@ let sliderContainer = document.getElementById('slider-container')
 let colorVisible = false
 let sliderVisible = true
 let sliderHTML = document.getElementById('slider-bar')
+let lightSliderVal = sliderHTML.value
+let roofSliderVal = sliderHTML.value
 
 let navBarLight = document.getElementById('nav-bar-light')
 navBarLight.addEventListener('click', (e)=>{
@@ -13,6 +15,7 @@ navBarLight.addEventListener('click', (e)=>{
         document.body.appendChild(sliderContainer)
         sliderVisible = true
     }
+    sliderHTML.value = lightSliderVal
     sliderHTML.className = 'slider-light'
     changeNavButtonClass('nav-bar-item-outer-selected', 'nav-bar-item-outer', 'nav-bar-item-outer', 'nav-bar-item-outer')
     if (colorVisible)
@@ -29,6 +32,7 @@ navBarRoof.addEventListener('click', (e)=>{
         document.body.appendChild(sliderContainer)
         sliderVisible = true
     }
+    sliderHTML.value = roofSliderVal
     sliderHTML.className = 'slider-roof'
     changeNavButtonClass('nav-bar-item-outer', 'nav-bar-item-outer-selected', 'nav-bar-item-outer')
     if (colorVisible)
@@ -150,9 +154,15 @@ window.onload = () =>
         let SLIDER = importMap.get('SLIDER')
         new SLIDER.SliderUI(sliderHTML, (v)=>{
             if (sliderHTML.className == 'slider-light')
+            {    
+                lightSliderVal = sliderHTML.value
                 directLight.orbit(v)
+            }
             else if (sliderHTML.className == 'slider-roof')
+            {
+                roofSliderVal = sliderHTML.value    
                 gltfActor.updateAnimationFrame(-(v/180))
+            }
         })
         let THREE = importMap.get('THREE')
         const canvas = document.querySelector('canvas')
