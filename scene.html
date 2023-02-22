@@ -528,18 +528,23 @@
                 height: 80%;
                 border-radius: 5ch;
             }
+
+            .nav-bar-item-outer
+            {
+                width: 25%;
+            }
             
             .nav-bar-item
             {
-                display: block;
-                margin: auto;
-                width: 25%;
+                position: relative;
+                top: 25%;
             }
 
             img.nav-bar-icon
             {
                 display: block;
                 margin: auto;
+                height: 50%;
             }
         </style>
     </head>
@@ -556,10 +561,26 @@
         <div id="nav-bar-container">
             <div id="nav-bar-outer">
                 <div id="nav-bar">
-                    <div id="nav-bar-light" class="nav-bar-item"><img class="nav-bar-icon" src="assets/light-icon.png"/></div>
-                    <div id="nav-bar-roof" class="nav-bar-item"><img class="nav-bar-icon" src="assets/roof-icon.jpg"/></div>
-                    <div id="nav-bar-color" class="nav-bar-item"><img class="nav-bar-icon" src="assets/color-icon.png"/></div>
-                    <div id="nav-bar-ar" class="nav-bar-item"><img class="nav-bar-icon" src="assets/ar-icon.png"/></div>
+                    <div id="nav-bar-light" class="nav-bar-item-outer">
+                        <div class="nav-bar-item">
+                            <img class="nav-bar-icon" src="assets/light-icon.png"/>
+                        </div>
+                    </div>
+                    <div id="nav-bar-roof" class="nav-bar-item-outer">
+                        <div class="nav-bar-item">
+                            <img class="nav-bar-icon" src="assets/roof-icon.jpg"/>
+                        </div>
+                    </div>
+                    <div id="nav-bar-color" class="nav-bar-item-outer">
+                        <div class="nav-bar-item">
+                            <img class="nav-bar-icon" src="assets/color-icon.png"/>
+                        </div>
+                    </div>
+                    <div id="nav-bar-ar" class="nav-bar-item-outer">
+                        <div class="nav-bar-item">
+                            <img class="nav-bar-icon" src="assets/ar-icon.png"/>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
