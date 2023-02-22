@@ -1,3 +1,5 @@
+import { MISC } from '../helpers/misc.js'
+
 /**
  * Represents the hotspots that appera attached onto a 3D model
  */
@@ -15,6 +17,7 @@ export class Hotspot
         this.lastRasterCoord = { x: -1, y: -1 }
         this.worldPosition = worldPosition
         this.input = new HotspotInput(this.img)
+        this.shouldRender = ()=>{ return true }
     }
 
     /**
@@ -40,6 +43,16 @@ export class Hotspot
      * @param {Function} onHold callback function that is called when the user clicks on the hot spot 
      */
     setOnHold(onHold) { this.input.onHold = onHold }
+
+    /**
+     * Sets the function callback that is used to check whether the hotspot should be rendered or not.
+     * @param {Function} shouldRender function that returns true if the conditions are met
+     */
+    setRenderCondition(shouldRender) 
+    {
+        if (shouldRender != undefined && shouldRender != null)
+            this.shouldRender = shouldRender
+    }
 
     /**
      * Returns the world space position of hot spot
@@ -72,7 +85,7 @@ export class Hotspot
      */
     show()
     {
-        if (!this.isVisible)
+        if (!this.isVisible && this.shouldRender())
         {
             document.body.appendChild(this.img)
             this.isVisible = true
@@ -121,7 +134,7 @@ class HotspotInput
      */
     onPress(event)
     {
-        let isDevice = navigator.userAgent.includes('iPad') || navigator.userAgent.includes('iPhone') || navigator.userAgent.includes('Android')
+        let isDevice = MISC.isHandHeldDevice()
         if ((isDevice && event.type == 'touchstart') || (!isDevice && event.type == 'mousedown'))
         {
             if (event.type == 'touchstart')

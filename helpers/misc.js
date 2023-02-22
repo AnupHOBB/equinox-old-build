@@ -32,5 +32,11 @@ export const MISC =
     {
         let pxValue = pxString.substring(0, pxString.length - 2)
         return Number.parseFloat(pxValue, 10)
-    }
+    },
+
+    /**
+     * Checks if the app is running on handheld device or not.
+     * @returns {Boolean} true if app is runnign on handheld device, false if otherwise
+     */
+    isHandHeldDevice : function() { return navigator.userAgent.includes('iPad') || navigator.userAgent.includes('iPhone') || navigator.userAgent.includes('Android') }
 }

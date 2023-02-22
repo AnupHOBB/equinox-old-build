@@ -7,6 +7,7 @@ let sliderVisible = true
 let sliderHTML = document.getElementById('slider-bar')
 let lightSliderVal = sliderHTML.value
 let roofSliderVal = sliderHTML.value
+let showHotSpot = true
 
 let navBarLight = document.getElementById('nav-bar-light')
 navBarLight.addEventListener('click', (e)=>{
@@ -70,7 +71,10 @@ arButton.addEventListener('click', (e)=>modelViewer.activateAR())
 let videoScreen = document.getElementById('video-screen')
 let videoHTML = document.querySelector('video')
 let crossIcon = document.getElementById('cross-icon')
-crossIcon.addEventListener('click', (e)=>document.body.removeChild(videoScreen))
+crossIcon.addEventListener('click', (e)=>{
+    document.body.removeChild(videoScreen)
+    showHotSpot = true
+})
 
 function changeNavButtonClass(navBarLightClass, navBarRoofClass, navBarColorClass)
 {
@@ -220,32 +224,29 @@ window.onload = () =>
         let MISC = importMap.get('MISC')
         let videoPlayer = new VIDEO.VideoPlayer('./assets/vid.mp4')
         let hotSpot1 = new HOTSPOT.Hotspot('assets/hotspot.png', MATHS.MATHS.addVectors(gltfActor.getPosition(), new THREE.Vector3(-3.55, 2.4, 0.01)))
+        hotSpot1.setRenderCondition(()=>{ return showHotSpot })
         hotSpot1.setOnClick((e)=>{   
-            if (!cameraManager.isZoomed())
-            {    
-                document.body.appendChild(videoScreen)
-                videoHTML.play()
-            }
+            document.body.appendChild(videoScreen)
+            videoHTML.play()
+            showHotSpot = false 
         })
         hotSpot1.setOnMove(()=>videoPlayer.hide())
         hotSpot1.setOnDblClick(()=>sceneManager.broadcastTo(gltfActor.name, cameraManager.name, hotSpot1.worldPosition))
         let hotSpot2 = new HOTSPOT.Hotspot('assets/hotspot.png', MATHS.MATHS.addVectors(gltfActor.getPosition(), new THREE.Vector3(-0.85, 2.4, 0.01)))
+        hotSpot2.setRenderCondition(()=>{ return showHotSpot })
         hotSpot2.setOnClick((e)=>{
-            if (!cameraManager.isZoomed())
-            {    
-                document.body.appendChild(videoScreen)
-                videoHTML.play()
-            }
+            document.body.appendChild(videoScreen)
+            videoHTML.play()
+            showHotSpot = false
         })
         hotSpot2.setOnMove(()=>videoPlayer.hide())
         hotSpot2.setOnDblClick(()=>sceneManager.broadcastTo(gltfActor.name, cameraManager.name, hotSpot2.worldPosition))
         let hotSpot3 = new HOTSPOT.Hotspot('assets/hotspot.png', MATHS.MATHS.addVectors(gltfActor.getPosition(), new THREE.Vector3(-3.25, 2.4, -3.4)))
+        hotSpot3.setRenderCondition(()=>{ return showHotSpot })
         hotSpot3.setOnClick((e)=>{
-            if (!cameraManager.isZoomed())
-            {    
-                document.body.appendChild(videoScreen)
-                videoHTML.play()
-            }
+            document.body.appendChild(videoScreen)
+            videoHTML.play()
+            showHotSpot = false
         })
         hotSpot3.setOnMove(()=>videoPlayer.hide())
         hotSpot3.setOnDblClick(()=>sceneManager.broadcastTo(gltfActor.name, cameraManager.name, hotSpot3.worldPosition))
