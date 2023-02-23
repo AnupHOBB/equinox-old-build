@@ -106,8 +106,9 @@ window.onload = () =>
     let dots = ''
     let dotCount = 1
     let status = 0    
-    let modelStatus = 0
-    let textureStatus = 0
+    let roofModelStatus = 0
+    let sceneModelStatus = 0
+    let textureStatus = 100
     let importStatus = 0
     let queryLoadStatus = true
     let colors = ['#ECF9FF', '#FFFBEB', '#FFE7CC', '#F8CBA6']
@@ -117,7 +118,7 @@ window.onload = () =>
     {
         if (queryLoadStatus)
         {
-            status = Math.round(((modelStatus + textureStatus + importStatus)/300) * 100)
+            status = Math.round(((roofModelStatus + sceneModelStatus + textureStatus + importStatus)/400) * 100)
             for(let i=0; i<dotCount; i++)
                 dots += '.'
             dotCount++
@@ -148,7 +149,7 @@ window.onload = () =>
     importmanager.add('MISC','../helpers/misc.js')
     importmanager.add('ACTOR','../core/Actor.js')
     importmanager.add('VIDEO','../ui/VideoPlayer.js')
-    importmanager.add('ORBITCAM','../camera_managers/OrbitalCameraManager.js')
+    importmanager.add('CAMERA','../camera_managers/OrbitalCameraManager.js')
     importmanager.add('LIGHT','../core/Light.js')
     importmanager.add('INPUT','../core/InputManager.js')
     importmanager.execute((p, t) => { importStatus= Math.round((p/t) * 100) }, onImportComplete)
@@ -165,7 +166,7 @@ window.onload = () =>
             else if (sliderHTML.className == 'slider-roof')
             {
                 roofSliderVal = sliderHTML.value    
-                gltfActor.updateAnimationFrame(-(v/180))
+                roofGLTF.updateAnimationFrame(-(v/180))
             }
         })
         let THREE = importMap.get('THREE')
@@ -173,40 +174,42 @@ window.onload = () =>
         const lookAtPosition = new THREE.Vector3(0, 0, -5)
         let SCENE = importMap.get('SCENE')
         let sceneManager = new SCENE.SceneManager(canvas)
-        new THREE.TextureLoader().load('./assets/Colored_Paving_Bricks.png', (texture)=>{
-            texture.wrapS = THREE.RepeatWrapping
-            texture.wrapT = THREE.RepeatWrapping
-            texture.repeat = new THREE.Vector2(100, 200)
-            texture.anisotropy = 2
-            let floor = new ACTOR.ShapeActor('Floor', new THREE.BoxGeometry(100, 0.1, 100), new THREE.MeshLambertMaterial(), true)
-            floor.applyTexture(texture)
-            floor.setPosition(0, -2, 0)
-            sceneManager.register(floor)
-            textureStatus = 100
-        })
         let MISC = importMap.get('MISC')
         if (!MISC.MISC.isHandHeldDevice())
             document.body.removeChild(arButton)
         let ACTOR = importMap.get('ACTOR')
         new THREE.TextureLoader().load('./assets/envmap.png', (texture)=>{
             let background = new ACTOR.ShapeActor('Background', new THREE.SphereGeometry(100, 256, 16),  new THREE.MeshBasicMaterial( { color: 0xffffff,  map: texture, side: THREE.BackSide }))
-            background.setPosition(0, 0, -4.5)
+            background.setPosition(2, 0, -5)
             sceneManager.register(background)
         })
-        let gltfActor = new ACTOR.MeshActor('Roof', './assets/eq_animation.glb', (xhr)=>{ 
+        let roofGLTF = new ACTOR.MeshActor('Roof', './assets/eq_animation.glb', (xhr)=>{ 
             let loadStat = Math.round((xhr.loaded/ xhr.total) * 100) 
             if (loadStat < 100)
-                modelStatus = loadStat
+                roofModelStatus = loadStat
         }, ()=>{
-            modelStatus = 100
-            onLoadingComplete(sceneManager, cameraManager, gltfActor, importMap)
+            roofModelStatus = 100
+            let completeStat = Math.round(((roofModelStatus + sceneModelStatus + textureStatus + importStatus)/400) * 100)
+            if (completeStat > 99)
+                onLoadingComplete(sceneManager, cameraManager, roofGLTF, importMap)
         })
-        gltfActor.applyColor(MISC.MISC.hexToColor(colors[0]))
-        modelViewer.color = colors[0]
-        gltfActor.setPosition(2, -2, -3)
-        sceneManager.register(gltfActor) 
-        let ORBITCAM = importMap.get('ORBITCAM')
-        let cameraManager = new ORBITCAM.OrbitalCameraManager('Camera', 90, lookAtPosition)
+        roofGLTF.applyColor(MISC.MISC.hexToColor(colors[0]))
+        roofGLTF.setPosition(2, -2, -3)
+        sceneManager.register(roofGLTF) 
+        let sceneGLTF = new ACTOR.MeshActor('Scene', './assets/scene.glb', (xhr)=>{
+            let loadStat = Math.round((xhr.loaded/ xhr.total) * 100) 
+            if (loadStat < 100)
+                sceneModelStatus = loadStat
+        }, ()=>{
+            sceneModelStatus = 100
+            let completeStat = Math.round(((roofModelStatus + sceneModelStatus + textureStatus + importStatus)/400) * 100)
+            if (completeStat > 99)
+                onLoadingComplete(sceneManager, cameraManager, roofGLTF, importMap)
+        })
+        sceneGLTF.setPosition(-39, -10.5, 60.4)
+        sceneManager.register(sceneGLTF) 
+        let CAMERA = importMap.get('CAMERA')
+        let cameraManager = new CAMERA.OrbitalCameraManager('Camera', 90, lookAtPosition)
         sceneManager.register(cameraManager)
         sceneManager.setActiveCamera('Camera')
         let LIGHT = importMap.get('LIGHT')
@@ -243,7 +246,7 @@ window.onload = () =>
         })
         hotSpot2.setOnMove(()=>videoPlayer.hide())
         hotSpot2.setOnDblClick(()=>sceneManager.broadcastTo(gltfActor.name, cameraManager.name, hotSpot2.worldPosition))
-        let hotSpot3 = new HOTSPOT.Hotspot('assets/hotspot.png', MATHS.MATHS.addVectors(gltfActor.getPosition(), new THREE.Vector3(-3.25, 2.4, -3.4)))
+        let hotSpot3 = new HOTSPOT.Hotspot('assets/hotspot.png', MATHS.MATHS.addVectors(gltfActor.getPosition(), new THREE.Vector3(-3.25, 2.4, -3.2)))
         hotSpot3.setRenderCondition(()=>{ return showHotSpot })
         hotSpot3.setOnClick((e)=>{
             document.body.appendChild(videoScreen)

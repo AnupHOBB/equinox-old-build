@@ -42,15 +42,15 @@ class OrbitControlCore
         }
     }
 
-    orbit(axis, speed, shouldMoveFunction)
+    orbit(axis, speed)
     {
         let vLookAt2Src = MATHS.subtractVectors(this.object3D.position, this.lookAtPosition)
         let vLookAt2Dest = new THREE.Vector3(vLookAt2Src.x, vLookAt2Src.y, vLookAt2Src.z)
         vLookAt2Dest.applyAxisAngle(axis, MATHS.toRadians(speed))
-        if (this.shouldMoveFunction(vLookAt2Dest))
+        let offset = MATHS.subtractVectors(vLookAt2Dest, vLookAt2Src)
+        let destination = MATHS.addVectors(this.object3D.position, offset)
+        if (this.shouldMoveFunction(destination))
         {
-            let offset = MATHS.subtractVectors(vLookAt2Dest, vLookAt2Src)
-            let destination = MATHS.addVectors(this.object3D.position, offset)
             this.object3D.position.set(destination.x, destination.y, destination.z)
             this.object3D.lookAt(this.lookAtPosition)
         }

@@ -97,8 +97,8 @@ class OrbitalCameraManagerCore extends PerspectiveCamera
     {
         super(fov)
         this.orbitSpeed = 60
-        this.cameraOrbiterYaw = new OrbitControl(this.camera, lookAt)
-        this.cameraOrbiterPitch = new OrbitControl(this.camera, lookAt, (newPosition) => {return (newPosition.y >= -1.7 && newPosition.y <= 4.9)})
+        this.cameraOrbiterYaw = new OrbitControl(this.camera, lookAt, (newPosition) => { return newPosition.z >= -5.7 })
+        this.cameraOrbiterPitch = new OrbitControl(this.camera, lookAt, (newPosition) => { return newPosition.y >= -1.7 && newPosition.y <= 4.9 })
         this.zoom = false
         this.isZooming = false
         this.ogPosition = this.camera.position
@@ -191,8 +191,7 @@ class OrbitalCameraManagerCore extends PerspectiveCamera
         if (!this.zoom && !this.isZooming)
         {    
             this.cameraOrbiterYaw.pan(new THREE.Vector3(0, 1, 0), -deltaX) 
-            //if (this.camera.position.y >= -1.7 && this.camera.position.y <= 4.9)
-                this.cameraOrbiterPitch.pan(this.right, -deltaY)
+            this.cameraOrbiterPitch.pan(this.right, -deltaY)
         }
     }
 }
