@@ -5,8 +5,8 @@ let colorContainer = document.getElementById('color-menu-container')
 let sliderContainer = document.getElementById('slider-container')
 let colorVisible = false
 let sliderVisible = true
-let lightSliderVal = 0//sliderHTML.value
-let roofSliderVal = 0//sliderHTML.value
+let lightSliderVal = 0
+let roofSliderVal = 0
 let showHotSpot = true
 let slider =  new SliderUI(document.getElementById('slider-bar'))
 
@@ -19,8 +19,6 @@ navBarLight.addEventListener('click', (e)=>{
     }
     slider.setValue(lightSliderVal)
     slider.setClassName('slider-light')
-    /* sliderHTML.value = lightSliderVal
-    sliderHTML.className = 'slider-light' */
     changeNavButtonClass('nav-bar-item-outer-selected', 'nav-bar-item-outer', 'nav-bar-item-outer', 'nav-bar-item-outer')
     if (colorVisible)
     {    
@@ -38,8 +36,6 @@ navBarRoof.addEventListener('click', (e)=>{
     }
     slider.setValue(roofSliderVal)
     slider.setClassName('slider-roof')
-    /* sliderHTML.value = roofSliderVal
-    sliderHTML.className = 'slider-roof' */
     changeNavButtonClass('nav-bar-item-outer', 'nav-bar-item-outer-selected', 'nav-bar-item-outer')
     if (colorVisible)
     {    
