@@ -170,19 +170,6 @@ window.onload = () =>
             background.setPosition(2, 0, -5)
             sceneManager.register(background)
         })
-        slider.setCallback((d, v, c)=>{
-            if (c == 'slider-light')
-            {    
-                lightSliderVal = v
-                directLight.orbit(d)
-            }
-            else if (c == 'slider-roof')
-            {
-                roofSliderVal = v   
-                roofGLTF.updateAnimationFrame(-(d/180))
-            }
-        })
-
         let sceneGLTF = new ACTOR.MeshActor('Scene', './assets/scene.glb', (xhr)=>{
             let loadStat = Math.round((xhr.loaded/ xhr.total) * 100) 
             if (loadStat < 100)
@@ -202,6 +189,19 @@ window.onload = () =>
             roofGLTF.applyColor(MISC.MISC.hexToColor(colors[0]))
             roofGLTF.setPosition(2, -2, -3)
             sceneManager.register(roofGLTF) 
+
+            slider.setCallback((d, v, c)=>{
+                if (c == 'slider-light')
+                {    
+                    lightSliderVal = v
+                    directLight.orbit(d)
+                }
+                else if (c == 'slider-roof')
+                {
+                    roofSliderVal = v   
+                    roofGLTF.updateAnimationFrame(-(d/180))
+                }
+            })
         })
         sceneGLTF.setPosition(-39, -10.5, 60.4)
         sceneManager.register(sceneGLTF) 
