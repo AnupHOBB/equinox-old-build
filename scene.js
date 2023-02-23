@@ -1,13 +1,14 @@
 import { ImportManager } from './core/ImportManager.js'
+import { SliderUI } from './ui/SliderUI.js'
 
 let colorContainer = document.getElementById('color-menu-container')
 let sliderContainer = document.getElementById('slider-container')
 let colorVisible = false
 let sliderVisible = true
-let sliderHTML = document.getElementById('slider-bar')
-let lightSliderVal = sliderHTML.value
-let roofSliderVal = sliderHTML.value
+let lightSliderVal = 0//sliderHTML.value
+let roofSliderVal = 0//sliderHTML.value
 let showHotSpot = true
+let slider =  new SliderUI(document.getElementById('slider-bar'))
 
 let navBarLight = document.getElementById('nav-bar-light')
 navBarLight.addEventListener('click', (e)=>{
@@ -16,8 +17,10 @@ navBarLight.addEventListener('click', (e)=>{
         document.body.appendChild(sliderContainer)
         sliderVisible = true
     }
-    sliderHTML.value = lightSliderVal
-    sliderHTML.className = 'slider-light'
+    slider.setValue(lightSliderVal)
+    slider.setClassName('slider-light')
+    /* sliderHTML.value = lightSliderVal
+    sliderHTML.className = 'slider-light' */
     changeNavButtonClass('nav-bar-item-outer-selected', 'nav-bar-item-outer', 'nav-bar-item-outer', 'nav-bar-item-outer')
     if (colorVisible)
     {    
@@ -33,8 +36,10 @@ navBarRoof.addEventListener('click', (e)=>{
         document.body.appendChild(sliderContainer)
         sliderVisible = true
     }
-    sliderHTML.value = roofSliderVal
-    sliderHTML.className = 'slider-roof'
+    slider.setValue(roofSliderVal)
+    slider.setClassName('slider-roof')
+    /* sliderHTML.value = roofSliderVal
+    sliderHTML.className = 'slider-roof' */
     changeNavButtonClass('nav-bar-item-outer', 'nav-bar-item-outer-selected', 'nav-bar-item-outer')
     if (colorVisible)
     {    
@@ -144,7 +149,6 @@ window.onload = () =>
     importmanager.add('THREE', 'three')
     importmanager.add('MATHS', '../helpers/maths.js')
     importmanager.add('HOTSPOT', '../core/HotSpot.js')
-    importmanager.add('SLIDER', '../ui/SliderUI.js')
     importmanager.add('SCENE','../core/SceneManager.js')
     importmanager.add('MISC','../helpers/misc.js')
     importmanager.add('ACTOR','../core/Actor.js')
@@ -156,19 +160,6 @@ window.onload = () =>
 
     function onImportComplete(importMap)
     {
-        let SLIDER = importMap.get('SLIDER')
-        new SLIDER.SliderUI(sliderHTML, (v)=>{
-            if (sliderHTML.className == 'slider-light')
-            {    
-                lightSliderVal = sliderHTML.value
-                directLight.orbit(v)
-            }
-            else if (sliderHTML.className == 'slider-roof')
-            {
-                roofSliderVal = sliderHTML.value    
-                roofGLTF.updateAnimationFrame(-(v/180))
-            }
-        })
         let THREE = importMap.get('THREE')
         const canvas = document.querySelector('canvas')
         const lookAtPosition = new THREE.Vector3(0, 0, -5)
@@ -196,6 +187,20 @@ window.onload = () =>
         roofGLTF.applyColor(MISC.MISC.hexToColor(colors[0]))
         roofGLTF.setPosition(2, -2, -3)
         sceneManager.register(roofGLTF) 
+
+        slider.setCallback((d, v, c)=>{
+            if (c == 'slider-light')
+            {    
+                lightSliderVal = v
+                directLight.orbit(d)
+            }
+            else if (c == 'slider-roof')
+            {
+                roofSliderVal = v   
+                roofGLTF.updateAnimationFrame(-(d/180))
+            }
+        })
+
         let sceneGLTF = new ACTOR.MeshActor('Scene', './assets/scene.glb', (xhr)=>{
             let loadStat = Math.round((xhr.loaded/ xhr.total) * 100) 
             if (loadStat < 100)
