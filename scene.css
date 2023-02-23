@@ -500,33 +500,56 @@ canvas
     }
 }
 
-@media screen and (max-height : 400px)
+@media screen and (max-aspect-ratio : 1/1) and (max-width : 500px)
 {
-    .color-item
+    #color-menu-container
     {
-        display: block;
-        margin: auto;
-        width: 20px; 
-        height: 20px;
-        border-radius: 50%;
+        position: absolute;
+        bottom: 7.5%; 
+        left: 0%;
+        width: 100%;
+        height: 10%;
     }
 }
 
-@media screen and (min-height : 400px)
+@media screen and (max-aspect-ratio : 1/1) and (min-width : 500px)
 {
-    .color-item
+    #color-menu-container
     {
-        display: block;
-        margin: auto;
-        width: 40px; 
-        height: 40px;
-        border-radius: 50%;
+        position: absolute;
+        bottom: 10%; 
+        left: 0%;
+        width: 100%;
+        height: 10%;
     }
 }
 
-.color-item:hover
+@media screen and (min-aspect-ratio : 1/1) and (max-height : 600px)
 {
-    transform: scale(1.2);
+    #color-menu-container
+    {
+        position: absolute;
+        bottom: 15%;
+        left: 0%;
+        width: 100%;
+    }
+}
+
+@media screen and (min-aspect-ratio : 1/1) and (min-height : 600px)
+{
+    #color-menu-container
+    {
+        position: absolute;
+        bottom: 10%;
+        left: 0%;
+        width: 100%;
+    }
+}
+
+#color-menu-outer
+{
+    display: block;
+    margin: auto;
 }
 
 @media screen and (max-aspect-ratio : 1/1) and (max-width : 500px)
@@ -622,56 +645,85 @@ canvas
     }
 }
 
-#color-menu-outer
+@media screen and (max-height : 400px)
 {
-    display: block;
-    margin: auto;
+    .color-item
+    {
+        display: block;
+        margin: auto;
+        width: 20px; 
+        height: 20px;
+        border-radius: 50%;
+        border-style: solid;
+        border-color: rgb(232, 117, 36);
+    }
+}
+
+@media screen and (min-height : 400px)
+{
+    .color-item
+    {
+        display: block;
+        margin: auto;
+        width: 40px; 
+        height: 40px;
+        border-radius: 50%;
+        border-style: solid;
+        border-color: rgb(232, 117, 36);
+    }
+}
+
+.color-item:hover
+{
+    transform: scale(1.2);
 }
 
 @media screen and (max-aspect-ratio : 1/1) and (max-width : 500px)
 {
-    #color-menu-container
+    #nav-bar-container
     {
         position: absolute;
-        bottom: 7.5%; 
+        bottom: 0%;
         left: 0%;
         width: 100%;
-        height: 10%;
+        height: 5%;
     }
 }
 
 @media screen and (max-aspect-ratio : 1/1) and (min-width : 500px)
 {
-    #color-menu-container
+    #nav-bar-container
     {
         position: absolute;
-        bottom: 10%; 
+        bottom: 2%;
         left: 0%;
         width: 100%;
-        height: 10%;
+        height: 5%;
     }
 }
 
 @media screen and (min-aspect-ratio : 1/1) and (max-height : 600px)
 {
-    #color-menu-container
+    #nav-bar-container
     {
         position: absolute;
-        bottom: 15%;
+        bottom: 1%;
         left: 0%;
         width: 100%;
-    }
+        height: 10%;
+    }  
 }
 
 @media screen and (min-aspect-ratio : 1/1) and (min-height : 600px)
 {
-    #color-menu-container
+    #nav-bar-container
     {
         position: absolute;
-        bottom: 10%;
+        bottom: 2%;
         left: 0%;
         width: 100%;
-    }
+        height: 5%;
+    }  
 }
 
 @media screen and (max-aspect-ratio : 1/1) and (max-width : 500px)
@@ -737,54 +789,6 @@ canvas
         background-color: rgba(0, 0, 0, 0.4);
         height: 100%;
     }
-}
-
-@media screen and (max-aspect-ratio : 1/1) and (max-width : 500px)
-{
-    #nav-bar-container
-    {
-        position: absolute;
-        bottom: 0%;
-        left: 0%;
-        width: 100%;
-        height: 5%;
-    }
-}
-
-@media screen and (max-aspect-ratio : 1/1) and (min-width : 500px)
-{
-    #nav-bar-container
-    {
-        position: absolute;
-        bottom: 2%;
-        left: 0%;
-        width: 100%;
-        height: 5%;
-    }
-}
-
-@media screen and (min-aspect-ratio : 1/1) and (max-height : 600px)
-{
-    #nav-bar-container
-    {
-        position: absolute;
-        bottom: 1%;
-        left: 0%;
-        width: 100%;
-        height: 10%;
-    }  
-}
-
-@media screen and (min-aspect-ratio : 1/1) and (min-height : 600px)
-{
-    #nav-bar-container
-    {
-        position: absolute;
-        bottom: 2%;
-        left: 0%;
-        width: 100%;
-        height: 5%;
-    }  
 }
 
 @media screen and (max-aspect-ratio : 1/1) and (max-width : 500px)
