@@ -170,20 +170,6 @@ window.onload = () =>
             background.setPosition(2, 0, -5)
             sceneManager.register(background)
         })
-        let roofGLTF = new ACTOR.MeshActor('Roof', './assets/eq_animation.glb', (xhr)=>{ 
-            let loadStat = Math.round((xhr.loaded/ xhr.total) * 100) 
-            if (loadStat < 100)
-                roofModelStatus = loadStat
-        }, ()=>{
-            roofModelStatus = 100
-            let completeStat = Math.round(((roofModelStatus + sceneModelStatus + textureStatus + importStatus)/400) * 100)
-            if (completeStat > 99)
-                onLoadingComplete(sceneManager, cameraManager, roofGLTF, importMap)
-        })
-        roofGLTF.applyColor(MISC.MISC.hexToColor(colors[0]))
-        roofGLTF.setPosition(2, -2, -3)
-        sceneManager.register(roofGLTF) 
-
         slider.setCallback((d, v, c)=>{
             if (c == 'slider-light')
             {    
@@ -203,9 +189,19 @@ window.onload = () =>
                 sceneModelStatus = loadStat
         }, ()=>{
             sceneModelStatus = 100
-            let completeStat = Math.round(((roofModelStatus + sceneModelStatus + textureStatus + importStatus)/400) * 100)
-            if (completeStat > 99)
-                onLoadingComplete(sceneManager, cameraManager, roofGLTF, importMap)
+            let roofGLTF = new ACTOR.MeshActor('Roof', './assets/eq_animation.glb', (xhr)=>{ 
+                let loadStat = Math.round((xhr.loaded/ xhr.total) * 100) 
+                if (loadStat < 100)
+                    roofModelStatus = loadStat
+            }, ()=>{
+                roofModelStatus = 100
+                let completeStat = Math.round(((roofModelStatus + sceneModelStatus + textureStatus + importStatus)/400) * 100)
+                if (completeStat > 99)
+                    onLoadingComplete(sceneManager, cameraManager, roofGLTF, importMap)
+            })
+            roofGLTF.applyColor(MISC.MISC.hexToColor(colors[0]))
+            roofGLTF.setPosition(2, -2, -3)
+            sceneManager.register(roofGLTF) 
         })
         sceneGLTF.setPosition(-39, -10.5, 60.4)
         sceneManager.register(sceneGLTF) 
