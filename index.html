@@ -9,58 +9,135 @@
                 overflow-x: hidden;
             }
 
-            p#title
+            @media screen and (max-aspect-ratio : 1/1)
             {
-                position: absolute;
-                top: 0.5%;
-                left: 0%;
-                width: 102%;
-                text-align: center;
-                font-size: 4vw;
-                font-weight: bold;
-                font-family: 'Trade Gothic LT Std', sans-serif;
-                letter-spacing: 1vw;
+                p#title
+                {
+                    position: absolute;
+                    top: 5%;
+                    left: 0%;
+                    width: 102%;
+                    text-align: center;
+                    font-size: 9vw;
+                    font-weight: bold;
+                    font-family: 'Trade Gothic LT Std', sans-serif;
+                    letter-spacing: 1vw;
+                }
             }
 
-            #logo-container
+            @media screen and (min-aspect-ratio : 1/1)
             {
-                position: absolute;
-                top: 2%;
-                left: 0%;
-                width: 102%;
+                p#title
+                {
+                    position: absolute;
+                    top: 0.5%;
+                    left: 0%;
+                    width: 102%;
+                    text-align: center;
+                    font-size: 4vw;
+                    font-weight: bold;
+                    font-family: 'Trade Gothic LT Std', sans-serif;
+                    letter-spacing: 1vw;
+                }
             }
 
-            #logo
+            @media screen and (max-aspect-ratio : 1/1)
             {
-                display: block;
-                margin: auto;
-                width: 20%;
+                #logo-container
+                {
+                    position: absolute;
+                    top: 5%;
+                    left: 0%;
+                    width: 102%;
+                }
+            }
+
+            @media screen and (min-aspect-ratio : 1/1)
+            {
+                #logo-container
+                {
+                    position: absolute;
+                    top: 2%;
+                    left: 0%;
+                    width: 102%;
+                }
+            }
+
+            @media screen and (max-aspect-ratio : 1/1)
+            {
+                #logo
+                {
+                    display: block;
+                    margin: auto;
+                    width: 50%;
+                }
+            }
+
+            @media screen and (min-aspect-ratio : 1/1)
+            {
+                #logo
+                {
+                    display: block;
+                    margin: auto;
+                    width: 20%;
+                }
             }
 
             #container
             {
                 position: absolute;
                 top: 22%;
+                left: 0%;
                 width: 100%;
                 height: 70%;  
             }
 
-            #product-type-label-container
+            @media screen and (max-aspect-ratio : 1/1)
             {
-                display: flex;
-                margin: auto;
-                width: 50%;
-                gap: 20%;
+                #product-type-label-container
+                {
+                    display: flex;
+                    margin: auto;
+                    width: 90%;
+                    gap: 3%;
+                }
             }
 
-            #grid-container
+            @media screen and (min-aspect-ratio : 1/1)
             {
-                display: grid;
-                grid-template-columns: auto auto;
-                margin: auto;
-                gap: 3% 20%;
-                width: 50%;
-                height: 80%;
+                #product-type-label-container
+                {
+                    display: flex;
+                    margin: auto;
+                    width: 50%;
+                    gap: 20%;
+                }
+            }
+
+            @media screen and (max-aspect-ratio : 1/1)
+            {
+                #grid-container
+                {
+                    display: grid;
+                    grid-template-columns: auto auto;
+                    margin: auto;
+                    gap: 3% 3%;
+                    width: 90%;
+                    height: 60%;
+                }
+            }
+
+            @media screen and (min-aspect-ratio : 1/1)
+            {
+                #grid-container
+                {
+                    display: grid;
+                    grid-template-columns: auto auto;
+                    margin: auto;
+                    gap: 3% 20%;
+                    width: 50%;
+                    height: 80%;
+                }
             }
 
             .grid-item
@@ -72,14 +149,30 @@
 
             .grid-item:hover { transform: scale(1.1); }
             
-            p.product-type-label
+            @media screen and (max-aspect-ratio : 1/1)
             {
-                display: block;
-                text-align: center;
-                width: 50%;
-                font-weight: bold;
-                font-family: 'Trade Gothic LT Std', sans-serif;
-                font-size: 1.5vw;
+                p.product-type-label
+                {
+                    display: block;
+                    text-align: center;
+                    width: 50%;
+                    font-weight: bold;
+                    font-family: 'Trade Gothic LT Std', sans-serif;
+                    font-size: 1.5vh
+                }
+            }
+
+            @media screen and (min-aspect-ratio : 1/1)
+            {
+                p.product-type-label
+                {
+                    display: block;
+                    text-align: center;
+                    width: 50%;
+                    font-weight: bold;
+                    font-family: 'Trade Gothic LT Std', sans-serif;
+                    font-size: 1.5vw;
+                }
             }
 
             sup
@@ -100,10 +193,10 @@
                 <p class="product-type-label">Residential</p>
             </div>
             <div id="grid-container">
-                <img class="grid-item" src="./assets/commercial.jpg"/>
-                <img class="grid-item" src="./assets/residential.jpg"/>
-                <img class="grid-item" src="./assets/commercial.jpg"/>
-                <img class="grid-item" src="./assets/residential.jpg"/>
+                <img class="grid-item" src="./assets/commercial.jpg" onclick="location.href= 'scene.html'"/>
+                <img class="grid-item" src="./assets/residential.jpg" onclick="location.href= 'scene.html'"/>
+                <img class="grid-item" src="./assets/commercial.jpg" onclick="location.href= 'scene.html'"/>
+                <img class="grid-item" src="./assets/residential.jpg" onclick="location.href= 'scene.html'"/>
             </div>
         </div>
     </body>
