@@ -10,6 +10,10 @@ let roofSliderVal = 0
 let showHotSpot = true
 let slider =  new SliderUI(document.getElementById('slider-bar'))
 
+let navLightBtn = document.getElementById('nav-light-btn')
+let navRoofBtn = document.getElementById('nav-roof-btn')
+let navColorBtn = document.getElementById('nav-color-btn')
+
 let navBarLight = document.getElementById('nav-bar-light')
 navBarLight.addEventListener('click', (e)=>{
     if (!sliderVisible)
@@ -19,6 +23,9 @@ navBarLight.addEventListener('click', (e)=>{
     }
     slider.setValue(lightSliderVal)
     slider.setClassName('slider-light')
+    navLightBtn.src = './assets/light-icon-gray.png'
+    navRoofBtn.src = './assets/roof-icon-orange.png'
+    navColorBtn.src = './assets/color-icon-orange.png'
     changeNavButtonClass('nav-bar-item-outer-selected', 'nav-bar-item-outer', 'nav-bar-item-outer', 'nav-bar-item-outer')
     if (colorVisible)
     {    
@@ -36,6 +43,9 @@ navBarRoof.addEventListener('click', (e)=>{
     }
     slider.setValue(roofSliderVal)
     slider.setClassName('slider-roof')
+    navLightBtn.src = './assets/light-icon-orange.png'
+    navRoofBtn.src = './assets/roof-icon-gray.png'
+    navColorBtn.src = './assets/color-icon-orange.png'
     changeNavButtonClass('nav-bar-item-outer', 'nav-bar-item-outer-selected', 'nav-bar-item-outer')
     if (colorVisible)
     {    
@@ -51,6 +61,9 @@ navBarColor.addEventListener('click', (e)=>{
         document.body.appendChild(colorContainer)
         colorVisible = true
     }
+    navLightBtn.src = './assets/light-icon-orange.png'
+    navRoofBtn.src = './assets/roof-icon-orange.png'
+    navColorBtn.src = './assets/color-icon-gray.png'
     changeNavButtonClass('nav-bar-item-outer', 'nav-bar-item-outer', 'nav-bar-item-outer-selected')
     if (sliderVisible)
     {    
@@ -112,7 +125,7 @@ window.onload = () =>
     let textureStatus = 100
     let importStatus = 0
     let queryLoadStatus = true
-    let colors = ['#ECF9FF', '#FFFBEB', '#FFE7CC', '#F8CBA6']
+    let colors = ['#FFFFFF', '#555555', '#786D5F', '#D4C59C', '#CD7F32']
 
     checkLoading()
     function checkLoading()
