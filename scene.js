@@ -3,6 +3,7 @@ import { SliderUI } from './ui/SliderUI.js'
 
 let colorContainer = document.getElementById('color-menu-container')
 let sliderContainer = document.getElementById('slider-container')
+let queryLoadStatus = true
 let colorVisible = false
 let sliderVisible = true
 let lightSliderVal = 0
@@ -115,16 +116,19 @@ function setupStartupUI()
 let arButtonVisible = true
 window.onresize = () => 
 {
-    let isHandHeld = navigator.userAgent.includes('iPad') || navigator.userAgent.includes('iPhone') || navigator.userAgent.includes('Android')
-    if (!arButtonVisible && isHandHeld)
-    {    
-        document.body.appendChild(arButton)
-        arButtonVisible = true
-    }
-    else if (arButtonVisible && !isHandHeld)
-    {    
-        document.body.removeChild(arButton)
-        arButtonVisible = false
+    if (!queryLoadStatus)
+    {
+        let isHandHeld = navigator.userAgent.includes('iPad') || navigator.userAgent.includes('iPhone') || navigator.userAgent.includes('Android')
+        if (!arButtonVisible && isHandHeld)
+        {    
+            document.body.appendChild(arButton)
+            arButtonVisible = true
+        }
+        else if (arButtonVisible && !isHandHeld)
+        {    
+            document.body.removeChild(arButton)
+            arButtonVisible = false
+        }
     }
 }
 
@@ -139,7 +143,6 @@ window.onload = () =>
     let sceneModelStatus = 0
     let textureStatus = 100
     let importStatus = 0
-    let queryLoadStatus = true
     let colors = ['#FFFFFF', '#555555', '#786D5F', '#D4C59C', '#CD7F32']
 
     checkLoading()
