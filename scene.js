@@ -225,7 +225,7 @@ window.onload = () =>
         let VIDEO = importMap.get('VIDEO')
         let MISC = importMap.get('MISC')
         let videoPlayer = new VIDEO.VideoPlayer('./assets/vid.mp4')
-        let hotSpot1 = new HOTSPOT.Hotspot('assets/hotspot.png', MATHS.MATHS.addVectors(gltfActor.getPosition(), new THREE.Vector3(-3.55, 2.4, 0.01)))
+        let hotSpot1 = new HOTSPOT.Hotspot(MATHS.MATHS.addVectors(gltfActor.getPosition(), new THREE.Vector3(-3.55, 2.4, 0.01)))
         hotSpot1.setRenderCondition(()=>{ return showHotSpot })
         hotSpot1.setOnClick((e)=>{   
             document.body.appendChild(videoScreen)
@@ -234,7 +234,7 @@ window.onload = () =>
         })
         hotSpot1.setOnMove(()=>videoPlayer.hide())
         hotSpot1.setOnDblClick(()=>sceneManager.broadcastTo(gltfActor.name, cameraManager.name, hotSpot1.worldPosition))
-        let hotSpot2 = new HOTSPOT.Hotspot('assets/hotspot.png', MATHS.MATHS.addVectors(gltfActor.getPosition(), new THREE.Vector3(-0.85, 2.4, 0.01)))
+        let hotSpot2 = new HOTSPOT.Hotspot(MATHS.MATHS.addVectors(gltfActor.getPosition(), new THREE.Vector3(-0.85, 2.4, 0.01)))
         hotSpot2.setRenderCondition(()=>{ return showHotSpot })
         hotSpot2.setOnClick((e)=>{
             document.body.appendChild(videoScreen)
@@ -243,7 +243,7 @@ window.onload = () =>
         })
         hotSpot2.setOnMove(()=>videoPlayer.hide())
         hotSpot2.setOnDblClick(()=>sceneManager.broadcastTo(gltfActor.name, cameraManager.name, hotSpot2.worldPosition))
-        let hotSpot3 = new HOTSPOT.Hotspot('assets/hotspot.png', MATHS.MATHS.addVectors(gltfActor.getPosition(), new THREE.Vector3(-3.25, 2.4, -3.2)))
+        let hotSpot3 = new HOTSPOT.Hotspot(MATHS.MATHS.addVectors(gltfActor.getPosition(), new THREE.Vector3(-3.25, 2.4, -3.2)))
         hotSpot3.setRenderCondition(()=>{ return showHotSpot })
         hotSpot3.setOnClick((e)=>{
             document.body.appendChild(videoScreen)

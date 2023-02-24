@@ -6,17 +6,16 @@ import { MISC } from '../helpers/misc.js'
 export class Hotspot
 {
     /**
-     * @param {String} imageUrl url of the image that is displayed as a hotspot
      * @param {THREE.Vector3} worldPosition position of the hotspot in world space
      */
-    constructor(imageUrl, worldPosition)
+    constructor(worldPosition)
     {
-        this.img = document.createElement('img')
-        this.img.src = imageUrl
+        this.div = document.createElement('div')
+        this.div.className = 'hotspot'
         this.isVisible = false
         this.lastRasterCoord = { x: -1, y: -1 }
         this.worldPosition = worldPosition
-        this.input = new HotspotInput(this.img)
+        this.input = new HotspotInput(this.div)
         this.shouldRender = ()=>{ return true }
     }
 
@@ -69,9 +68,9 @@ export class Hotspot
     {
         let aspect = window.innerWidth/window.innerHeight
         if (aspect < 1)
-            this.img.style = 'position: absolute; top: '+y+'; left: '+x+'; width: auto; height: 4%; user-select: none;'
+            this.div.style = 'position: absolute; top: '+y+'; left: '+x+';'// width: auto; height: 4%; user-select: none;'
         else
-            this.img.style = 'position: absolute; top: '+y+'; left: '+x+'; width: 3%; height: auto; user-select: none;'
+            this.div.style = 'position: absolute; top: '+y+'; left: '+x+';'// width: 3%; height: auto; user-select: none;'
         if (this.lastRasterCoord.x != x || this.lastRasterCoord.y != y)
         {    
             this.input.onMove()
@@ -87,7 +86,7 @@ export class Hotspot
     {
         if (!this.isVisible && this.shouldRender())
         {
-            document.body.appendChild(this.img)
+            document.body.appendChild(this.div)
             this.isVisible = true
         }
     }
@@ -99,7 +98,7 @@ export class Hotspot
     {
         if (this.isVisible)
         {
-            document.body.removeChild(this.img)
+            document.body.removeChild(this.div)
             this.isVisible = false
         }
     }
