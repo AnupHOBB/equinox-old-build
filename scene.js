@@ -9,7 +9,6 @@ let lightSliderVal = 0
 let roofSliderVal = 0
 let showHotSpot = true
 let slider =  new SliderUI(document.getElementById('slider-bar'))
-
 let navLightBtn = document.getElementById('nav-light-btn')
 let navRoofBtn = document.getElementById('nav-roof-btn')
 let navColorBtn = document.getElementById('nav-color-btn')
@@ -113,6 +112,22 @@ function setupStartupUI()
     changeNavButtonClass('nav-bar-item-outer-selected', 'nav-bar-item-outer', 'nav-bar-item-outer')
 }
 
+let arButtonVisible = true
+window.onresize = () => 
+{
+    let isHandHeld = navigator.userAgent.includes('iPad') || navigator.userAgent.includes('iPhone') || navigator.userAgent.includes('Android')
+    if (!arButtonVisible && isHandHeld)
+    {    
+        document.body.appendChild(arButton)
+        arButtonVisible = true
+    }
+    else if (arButtonVisible && !isHandHeld)
+    {    
+        document.body.removeChild(arButton)
+        arButtonVisible = false
+    }
+}
+
 window.onload = () =>
 {    
     let loadingText = document.getElementById('loading-text')
@@ -176,7 +191,10 @@ window.onload = () =>
         let sceneManager = new SCENE.SceneManager(canvas)
         let MISC = importMap.get('MISC')
         if (!MISC.MISC.isHandHeldDevice())
+        {    
             document.body.removeChild(arButton)
+            arButtonVisible = false
+        }
         let ACTOR = importMap.get('ACTOR')
         new THREE.TextureLoader().load('./assets/envmap.png', (texture)=>{
             let background = new ACTOR.ShapeActor('Background', new THREE.SphereGeometry(100, 256, 16),  new THREE.MeshBasicMaterial( { color: 0xffffff,  map: texture, side: THREE.BackSide }))
