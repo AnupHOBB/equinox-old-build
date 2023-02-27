@@ -1,177 +1,85 @@
 import { ImportManager } from './core/ImportManager.js'
-import { SliderUI } from './ui/SliderUI.js'
+import { ARViewer } from './ui/ARViewer.js'
+import { ColorMenu } from './ui/ColorMenu.js'
+import { LoadingScreen } from './ui/LoadingScreen.js'
+import { NavigationBarItem, NavigationBarManager } from './ui/NavigationBar.js'
+import { Slider } from './ui/Slider.js'
+import { VideoPlayer } from './ui/VideoPlayer.js'
 
-let colorContainer = document.getElementById('color-menu-container')
-let sliderContainer = document.getElementById('slider-container')
-let queryLoadStatus = true
-let colorVisible = false
-let sliderVisible = true
-let lightSliderVal = 0
-let roofSliderVal = 0
-let showHotSpot = true
-let slider =  new SliderUI(document.getElementById('slider-bar'))
-let navLightBtn = document.getElementById('nav-light-btn')
-let navRoofBtn = document.getElementById('nav-roof-btn')
-let navColorBtn = document.getElementById('nav-color-btn')
+let colors = ['#FFFFFF', '#555555', '#786D5F', '#D4C59C', '#CD7F32']
+let colorMenu = new ColorMenu(document.getElementById('color-menu-container'), colors)
 
-let navBarLight = document.getElementById('nav-bar-light')
-navBarLight.addEventListener('click', (e)=>{
-    if (!sliderVisible)
-    {    
-        document.body.appendChild(sliderContainer)
-        sliderVisible = true
-    }
-    slider.setValue(lightSliderVal)
-    slider.setClassName('slider-light')
-    navLightBtn.src = './assets/light-icon-gray.png'
-    navRoofBtn.src = './assets/roof-icon-orange.png'
-    navColorBtn.src = './assets/color-icon-orange.png'
-    changeNavButtonClass('nav-bar-item-outer-selected', 'nav-bar-item-outer', 'nav-bar-item-outer', 'nav-bar-item-outer')
-    if (colorVisible)
-    {    
-        document.body.removeChild(colorContainer)
-        colorVisible = false
-    }
+let loadingScreen = new LoadingScreen(document.getElementById('loading-screen'), document.getElementById('loading-text'), document.getElementById('loading-bar'))
+let videoPlayer = new VideoPlayer(document.getElementById('video-screen'), document.querySelector('video'), document.getElementById('cross-icon'))
+videoPlayer.setOnCloseEvent((e)=>videoPlayer.show(false)) 
+videoPlayer.show(false)
+
+let slider =  new Slider(document.getElementById('slider-container'), document.getElementById('slider'))
+let navBarManager = new NavigationBarManager()
+
+let navBarLightItem = new NavigationBarItem(document.getElementById('nav-bar-light'), document.getElementById('nav-light-img'))
+navBarLightItem.setCustomValue('sliderValue', 0)
+navBarLightItem.setOnSelect((navBarLightItem)=>{
+    slider.show(true)
+    slider.setValue(navBarLightItem.getCustomValue('sliderValue'))
+    slider.setType('slider-light')
+    navBarLightItem.setImage('./assets/light-icon-gray.png')
+    navBarLightItem.setContainerClass('nav-bar-item-outer-selected')
 })
-
-let navBarRoof = document.getElementById('nav-bar-roof')
-navBarRoof.addEventListener('click', (e)=>{
-    if (!sliderVisible)
-    {    
-        document.body.appendChild(sliderContainer)
-        sliderVisible = true
-    }
-    slider.setValue(roofSliderVal)
-    slider.setClassName('slider-roof')
-    navLightBtn.src = './assets/light-icon-orange.png'
-    navRoofBtn.src = './assets/roof-icon-gray.png'
-    navColorBtn.src = './assets/color-icon-orange.png'
-    changeNavButtonClass('nav-bar-item-outer', 'nav-bar-item-outer-selected', 'nav-bar-item-outer')
-    if (colorVisible)
-    {    
-        document.body.removeChild(colorContainer)
-        colorVisible = false
-    }
+navBarLightItem.setOnUnselect(()=>{
+    slider.show(false)
+    navBarLightItem.setImage('./assets/light-icon-orange.png')
+    navBarLightItem.setContainerClass('nav-bar-item-outer')
 })
+navBarManager.addItem(navBarLightItem)
 
-let navBarColor = document.getElementById('nav-bar-color')
-navBarColor.addEventListener('click', (e)=>{
-    if (!colorVisible)
-    {    
-        document.body.appendChild(colorContainer)
-        colorVisible = true
-    }
-    navLightBtn.src = './assets/light-icon-orange.png'
-    navRoofBtn.src = './assets/roof-icon-orange.png'
-    navColorBtn.src = './assets/color-icon-gray.png'
-    changeNavButtonClass('nav-bar-item-outer', 'nav-bar-item-outer', 'nav-bar-item-outer-selected')
-    if (sliderVisible)
-    {    
-        document.body.removeChild(sliderContainer)
-        sliderVisible = false
-    }
+let navBarRoofItem = new NavigationBarItem(document.getElementById('nav-bar-roof'), document.getElementById('nav-roof-img'))
+navBarRoofItem.setCustomValue('sliderValue', 0)
+navBarRoofItem.setOnSelect((navBarRoofItem)=>{
+    slider.show(true)
+    slider.setValue(navBarRoofItem.getCustomValue('sliderValue'))
+    slider.setType('slider-roof')
+    navBarRoofItem.setImage('./assets/roof-icon-gray.png')
+    navBarRoofItem.setContainerClass('nav-bar-item-outer-selected')
 })
-
-let modelViewer = document.createElement('model-viewer')
-modelViewer.style = 'width:0%; height:0%'
-modelViewer.ar = true
-modelViewer.arScale = 'fixed'
-modelViewer.src = './assets/LouveredRoof.glb'
-document.body.appendChild(modelViewer)
-
-let arButton = document.getElementById('ar-button')
-arButton.addEventListener('click', (e)=>modelViewer.activateAR()) 
-
-let videoScreen = document.getElementById('video-screen')
-let videoHTML = document.querySelector('video')
-let crossIcon = document.getElementById('cross-icon')
-crossIcon.addEventListener('click', (e)=>{
-    document.body.removeChild(videoScreen)
-    showHotSpot = true
+navBarRoofItem.setOnUnselect(()=>{
+    slider.show(false)
+    navBarRoofItem.setImage('./assets/roof-icon-orange.png')
+    navBarRoofItem.setContainerClass('nav-bar-item-outer')
 })
+navBarManager.addItem(navBarRoofItem)
 
-function changeNavButtonClass(navBarLightClass, navBarRoofClass, navBarColorClass)
-{
-    navBarLight.className = navBarLightClass
-    navBarRoof.className = navBarRoofClass
-    navBarColor.className = navBarColorClass
-}
+let navBarColorItem = new NavigationBarItem(document.getElementById('nav-bar-color'), document.getElementById('nav-color-img'))
+navBarColorItem.setOnSelect((navBarColorItem)=>{
+    colorMenu.show(true)
+    navBarColorItem.setImage('./assets/color-icon-gray.png')
+    navBarColorItem.setContainerClass('nav-bar-item-outer-selected')
+})
+navBarColorItem.setOnUnselect(()=>{
+    colorMenu.show(false)
+    navBarColorItem.setImage('./assets/color-icon-orange.png')
+    navBarColorItem.setContainerClass('nav-bar-item-outer')
+})
+navBarManager.addItem(navBarColorItem)
 
-function changeModelViewerColor(colorInHex)
-{
-    const materials = modelViewer.model.materials
-    for (let material of materials)
-        material.pbrMetallicRoughness.setBaseColorFactor(colorInHex)
-}
+let arViewer = new ARViewer(document.getElementById('ar-button'))
 
-function setupStartupUI()
-{
-    let loadingScreen = document.getElementById('loading-screen')
-    document.body.removeChild(loadingScreen) 
-    document.body.removeChild(colorContainer)
-    document.body.removeChild(videoScreen)
-    changeNavButtonClass('nav-bar-item-outer-selected', 'nav-bar-item-outer', 'nav-bar-item-outer')
-}
-
-let arButtonVisible = true
 window.onresize = () => 
 {
-    if (!queryLoadStatus)
+    if (!loadingScreen.isVisible())
     {
         let isHandHeld = navigator.userAgent.includes('iPad') || navigator.userAgent.includes('iPhone') || navigator.userAgent.includes('Android')
-        if (!arButtonVisible && isHandHeld)
-        {    
-            document.body.appendChild(arButton)
-            arButtonVisible = true
-        }
-        else if (arButtonVisible && !isHandHeld)
-        {    
-            document.body.removeChild(arButton)
-            arButtonVisible = false
-        }
+        arViewer.show(isHandHeld)
     }
-}
+} 
 
 window.onload = () =>
 {    
-    let loadingText = document.getElementById('loading-text')
-    let loadingBar = document.getElementById('loading-bar')
-    let dots = ''
-    let dotCount = 1
-    let status = 0    
     let roofModelStatus = 0
     let sceneModelStatus = 0
     let textureStatus = 100
     let importStatus = 0
-    let colors = ['#FFFFFF', '#555555', '#786D5F', '#D4C59C', '#CD7F32']
-
-    checkLoading()
-    function checkLoading()
-    {
-        if (queryLoadStatus)
-        {
-            status = Math.round(((roofModelStatus + sceneModelStatus + textureStatus + importStatus)/400) * 100)
-            for(let i=0; i<dotCount; i++)
-                dots += '.'
-            dotCount++
-            if (dotCount > 3)
-                dotCount = 1
-            if (status > 99)
-            { 
-                loadingBar.style.width = '100%'
-                loadingText.innerHTML = 'SETTING UP SCENE' + dots
-            }
-            else
-            {
-                dots += '&nbsp&nbsp&nbsp'
-                loadingText.innerHTML = 'LOADING'+ dots +status+'%'
-                loadingBar.style.width = status + '%'
-            }
-            dots = ''
-            setTimeout(checkLoading, 100)
-        }
-    }
-    
+    loadingScreen.show(true)
     let importmanager = new ImportManager()
     importmanager.add('THREE', 'three')
     importmanager.add('MATHS', '../helpers/maths.js')
@@ -179,11 +87,14 @@ window.onload = () =>
     importmanager.add('SCENE','../core/SceneManager.js')
     importmanager.add('MISC','../helpers/misc.js')
     importmanager.add('ACTOR','../core/Actor.js')
-    importmanager.add('VIDEO','../ui/VideoPlayer.js')
     importmanager.add('CAMERA','../camera_managers/OrbitalCameraManager.js')
     importmanager.add('LIGHT','../core/Light.js')
     importmanager.add('INPUT','../core/InputManager.js')
-    importmanager.execute((p, t) => { importStatus= Math.round((p/t) * 100) }, onImportComplete)
+    importmanager.execute((p, t) => 
+    {
+        let stat = Math.round(((roofModelStatus + sceneModelStatus + textureStatus + importStatus)/400) * 100)
+        loadingScreen.update(stat)
+    }, onImportComplete)
 
     function onImportComplete(importMap)
     {
@@ -193,11 +104,7 @@ window.onload = () =>
         let SCENE = importMap.get('SCENE')
         let sceneManager = new SCENE.SceneManager(canvas)
         let MISC = importMap.get('MISC')
-        if (!MISC.MISC.isHandHeldDevice())
-        {    
-            document.body.removeChild(arButton)
-            arButtonVisible = false
-        }
+        arViewer.show(MISC.MISC.isHandHeldDevice())
         let ACTOR = importMap.get('ACTOR')
         new THREE.TextureLoader().load('./assets/envmap.png', (texture)=>{
             let background = new ACTOR.ShapeActor('Background', new THREE.SphereGeometry(100, 256, 16),  new THREE.MeshBasicMaterial( { color: 0xffffff,  map: texture, side: THREE.BackSide }))
@@ -207,32 +114,39 @@ window.onload = () =>
         let sceneGLTF = new ACTOR.MeshActor('Scene', './assets/scene.glb', (xhr)=>{
             let loadStat = Math.round((xhr.loaded/ xhr.total) * 100) 
             if (loadStat < 100)
+            {
                 sceneModelStatus = loadStat
+                let stat = Math.round(((roofModelStatus + sceneModelStatus + textureStatus + importStatus)/400) * 100)
+                loadingScreen.update(stat)
+            }
         }, ()=>{
             sceneModelStatus = 100
             let roofGLTF = new ACTOR.MeshActor('Roof', './assets/eq_animation.glb', (xhr)=>{ 
                 let loadStat = Math.round((xhr.loaded/ xhr.total) * 100) 
                 if (loadStat < 100)
+                {    
                     roofModelStatus = loadStat
+                    let stat = Math.round(((roofModelStatus + sceneModelStatus + textureStatus + importStatus)/400) * 100)
+                    loadingScreen.update(stat)
+                }
             }, ()=>{
                 roofModelStatus = 100
                 let completeStat = Math.round(((roofModelStatus + sceneModelStatus + textureStatus + importStatus)/400) * 100)
-                if (completeStat > 99)
-                    onLoadingComplete(sceneManager, cameraManager, roofGLTF, importMap)
+                loadingScreen.update(completeStat)
+                onLoadingComplete(sceneManager, cameraManager, roofGLTF, importMap)
             })
             roofGLTF.applyColor(MISC.MISC.hexToColor(colors[0]))
             roofGLTF.setPosition(2, -2, -3)
             sceneManager.register(roofGLTF) 
-
             slider.setCallback((d, v, c)=>{
                 if (c == 'slider-light')
                 {    
-                    lightSliderVal = v
+                    navBarLightItem.setCustomValue('sliderValue', v)
                     directLight.orbit(d)
                 }
                 else if (c == 'slider-roof')
                 {
-                    roofSliderVal = v   
+                    navBarRoofItem.setCustomValue('sliderValue', v)
                     roofGLTF.updateAnimationFrame(-(d/180))
                 }
             })
@@ -256,56 +170,27 @@ window.onload = () =>
         let HOTSPOT = importMap.get('HOTSPOT')
         let MATHS = importMap.get('MATHS')
         let THREE = importMap.get('THREE')
-        let VIDEO = importMap.get('VIDEO')
         let MISC = importMap.get('MISC')
-        let videoPlayer = new VIDEO.VideoPlayer('./assets/vid.mp4')
         let hotSpot1 = new HOTSPOT.Hotspot(MATHS.MATHS.addVectors(gltfActor.getPosition(), new THREE.Vector3(-3.55, 2.4, 0.01)))
-        hotSpot1.setRenderCondition(()=>{ return showHotSpot })
-        hotSpot1.setOnClick((e)=>{   
-            document.body.appendChild(videoScreen)
-            videoHTML.play()
-            showHotSpot = false 
-        })
-        hotSpot1.setOnMove(()=>videoPlayer.hide())
+        hotSpot1.setRenderCondition(()=>{ return !videoPlayer.isShowing() })
+        hotSpot1.setOnClick((e)=>videoPlayer.show(true))
         hotSpot1.setOnDblClick(()=>sceneManager.broadcastTo(gltfActor.name, cameraManager.name, hotSpot1.worldPosition))
         let hotSpot2 = new HOTSPOT.Hotspot(MATHS.MATHS.addVectors(gltfActor.getPosition(), new THREE.Vector3(-0.85, 2.4, 0.01)))
-        hotSpot2.setRenderCondition(()=>{ return showHotSpot })
-        hotSpot2.setOnClick((e)=>{
-            document.body.appendChild(videoScreen)
-            videoHTML.play()
-            showHotSpot = false
-        })
-        hotSpot2.setOnMove(()=>videoPlayer.hide())
+        hotSpot2.setRenderCondition(()=>{ return !videoPlayer.isShowing() })
+        hotSpot2.setOnClick((e)=>videoPlayer.show(true))
         hotSpot2.setOnDblClick(()=>sceneManager.broadcastTo(gltfActor.name, cameraManager.name, hotSpot2.worldPosition))
         let hotSpot3 = new HOTSPOT.Hotspot(MATHS.MATHS.addVectors(gltfActor.getPosition(), new THREE.Vector3(-3.25, 2.4, -3.2)))
-        hotSpot3.setRenderCondition(()=>{ return showHotSpot })
-        hotSpot3.setOnClick((e)=>{
-            document.body.appendChild(videoScreen)
-            videoHTML.play()
-            showHotSpot = false
-        })
-        hotSpot3.setOnMove(()=>videoPlayer.hide())
+        hotSpot3.setRenderCondition(()=>{ return !videoPlayer.isShowing() })
+        hotSpot3.setOnClick((e)=>videoPlayer.show(true))
         hotSpot3.setOnDblClick(()=>sceneManager.broadcastTo(gltfActor.name, cameraManager.name, hotSpot3.worldPosition))
         gltfActor.addHotSpots(hotSpot1)
         gltfActor.addHotSpots(hotSpot2)
         gltfActor.addHotSpots(hotSpot3)
-        let colorMenu = document.getElementById('color-menu')
-        for(let i=0; i<colors.length; i++)
-        {
-            let colorItem = document.createElement('div')
-            colorItem.id = 'color-item'+i
-            colorItem.className = 'color-item'
-            colorItem.style.backgroundColor = colors[i]
-            colorItem.onclick = ()=>
-            {
-                let style = window.getComputedStyle(colorItem)
-                let color = MISC.MISC.toColor(style.getPropertyValue('background-color'))
-                gltfActor.applyColor(color)
-                changeModelViewerColor(colors[i])
-            }  
-            colorMenu.appendChild(colorItem)
-        }
-        queryLoadStatus = false
-        setupStartupUI()
+        colorMenu.populateItems(document.getElementById('color-menu'), (color)=>{
+            gltfActor.applyColor(MISC.MISC.hexToColor(color))
+            arViewer.setColor(color)
+        })
+        colorMenu.show(false)
+        loadingScreen.show(false)
     }
 }

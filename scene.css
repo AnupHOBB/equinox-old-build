@@ -420,7 +420,7 @@ canvas
 
 @media screen and (max-aspect-ratio : 1/1) and (max-width : 500px)
 {
-    .slider-light
+    #slider
     {
         width: 80%;
         max-width: 400px;
@@ -435,7 +435,7 @@ canvas
 
 @media screen and (max-aspect-ratio : 1/1) and (min-width : 500px)
 {
-    .slider-light
+    #slider
     {
         width: 60%;
         max-width: 400px;
@@ -450,7 +450,7 @@ canvas
 
 @media screen and (min-aspect-ratio : 1/1)
 {
-    .slider-light
+    #slider
     {
         display: block;
         margin: auto;
@@ -464,7 +464,7 @@ canvas
 
 @media screen and (max-aspect-ratio : 1/1)
 {
-    .slider-light::-webkit-slider-thumb 
+    #slider::-webkit-slider-thumb 
     {
         -webkit-appearance: none;
         appearance: none;
@@ -478,79 +478,7 @@ canvas
 
 @media screen and (min-aspect-ratio : 1/1)
 {
-    .slider-light::-webkit-slider-thumb 
-    {
-        -webkit-appearance: none;
-        appearance: none;
-        width: 23px;
-        height: 24px;
-        border-radius: 50%;
-        background-color: rgb(232, 117, 36);
-        cursor: pointer;
-    }
-}
-
-@media screen and (max-aspect-ratio : 1/1) and (max-width : 500px)
-{
-    .slider-roof
-    {
-        width: 80%;
-        max-width: 400px;
-        display : block; 
-        margin: auto;
-        -webkit-appearance: none;
-        border-radius: 5ch;  
-        background: rgb(221, 221, 221);
-        outline: none;
-    }
-}
-
-@media screen and (max-aspect-ratio : 1/1) and (min-width : 500px)
-{
-    .slider-roof
-    {
-        width: 60%;
-        max-width: 400px;
-        display : block; 
-        margin: auto;
-        -webkit-appearance: none;
-        border-radius: 5ch;  
-        background: rgb(221, 221, 221);
-        outline: none;
-    }
-}
-
-@media screen and (min-aspect-ratio : 1/1)
-{
-    .slider-roof
-    {
-        display: block;
-        margin: auto;
-        width: 30%; 
-        -webkit-appearance: none;
-        border-radius: 5ch;  
-        background: rgb(221, 221, 221);
-        outline: none;
-    }
-}
-
-@media screen and (max-aspect-ratio : 1/1)
-{
-    .slider-roof::-webkit-slider-thumb 
-    {
-        -webkit-appearance: none;
-        appearance: none;
-        width: 23px;
-        height: 24px;
-        border-radius: 50%;
-        background-color: rgb(232, 117, 36);
-        cursor: pointer;
-    }
-}
-
-@media screen and (min-aspect-ratio : 1/1)
-{
-    .slider-roof::-webkit-slider-thumb 
+    #slider::-webkit-slider-thumb 
     {
         -webkit-appearance: none;
         appearance: none;
