@@ -80,6 +80,18 @@ export class DirectLight extends SceneObject
     }
 
     /**
+     * Called by SceneManager when there is a message for this object posted by any other object registered in SceneManager.
+     * @param {SceneManager} sceneManager the SceneManager object
+     * @param {String} senderName name of the object who posted the message
+     * @param {any} data any object sent as part of the message
+     */
+    onMessage(sceneManager, senderName, data) 
+    { 
+        if (senderName == 'Slider')
+            this.orbit(data)
+    }
+
+    /**
      * Called by SceneManager every frame.
      * If enableGizmo is true, then this function will add the gizmo into the scene for display.
      * If enableGizmo is false, then this function will remove the gizmo from the scene.

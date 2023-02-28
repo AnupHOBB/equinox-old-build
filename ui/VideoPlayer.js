@@ -13,14 +13,9 @@ export class VideoPlayer
         this.videoContainerElement = videoContainerElement
         this.videoElement = videoElement
         this.crossIcon = crossIconElement
+        this.crossIcon.onclick = (e) => this.show(false)
         this.isVisible = true
     }
-
-    /**
-     * Sets the callback that will be called when the video player is closed.
-     * @param {Function} onClose callback to be called when the video player is closed 
-     */
-    setOnCloseEvent(onClose) { this.crossIcon.onclick = onClose }
 
     /**
      * Shows or hides slider video player

@@ -115,6 +115,14 @@ export class MeshActor extends SceneObject
     addHotSpots(hotSpot) { this.core.hotspots.push(hotSpot) }
 
     /**
+     * Called by SceneManager when there is a message for this object posted by any other object registered in SceneManager.
+     * @param {SceneManager} sceneManager the SceneManager object
+     * @param {String} senderName name of the object who posted the message
+     * @param {any} data any object sent as part of the message
+     */
+    onMessage(sceneManager, senderName, data) { this.core.onMessage(sceneManager, senderName, data) }
+
+    /**
      * Called by SceneManager as soon as the object gets registered in SceneManager.
      * However, this function only delegates call to MeshActorCore's onSceneRender.
      * @param {SceneManager} sceneManager the SceneManager object
@@ -212,6 +220,22 @@ class MeshActorCore
      * @param {THREE.Color} color threejs color object 
      */
     applyColor(color) { this.meshes.forEach(mesh => mesh.children.forEach(child => child.material.color = color)) }
+
+    /**
+     * Called by SceneManager when there is a message for this object posted by any other object registered in SceneManager.
+     * @param {SceneManager} sceneManager the SceneManager object
+     * @param {String} senderName name of the object who posted the message
+     * @param {any} data any object sent as part of the message
+     */
+    onMessage(sceneManager, senderName, data) 
+    {
+        if (senderName == 'Slider')
+            this.updateAnimationFrame(data)
+        else if (senderName == 'ColorMenu')
+            this.applyColor(data)
+        else if (senderName == 'Hotspot')
+            this.hotspots.push(data)
+    }
 
     /**
      * Called by OrbitalCameraManager every frame.
