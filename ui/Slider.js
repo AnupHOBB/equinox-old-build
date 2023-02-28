@@ -12,7 +12,18 @@ export class Slider
         this.sliderBarContainer = sliderBarContainer
         this.core = new SliderCore(sliderBarElement)
         this.isVisible = true
-     }
+    }
+
+    /**
+     * sets the slider value range
+     * @param {Number} min minimum slider value
+     * @param {Number} max maximum slider value
+     */
+    setRange(min, max)
+    {
+        this.core.sliderBarElement.min = min
+        this.core.sliderBarElement.max = max
+    }
 
     /**
      * sets the slider value
@@ -67,7 +78,7 @@ class SliderCore
         this.sliderBarElement = sliderBarElement
         this.sliderBarElement.addEventListener('input', ()=>this.onChange())
         this.typeName = ''
-        this.prevSliderValue = 0
+        this.prevSliderValue = sliderBarElement.value
         this.onChangeCallback = (d,v,c)=>{}
     }
 

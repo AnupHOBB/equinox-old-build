@@ -25,7 +25,6 @@ export class VideoPlayer
         if (show && !this.isVisible)
         {
             document.body.append(this.videoContainerElement)
-            this.videoElement.play() 
             this.isVisible = true
         }
         else if (!show && this.isVisible)

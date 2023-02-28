@@ -174,6 +174,7 @@ class MeshActorCore
         {
             this.mixer = new THREE.AnimationMixer(model.scene)
             this.mixer.clipAction(clip).play()
+            this.mixer.update(0.6)
         }
         this.hotspots = []
         this.position = new THREE.Vector3()

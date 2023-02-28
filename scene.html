@@ -19,7 +19,7 @@
         <canvas></canvas>
         <img id="ar-button" src="assets/ar-icon.png"/>
         <div id="slider-container">
-            <input id="slider" type="range" min="1" max="359" value="1"/>
+            <input id="slider" type="range" min="0" max="120" value="120"/><!--min="1" max="359"-->
         </div>
         <div id="color-menu-container">
             <div id="color-menu-outer">
@@ -50,7 +50,10 @@
         <div id="video-screen">
             <div id="video-container">
                 <div id="video-container-outer">
-                    <video src="assets/vid.mp4" muted autoplay loop></video>
+                    <video controls>
+                        <source src="assets/vid.mp4" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
                     <div id="cross-icon-container">
                         <img id="cross-icon" src="assets/cross.png"/>
                     </div>

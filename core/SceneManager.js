@@ -109,7 +109,7 @@ class SceneCore
      */
     constructor(canvas, sceneManager)
     {
-        this.renderer = new THREE.WebGLRenderer({canvas, alpha:true, antialias:true})
+        this.renderer = new THREE.WebGLRenderer({canvas, antialias:true})
         this.renderer.shadowMap.enabled = true
         this.renderer.shadowMap.type = THREE.PCFSoftShadowMap
         this.scene = new THREE.Scene()

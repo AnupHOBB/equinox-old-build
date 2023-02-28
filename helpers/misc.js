@@ -1,4 +1,5 @@
 import { Color } from 'three'
+import { Vector3 } from 'three'
 
 export const MISC = 
 {
@@ -38,5 +39,12 @@ export const MISC =
      * Checks if the app is running on handheld device or not.
      * @returns {Boolean} true if app is runnign on handheld device, false if otherwise
      */
-    isHandHeldDevice : function() { return navigator.userAgent.includes('iPad') || navigator.userAgent.includes('iPhone') || navigator.userAgent.includes('Android') }
+    isHandHeldDevice : function() { return navigator.userAgent.includes('iPad') || navigator.userAgent.includes('iPhone') || navigator.userAgent.includes('Android') },
+
+    /**
+     * Converts vector in json format to threejs vector object
+     * @param {any} vectorJson vector in json format
+     * @returns {THREE.Vector3} threejs vector object
+     */    
+    toThreeJSVector : function(vectorJson) { return new Vector3(vectorJson.x, vectorJson.y, vectorJson.z) }
 }

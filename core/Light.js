@@ -1,5 +1,7 @@
 import * as THREE from 'three'
 import { SceneObject } from '../core/SceneManager.js'
+import { MATHS } from '../helpers/maths.js'
+import { MISC } from '../helpers/misc.js'
 import { OrbitControl } from './OrbitControl.js'
 
 /**
@@ -61,6 +63,7 @@ export class DirectLight extends SceneObject
         this.mesh.position.set(position.x, position.y, position.z)
         this.lightOrbiter = new OrbitControl(this.light, lookAt)
         this.meshOrbiter = new OrbitControl(this.mesh, lookAt)
+        this.lookAt = lookAt
     }
 
     /**
@@ -80,6 +83,19 @@ export class DirectLight extends SceneObject
     }
 
     /**
+     * Moves the light from east to west
+     * @param {Number} speed float value used for controlling the movement speed.
+     */
+    moveEastToWest(speed)
+    {
+        let vRoofToLight = MISC.toThreeJSVector(MATHS.subtractVectors(this.light.position, this.lookAt))
+        vRoofToLight.applyAxisAngle(new THREE.Vector3(0, 0, 1), MATHS.toRadians(speed))
+        let newPosition = MATHS.addVectors(this.lookAt, vRoofToLight)
+        this.light.position.set(newPosition.x, newPosition.y, newPosition.z)
+        this.mesh.position.set(newPosition.x, newPosition.y, newPosition.z)
+    }
+
+    /**
      * Called by SceneManager when there is a message for this object posted by any other object registered in SceneManager.
      * @param {SceneManager} sceneManager the SceneManager object
      * @param {String} senderName name of the object who posted the message
@@ -88,7 +104,7 @@ export class DirectLight extends SceneObject
     onMessage(sceneManager, senderName, data) 
     { 
         if (senderName == 'Slider')
-            this.orbit(data)
+            this.moveEastToWest(data)
     }
 
     /**
