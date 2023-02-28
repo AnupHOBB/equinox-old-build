@@ -1,5 +1,4 @@
 import * as THREE from 'three'
-import { GLTFLoader } from 'gltf-loader'
 import { SceneManager, SceneObject } from '../core/SceneManager.js'
 import { Hotspot } from './HotSpot.js'
 
@@ -62,15 +61,13 @@ export class MeshActor extends SceneObject
 {
     /**
      * @param {String} name name of the object which is used in sending or receiving message
-     * @param {String} url url of the 3D model
-     * @param {Function} onProgress callback for notifying model loading status
-     * @param {Function} onLoad callback for notifying that the model is loaded
+     * @param {any} model 3D model data
      */
-    constructor(name, url, onProgress, onLoad) 
+    constructor(name, model) 
     {
         super()
         this.name = name 
-        this.core = new MeshActorCore(url, onProgress, onLoad)
+        this.core = new MeshActorCore(model)
     }
 
     /**
@@ -128,7 +125,7 @@ export class MeshActor extends SceneObject
      * Used for notifying the SceneManager if this object is ready to be included in scene.
      * @returns {Boolean} ready status of object
      */
-    isReady() { return this.core.ready }
+    isReady() { return true }
 
     /**
      * Returns the list of drawable threejs meshes
@@ -149,23 +146,31 @@ export class MeshActor extends SceneObject
 class MeshActorCore
 {
     /**
-     * @param {String} url url of the 3D model
-     * @param {Function} onProgress callback for notifying model loading status
-     * @param {Function} onLoad callback for notifying that the model is loaded
+     * @param {any} model 3D model data
      */
-    constructor(url, onProgress, onLoad)
+    constructor(model)
     {
-        new GLTFLoader().load(url, (model)=>this.onModelLoad(model), onProgress)
         this.meshes = []
-        this.texture = null
-        this.color = new THREE.Color(1, 1, 1)
+        model.scene.children.forEach(mesh=>this.meshes.push(mesh))
+        this.meshes.forEach(mesh => {
+            mesh.children.forEach(child => {
+                child.material.shadowSide = THREE.BackSide
+                child.material.metalness = 0
+                child.receiveShadow = true
+                child.castShadow = true
+            })
+        })
+        const clip = model.animations[0]
+        this.mixer = null
+        if (clip != null && clip != undefined)
+        {
+            this.mixer = new THREE.AnimationMixer(model.scene)
+            this.mixer.clipAction(clip).play()
+        }
         this.hotspots = []
-        this.ready = false
         this.position = new THREE.Vector3()
         this.roofBound = new THREE.Mesh(new THREE.BoxGeometry(4.75, 0.5, 3.3), new THREE.MeshBasicMaterial({ transparent: true, opacity: 0 }))
         this.roofBound.position.set(-0.1, 0.5, -4.65)
-        this.mixer = null
-        this.onLoad = onLoad
     }
 
     /**
@@ -189,49 +194,24 @@ class MeshActorCore
         this.position.x = x
         this.position.y = y
         this.position.z = z
-        if (this.ready)
-        {
-            this.meshes.forEach(mesh => {
-                mesh.position.x += this.position.x
-                mesh.position.y += this.position.y
-                mesh.position.z += this.position.z
-            })
-        }
+        this.meshes.forEach(mesh => {
+            mesh.position.x += this.position.x
+            mesh.position.y += this.position.y
+            mesh.position.z += this.position.z
+        })
     }
 
     /**
      * Applies texture on the floor object.
      * @param {THREE.Texture} texture threejs texture object
      */
-    applyTexture(texture)
-    {
-        this.texture = texture
-        this.changeTexture()
-    }
+    applyTexture(texture) { this.meshes.forEach(mesh => mesh.children.forEach(child => child.material.map = texture)) }
 
     /**
      * Stores the new color that needs to be applied
      * @param {THREE.Color} color threejs color object 
      */
-    applyColor(color) 
-    { 
-        this.color = color
-        this.changeColor() 
-    }
-
-    /**
-     * Chnages the texture of the 3D model
-     */
-    changeTexture()
-    {
-        if (this.texture != null)
-            this.meshes.forEach(mesh => mesh.children.forEach(child => child.material.map = this.texture))
-    }
-
-    /**
-     * Changes the color of the 3D model
-     */
-    changeColor() { this.meshes.forEach(mesh => mesh.children.forEach(child => child.material.color = this.color )) }
+    applyColor(color) { this.meshes.forEach(mesh => mesh.children.forEach(child => child.material.color = color)) }
 
     /**
      * Called by OrbitalCameraManager every frame.
@@ -266,37 +246,5 @@ class MeshActorCore
         drawables.push({object: this.roofBound, isRayCastable: true}) 
         this.meshes.forEach(mesh => drawables.push({object: mesh, isRayCastable: false}) )
         return drawables
-    }
-
-    /**
-     * Callback function that is called when the GLTFLoader finishes loading the 3D model
-     * @param {any} model GLTF 3D model taht is loaded
-     */
-    onModelLoad(model)
-    {
-        model.scene.children.forEach(mesh=>this.meshes.push(mesh))
-        this.meshes.forEach(mesh => {
-            mesh.children.forEach(child => {
-                child.material.shadowSide = THREE.BackSide
-                child.material.metalness = 0
-                child.receiveShadow = true
-                child.castShadow = true
-            })
-        })
-        this.meshes.forEach(mesh => {
-            mesh.position.x += this.position.x
-            mesh.position.y += this.position.y
-            mesh.position.z += this.position.z
-        })
-        const clip = model.animations[0]
-        if (clip != null && clip != undefined)
-        {
-            this.mixer = new THREE.AnimationMixer(model.scene)
-            this.mixer.clipAction(clip).play()
-        }
-        this.changeTexture()
-        this.changeColor()
-        this.ready = true
-        this.onLoad()
     }
 }

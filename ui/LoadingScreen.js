@@ -24,7 +24,6 @@ export class LoadingScreen
     { 
         if ((show && !this.core.isVisible) || (!show && this.core.isVisible))
         {
-            this.core.showLoading = show 
             this.core.isVisible = show
             if (show)
             {
@@ -61,7 +60,6 @@ class LoadingScreenCore
         this.dots = ''
         this.dotCount = 1
         this.isVisible = true
-        this.showLoading = true
         this.status = 0
         this.update()
     }
@@ -88,7 +86,7 @@ class LoadingScreenCore
             this.loadingBar.style.width = this.status + '%'
         }
         this.dots = ''
-        if (this.showLoading)
+        if (this.isVisible)
             setTimeout(()=>this.update(), 100)
     }
 }

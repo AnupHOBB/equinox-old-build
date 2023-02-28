@@ -13,6 +13,7 @@ export class ARViewer
         this.modelViewer.ar = true
         this.modelViewer.arScale = 'fixed'
         this.modelViewer.src = './assets/LouveredRoof.glb'
+        document.body.appendChild(this.modelViewer)
         this.arButtonElement = arButtonElement
         this.arButtonElement.addEventListener('click', (e)=>modelViewer.activateAR()) 
         this.isVisible = true
