@@ -1,5 +1,29 @@
 body { overflow: hidden; }
 
+@media screen and (max-aspect-ratio: 1/1)
+{
+    #back-button
+    {
+        position: absolute;
+        top: 1%;
+        left: 2.5%;
+        width: auto;
+        height: 5%;
+    }
+}
+
+@media screen and (min-aspect-ratio: 1/1)
+{
+    #back-button
+    {
+        position: absolute;
+        top: 2.5%;
+        left: 1%;
+        width: 5%;
+        height: auto;
+    }
+}
+
 @media screen and (max-aspect-ratio: 1/1) and (max-width: 600px)
 {
     #logo-container
@@ -201,8 +225,8 @@ canvas
     #ar-button
     {
         position: absolute;
-        top: 3%;
-        right: 5%;
+        top: 1%;
+        right: 2.5%;
         width: auto;
         height: 5%;
         border-radius: 1ch;
@@ -214,8 +238,8 @@ canvas
     #ar-button
     {
         position: absolute;
-        top: 3%;
-        right: 5%;
+        top: 2.5%;
+        right: 1%;
         width: 5%;
         height: auto;
         border-radius: 1ch;
