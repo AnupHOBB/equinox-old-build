@@ -12,12 +12,28 @@
                 }
             }
         </script>
+        <script>
+            window.onload = ()=>{
+                const queryString = window.location.search
+                if (queryString != undefined)
+                {
+                    const urlParams = new URLSearchParams(queryString)
+                    const type = urlParams.get('type')
+                    if (type != undefined)  
+                        document.getElementById('back-button').addEventListener('click', ()=>window.location.replace('option.html?type='+type))
+                    else  
+                        document.getElementById('back-button').addEventListener('click', ()=>window.location.replace('option.html'))
+                }
+                else
+                    document.getElementById('back-button').addEventListener('click', ()=>window.location.replace('option.html'))
+            }
+        </script>
         <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
         <script type="module" src="scene.js"></script>
     </head>
     <body>
         <canvas></canvas>
-        <img id="back-button" src="assets/back-button.png" onclick="location.href= 'index.html'"/>
+        <img id="back-button" src="assets/back-button.png"/>
         <img id="ar-button" src="assets/ar-icon.png"/>
         <div id="slider-container">
             <input id="slider" type="range" min="0" max="120" value="120"/>
@@ -62,9 +78,9 @@
             </div>
         </div>
         <div id="loading-screen">
-            <div id="logo-container">
+<!--             <div id="logo-container">
                 <img id="logo" src="assets/logo.png"/>
-            </div>
+            </div> -->
             <div id="loading-bar-container">
                 <div id="loading-bar-outer">
                     <div id="loading-bar"></div>

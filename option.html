@@ -1,0 +1,230 @@
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, user-scalable=no">
+        <style>
+            @media screen and (max-aspect-ratio : 1/1)
+            {
+                #container
+                {
+                    position: absolute;
+                    top: 0%;
+                    left: 0%;
+                    width: 100%;
+                    height: 100%;
+                }
+            }
+
+            @media screen and (min-aspect-ratio : 1/1)
+            {
+                #container
+                {
+                    position: absolute;
+                    top: 0%;
+                    left: 0%;
+                    width: 100%;
+                    height: 100%;
+                }
+            }
+
+            @media screen and (max-aspect-ratio: 1/1)
+            {
+                #back-button
+                {
+                    position: absolute;
+                    top: 1%;
+                    left: 2.5%;
+                    width: auto;
+                    background-color: white;
+                    border-radius: 1ch;
+                    height: 4%;
+                    padding: 1%;
+                }
+            }
+
+            @media screen and (min-aspect-ratio: 1/1)
+            {
+                #back-button
+                {
+                    position: absolute;
+                    top: 2.5%;
+                    left: 1%;
+                    width: 3%;
+                    background-color: white;
+                    border-radius: 1ch;
+                    height: auto;
+                    padding: 1%;
+                }
+            }
+
+            @media screen and (max-aspect-ratio : 1/1)
+            {
+                #list-container
+                {
+                    display:block; 
+                    margin: auto;
+                    width: 100%;
+                }
+            }
+
+            @media screen and (min-aspect-ratio : 1/1)
+            {
+                #list-container
+                {
+                    display:block; 
+                    margin: auto;
+                    width: 100%;
+                }
+            }
+
+            @media screen and (max-aspect-ratio : 1/1)
+            {
+                #tile-container-item-1
+                {
+                    height: 50%;
+                    background-image: url("./assets/commercial.jpg");
+                    background-size: cover;
+                }
+            }
+
+            @media screen and (min-aspect-ratio : 1/1)
+            {
+                #tile-container-item-1
+                {
+                    height: 50%;
+                    background-image: url("./assets/commercial-wide.jpg");
+                    background-size: cover;
+                }
+            }
+
+            @media screen and (max-aspect-ratio : 1/1)
+            {
+                #tile-container-item-2
+                {
+                    height: 50%;
+                    background-image: url("./assets/commercial-2.jpg");
+                    background-size: cover;
+                }
+            }
+
+            @media screen and (min-aspect-ratio : 1/1)
+            {
+                #tile-container-item-2
+                {
+                    height: 50%;
+                    background-image: url("./assets/commercial-2-wide.jpg");
+                    background-size: cover;
+                }
+            }
+
+            #label-container
+            {
+                position: relative;
+                top: 47.5%;
+            }
+
+            @media screen and (max-aspect-ratio : 1/1)
+            {
+                p
+                {
+                    display: block;
+                    margin: auto;
+                    padding-top: 1px;
+                    color: black;
+                    width: 15vh;
+                    font-family: 'Trade Gothic LT Std', sans-serif;
+                    font-size: 2vh;
+                    text-align: center;
+                    border-radius: 5ch;
+                    background-color: rgba(220, 220, 220, 0.7);
+                }
+            }
+
+            @media screen and (min-aspect-ratio : 1/1)
+            {
+                p
+                {
+                    display: block;
+                    margin: auto;
+                    color: black;
+                    width: 10vw;
+                    text-align: center;
+                    font-family: 'Trade Gothic LT Std', sans-serif;
+                    font-size: 1.5vw;
+                    border-radius: 5ch;
+                    background-color: rgba(220, 220, 220, 0.7);
+                }
+            }
+        </style>
+        <script>
+            function aspectRatio() { return window.innerWidth/window.innerHeight }
+            const queryString = window.location.search
+            let type
+            if (queryString != undefined)
+            {
+                const urlParams = new URLSearchParams(queryString)
+                type = urlParams.get('type')
+            }
+
+            window.onload = ()=>{
+                if (type != undefined)
+                {
+                    const tile1 = document.getElementById('tile-container-item-1')
+                    const tile2 = document.getElementById('tile-container-item-2')
+                    if (type == 'c' || type == 'c1' || type == 'c2')
+                    {
+                        tile1.style.backgroundImage = (aspectRatio() < 1)? 'url("./assets/commercial.jpg")':'url("./assets/commercial-wide.jpg")'
+                        tile1.addEventListener('click', ()=>window.location.replace('scene.html?type=c1'))
+                        tile2.style.backgroundImage = (aspectRatio() < 1)? 'url("./assets/commercial-2.jpg")': 'url("./assets/commercial-2-wide.jpg")'
+                        tile2.addEventListener('click', ()=>window.location.replace('scene.html?type=c2'))
+                    }
+                    else if (type == 'r' || type == 'r1' || type == 'r2')
+                    {
+                        tile1.style.backgroundImage = (aspectRatio() < 1)? 'url("./assets/residential.jpg")' : 'url("./assets/residential-wide.jpg")'
+                        tile1.addEventListener('click', ()=>window.location.replace('scene.html?type=r1'))
+                        tile2.style.backgroundImage = (aspectRatio() < 1)? 'url("./assets/residential-2.jpg")' : 'url("./assets/residential-2-wide.png")'
+                        tile2.addEventListener('click', ()=>window.location.replace('scene.html?type=r2'))
+                    }
+                }
+            }
+
+            window.onresize = ()=>{
+                if (type != undefined)
+                {
+                    const tile1 = document.getElementById('tile-container-item-1')
+                    const tile2 = document.getElementById('tile-container-item-2')
+                    if (type == 'c' || type == 'c1' || type == 'c2')
+                    {
+                        tile1.style.backgroundImage = (aspectRatio() < 1)? 'url("./assets/commercial.jpg")':'url("./assets/commercial-wide.jpg")'
+                        tile1.addEventListener('click', ()=>window.location.replace('scene.html?type=c1'))
+                        tile2.style.backgroundImage = (aspectRatio() < 1)? 'url("./assets/commercial-2.jpg")': 'url("./assets/commercial-2-wide.jpg")'
+                        tile2.addEventListener('click', ()=>window.location.replace('scene.html?type=c2'))
+                    }
+                    else if (type == 'r' || type == 'r1' || type == 'r2')
+                    {
+                        tile1.style.backgroundImage = (aspectRatio() < 1)? 'url("./assets/residential.jpg")' : 'url("./assets/residential-wide.jpg")'
+                        tile1.addEventListener('click', ()=>window.location.replace('scene.html?type=r1'))
+                        tile2.style.backgroundImage = (aspectRatio() < 1)? 'url("./assets/residential-2.jpg")' : 'url("./assets/residential-2-wide.png")'
+                        tile2.addEventListener('click', ()=>window.location.replace('scene.html?type=r2'))
+                    }
+                }
+            }
+        </script>
+    </head>
+    <body style='background-image: linear-gradient(to right, #192882, #2B69AC, #192882);''>
+        <div id="container">
+            <img id="back-button" src="assets/back-button.png" onclick="location.href= 'index.html'"/>
+            <div id="list-container">
+                <div id="tile-container-item-1" class="list-item" onclick="location.href= 'scene.html?type=c1'">
+                    <div id="label-container">
+                        <p>TYPE-I</p>
+                    </div>
+                </div>
+                <div id="tile-container-item-2" class="list-item" onclick="location.href= 'scene.html?type=c2'">
+                    <div id="label-container">
+                        <p>TYPE-II</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
