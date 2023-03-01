@@ -133,9 +133,8 @@ function addUIObjects(sceneManager)
 
     let AR = importMap.get('AR')
     let arViewer = new AR.ARViewer(document.getElementById('ar-button'))
-    arViewer.show(MISC.MISC.isHandHeldDevice() && !loadingScreen.isVisible())
     document.body.onresize = ()=>{arViewer.show(importMap.get('MISC').MISC.isHandHeldDevice() && !loadingScreen.isVisible())}
-    
+
     let VIDEO = importMap.get('VIDEO')
     let videoPlayer = new VIDEO.VideoPlayer(document.getElementById('video-screen'), document.querySelector('video'), document.getElementById('cross-icon'))
     videoPlayer.show(false)
@@ -160,4 +159,5 @@ function addUIObjects(sceneManager)
     sceneManager.broadcastTo('Hotspot', 'Roof', hotSpot3)
 
     loadingScreen.show(false)
+    arViewer.show(MISC.MISC.isHandHeldDevice() && !loadingScreen.isVisible())
 }
