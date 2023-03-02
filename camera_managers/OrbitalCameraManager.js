@@ -98,34 +98,8 @@ class OrbitalCameraManagerCore extends PerspectiveCamera
     {
         super(fov)
         this.orbitSpeed = 60
-        this.cameraOrbiterYaw = new OrbitControl(this.camera, lookAt, (newPosition, oldPosition) => { 
-            let yOffset = 4.5
-            let isValid = ((newPosition.y < 1 && newPosition.z >= -5.7) || (newPosition.y >= (-newPosition.z - yOffset)))
-            if (!isValid && (newPosition.z < -5.7 && newPosition.y < 1))
-            {
-                oldPosition.y += 0.1
-                return [true, oldPosition]
-            }
-            if (!isValid && (newPosition.y < (-newPosition.z - yOffset)))
-            {
-                let temp = new THREE.Vector3(newPosition.x, newPosition.y, newPosition.z)
-                temp.y = -newPosition.z - yOffset
-                let correctOrbitRadius = MATHS.length(MATHS.subtractVectors(oldPosition, lookAt))
-                let actualOrbitRadius = MATHS.length(MATHS.subtractVectors(temp, lookAt))
-                if (actualOrbitRadius == correctOrbitRadius) 
-                    return [true, temp]
-                else
-                {
-                    let vRoofToCam = MISC.toThreeJSVector(MATHS.scaleVector(MATHS.normalize(MATHS.subtractVectors(newPosition, lookAt)), 4.99))
-                    vRoofToCam.applyAxisAngle(this.right, MATHS.toRadians(newPosition.y - temp.y))
-                    return [true, MATHS.addVectors(lookAt, vRoofToCam)]
-                }
-            }
-            return [isValid, newPosition]
-        })
-        this.cameraOrbiterPitch = new OrbitControl(this.camera, lookAt, (newPosition) => {
-            return [newPosition.y >= -1.7 && newPosition.y <= 4.9 && (newPosition.z >= -5.7 || (newPosition.z < -5.7 && (newPosition.y >= (-newPosition.z - 4.95)))), newPosition]
-        })
+        this.cameraOrbiterYaw = new OrbitControl(this.camera, lookAt, (newPosition) => { return [newPosition.z >= -5, newPosition] })
+        this.cameraOrbiterPitch = new OrbitControl(this.camera, lookAt, (newPosition) => { return [newPosition.y >= -1.7 && newPosition.y <= 4.7, newPosition] })
         this.zoom = false
         this.isZooming = false
         this.ogPosition = this.camera.position
