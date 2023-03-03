@@ -20,12 +20,18 @@ importMap.set('SLIDER','../ui/Slider.js')
 importMap.set('VIDEO','../ui/VideoPlayer.js')
 importMap.set('LOADER','../core/AssetLoader.js')
 
+/**
+ * Imports all the required modules present within the import map
+ */
 ImportManager.execute(importMap, (name, module, progress) => 
-{
+{//Called after successfully importing each module
     loadingScreen.update(Math.round((progress * 33)/100))
     importMap.set(name, module)
 }, onImport)
 
+/**
+ * Called after successfully importing all modules
+ */
 function onImport()
 {
     let GLTF = importMap.get('GLTF')
@@ -38,6 +44,10 @@ function onImport()
     loader.execute((p)=>loadingScreen.update(Math.round((p * 67)/100) + 33), onLoadComplete)
 }
 
+/**
+ * Called after successfully loading all assets
+ * @param {Map} assetMap map consisting of all the requested assets
+ */
 function onLoadComplete(assetMap)
 {
     let SCENE = importMap.get('SCENE')
@@ -46,6 +56,11 @@ function onLoadComplete(assetMap)
     addUIObjects(sceneManager)
 }
 
+/**
+ * Adds 3D threejs objects into the threejs scene via SceneManager
+ * @param {SceneManager} sceneManager 
+ * @param {Map} assetMap map consisting of all the requested assets
+ */
 function addSceneObjects(sceneManager, assetMap)
 {
     let THREE = importMap.get('THREE')
@@ -72,6 +87,10 @@ function addSceneObjects(sceneManager, assetMap)
     sceneManager.register(roofGLTF) 
 }
 
+/**
+ * Adds HTML UI elements
+ * @param {SceneManager} sceneManager 
+ */
 function addUIObjects(sceneManager)
 {
     let colors = ['#FFFFFF', '#555555', '#786D5F', '#D4C59C', '#CD7F32']
